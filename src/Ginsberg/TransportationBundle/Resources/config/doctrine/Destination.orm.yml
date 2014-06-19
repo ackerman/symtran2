@@ -1,0 +1,24 @@
+Ginsberg\TransportationBundle\Entity\Destination:
+    type: entity
+    table: destination
+    id:
+        id:
+            type: integer
+            generator:
+              strategy: AUTO
+    fields:
+        name:
+            type: string
+            length: 255
+            unique: true
+            nullable: false
+        is_active:
+            type: boolean
+            nullable: true
+    manyToOne:
+        program:
+            targetEntity: Program
+            inversedBy: destinations
+            joinColumn:
+                name: program_id
+                referencedColumnName: id

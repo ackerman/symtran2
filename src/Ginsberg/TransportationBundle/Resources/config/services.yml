@@ -1,0 +1,7 @@
+parameters:
+#    ginsberg_transportation.example.class: Ginsberg\TransportationBundle\Example
+
+services:
+#    ginsberg_transportation.example:
+#        class: %ginsberg_transportation.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]

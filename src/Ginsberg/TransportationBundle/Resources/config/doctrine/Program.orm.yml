@@ -1,0 +1,25 @@
+Ginsberg\TransportationBundle\Entity\Program:
+    type: entity
+    table: program
+    id:
+        id:
+            type: integer
+            generator:
+              strategy: AUTO
+    fields:
+        name:
+            type: string
+            length: 255
+            unique: true
+            nullable: false
+        shortcode:
+            type: integer
+            nullable: false
+        eligibility_group:
+            type: string
+            length: 255
+            nullable: false
+    oneToMany:
+        destinations:
+            targetEntity: Destination
+            mappedBy: program
