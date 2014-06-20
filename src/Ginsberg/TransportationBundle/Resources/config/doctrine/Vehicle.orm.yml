@@ -21,6 +21,7 @@ Ginsberg\TransportationBundle\Entity\Vehicle:
           nullable: true
         is_active:
           type: boolean
+          nullable: true
     oneToMany:
       reservations:
             targetEntity: Reservation
@@ -30,6 +31,6 @@ Ginsberg\TransportationBundle\Entity\Vehicle:
             targetEntity: Program
             inversedBy: vehicles
             joinColumn:
-                name: vehicile_id
+                name: program_id
                 referencedColumnName: id
 

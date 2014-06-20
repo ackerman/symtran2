@@ -13,12 +13,15 @@ Ginsberg\TransportationBundle\Entity\Reservation:
           type: datetime
         out:
           type: datetime
+          nullable: true
         in:
           type: datetime
+          nullable: true
         created:
           type: datetime
         modified:
           type: datetime
+          nullable: true
         seats_required:
           type: smallint
         destination_text:
@@ -64,6 +67,7 @@ Ginsberg\TransportationBundle\Entity\Reservation:
             joinColumn:
                 name: series_id
                 referencedColumnName: id
+                nullable: true
     manyToOne:
       destination:
             targetEntity: Destination
@@ -71,3 +75,4 @@ Ginsberg\TransportationBundle\Entity\Reservation:
             joinColumn:
                 name: destination_id
                 referencedColumnName: id
+                nullable: true

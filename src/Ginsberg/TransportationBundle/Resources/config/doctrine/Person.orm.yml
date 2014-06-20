@@ -10,20 +10,33 @@ Ginsberg\TransportationBundle\Entity\Person:
         first_name:
             type: string
             length: 100
-            nullable: false
         last_name:
             type: string
             length: 100
-            nullable: false
         uniqname:
             type: string
             length: 25
-            nullable: false
         phone:
           type: string
-          length: 15
-        is_active:
+          length: 20
+        status:
+          type: string
+          length: 100
+          nullable: true
+        date_approved:
+          type: datetime
+          nullable: true
+        is_terms_agreed:
           type: boolean
+          nullable: true
+        is_ticket_unpaid:
+          type: boolean
+          nullable: true
+        created:
+          type: datetime
+        modified:
+          type: datatime
+          nullable: true
     oneToMany:
       reservations:
             targetEntity: Reservation
@@ -33,5 +46,5 @@ Ginsberg\TransportationBundle\Entity\Person:
             targetEntity: Program
             inversedBy: persons
             joinColumn:
-                name: person_id
+                name: program_id
                 referencedColumnName: id
