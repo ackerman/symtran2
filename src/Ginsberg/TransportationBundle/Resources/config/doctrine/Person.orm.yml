@@ -35,7 +35,7 @@ Ginsberg\TransportationBundle\Entity\Person:
         created:
           type: datetime
         modified:
-          type: datatime
+          type: datetime
           nullable: true
     oneToMany:
       reservations:

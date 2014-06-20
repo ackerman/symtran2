@@ -7,21 +7,21 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Ginsberg\TransportationBundle\Entity\Program;
-use Ginsberg\TransportationBundle\Form\ProgramType;
+use Ginsberg\TransportationBundle\Entity\Ticket;
+use Ginsberg\TransportationBundle\Form\TicketType;
 
 /**
- * Program controller.
+ * Ticket controller.
  *
- * @Route("/program")
+ * @Route("/ticket")
  */
-class ProgramController extends Controller
+class TicketController extends Controller
 {
 
     /**
-     * Lists all Program entities.
+     * Lists all Ticket entities.
      *
-     * @Route("/", name="program")
+     * @Route("/", name="ticket")
      * @Method("GET")
      * @Template()
      */
@@ -29,22 +29,22 @@ class ProgramController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('GinsbergTransportationBundle:Program')->findAll();
+        $entities = $em->getRepository('GinsbergTransportationBundle:Ticket')->findAll();
 
         return array(
             'entities' => $entities,
         );
     }
     /**
-     * Creates a new Program entity.
+     * Creates a new Ticket entity.
      *
-     * @Route("/", name="program_create")
+     * @Route("/", name="ticket_create")
      * @Method("POST")
-     * @Template("GinsbergTransportationBundle:Program:new.html.twig")
+     * @Template("GinsbergTransportationBundle:Ticket:new.html.twig")
      */
     public function createAction(Request $request)
     {
-        $entity = new Program();
+        $entity = new Ticket();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
@@ -53,7 +53,7 @@ class ProgramController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('program_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('ticket_show', array('id' => $entity->getId())));
         }
 
         return array(
@@ -63,16 +63,16 @@ class ProgramController extends Controller
     }
 
     /**
-    * Creates a form to create a Program entity.
+    * Creates a form to create a Ticket entity.
     *
-    * @param Program $entity The entity
+    * @param Ticket $entity The entity
     *
     * @return \Symfony\Component\Form\Form The form
     */
-    private function createCreateForm(Program $entity)
+    private function createCreateForm(Ticket $entity)
     {
-        $form = $this->createForm(new ProgramType(), $entity, array(
-            'action' => $this->generateUrl('program_create'),
+        $form = $this->createForm(new TicketType(), $entity, array(
+            'action' => $this->generateUrl('ticket_create'),
             'method' => 'POST',
         ));
 
@@ -82,15 +82,15 @@ class ProgramController extends Controller
     }
 
     /**
-     * Displays a form to create a new Program entity.
+     * Displays a form to create a new Ticket entity.
      *
-     * @Route("/new", name="program_new")
+     * @Route("/new", name="ticket_new")
      * @Method("GET")
      * @Template()
      */
     public function newAction()
     {
-        $entity = new Program();
+        $entity = new Ticket();
         $form   = $this->createCreateForm($entity);
 
         return array(
@@ -100,9 +100,9 @@ class ProgramController extends Controller
     }
 
     /**
-     * Finds and displays a Program entity.
+     * Finds and displays a Ticket entity.
      *
-     * @Route("/{id}", name="program_show")
+     * @Route("/{id}", name="ticket_show")
      * @Method("GET")
      * @Template()
      */
@@ -110,10 +110,10 @@ class ProgramController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('GinsbergTransportationBundle:Program')->find($id);
+        $entity = $em->getRepository('GinsbergTransportationBundle:Ticket')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Program entity.');
+            throw $this->createNotFoundException('Unable to find Ticket entity.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
@@ -125,9 +125,9 @@ class ProgramController extends Controller
     }
 
     /**
-     * Displays a form to edit an existing Program entity.
+     * Displays a form to edit an existing Ticket entity.
      *
-     * @Route("/{id}/edit", name="program_edit")
+     * @Route("/{id}/edit", name="ticket_edit")
      * @Method("GET")
      * @Template()
      */
@@ -135,10 +135,10 @@ class ProgramController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('GinsbergTransportationBundle:Program')->find($id);
+        $entity = $em->getRepository('GinsbergTransportationBundle:Ticket')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Program entity.');
+            throw $this->createNotFoundException('Unable to find Ticket entity.');
         }
 
         $editForm = $this->createEditForm($entity);
@@ -152,16 +152,16 @@ class ProgramController extends Controller
     }
 
     /**
-    * Creates a form to edit a Program entity.
+    * Creates a form to edit a Ticket entity.
     *
-    * @param Program $entity The entity
+    * @param Ticket $entity The entity
     *
     * @return \Symfony\Component\Form\Form The form
     */
-    private function createEditForm(Program $entity)
+    private function createEditForm(Ticket $entity)
     {
-        $form = $this->createForm(new ProgramType(), $entity, array(
-            'action' => $this->generateUrl('program_update', array('id' => $entity->getId())),
+        $form = $this->createForm(new TicketType(), $entity, array(
+            'action' => $this->generateUrl('ticket_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));
 
@@ -170,20 +170,20 @@ class ProgramController extends Controller
         return $form;
     }
     /**
-     * Edits an existing Program entity.
+     * Edits an existing Ticket entity.
      *
-     * @Route("/{id}", name="program_update")
+     * @Route("/{id}", name="ticket_update")
      * @Method("PUT")
-     * @Template("GinsbergTransportationBundle:Program:edit.html.twig")
+     * @Template("GinsbergTransportationBundle:Ticket:edit.html.twig")
      */
     public function updateAction(Request $request, $id)
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('GinsbergTransportationBundle:Program')->find($id);
+        $entity = $em->getRepository('GinsbergTransportationBundle:Ticket')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Program entity.');
+            throw $this->createNotFoundException('Unable to find Ticket entity.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
@@ -193,7 +193,7 @@ class ProgramController extends Controller
         if ($editForm->isValid()) {
             $em->flush();
 
-            return $this->redirect($this->generateUrl('program_edit', array('id' => $id)));
+            return $this->redirect($this->generateUrl('ticket_edit', array('id' => $id)));
         }
 
         return array(
@@ -203,9 +203,9 @@ class ProgramController extends Controller
         );
     }
     /**
-     * Deletes a Program entity.
+     * Deletes a Ticket entity.
      *
-     * @Route("/{id}", name="program_delete")
+     * @Route("/{id}", name="ticket_delete")
      * @Method("DELETE")
      */
     public function deleteAction(Request $request, $id)
@@ -215,21 +215,21 @@ class ProgramController extends Controller
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('GinsbergTransportationBundle:Program')->find($id);
+            $entity = $em->getRepository('GinsbergTransportationBundle:Ticket')->find($id);
 
             if (!$entity) {
-                throw $this->createNotFoundException('Unable to find Program entity.');
+                throw $this->createNotFoundException('Unable to find Ticket entity.');
             }
 
             $em->remove($entity);
             $em->flush();
         }
 
-        return $this->redirect($this->generateUrl('program'));
+        return $this->redirect($this->generateUrl('ticket'));
     }
 
     /**
-     * Creates a form to delete a Program entity by id.
+     * Creates a form to delete a Ticket entity by id.
      *
      * @param mixed $id The entity id
      *
@@ -238,7 +238,7 @@ class ProgramController extends Controller
     private function createDeleteForm($id)
     {
         return $this->createFormBuilder()
-            ->setAction($this->generateUrl('program_delete', array('id' => $id)))
+            ->setAction($this->generateUrl('ticket_delete', array('id' => $id)))
             ->setMethod('DELETE')
             ->add('submit', 'submit', array('label' => 'Delete'))
             ->getForm()

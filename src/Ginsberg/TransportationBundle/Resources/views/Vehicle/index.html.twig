@@ -1,13 +1,16 @@
 {% extends '::base.html.twig' %}
 
 {% block body -%}
-    <h1>Destination list</h1>
+    <h1>Vehicle list</h1>
 
     <table class="records_list">
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Name</th>
+                <th>Type</th>
+                <th>Capacity</th>
+                <th>Notes</th>
                 <th>Is_active</th>
                 <th>Actions</th>
             </tr>
@@ -15,16 +18,19 @@
         <tbody>
         {% for entity in entities %}
             <tr>
-                <td><a href="{{ path('destination_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td><a href="{{ path('vehicle_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
                 <td>{{ entity.name }}</td>
+                <td>{{ entity.type }}</td>
+                <td>{{ entity.capacity }}</td>
+                <td>{{ entity.notes }}</td>
                 <td>{{ entity.isactive }}</td>
                 <td>
                 <ul>
                     <li>
-                        <a href="{{ path('destination_show', { 'id': entity.id }) }}">show</a>
+                        <a href="{{ path('vehicle_show', { 'id': entity.id }) }}">show</a>
                     </li>
                     <li>
-                        <a href="{{ path('destination_edit', { 'id': entity.id }) }}">edit</a>
+                        <a href="{{ path('vehicle_edit', { 'id': entity.id }) }}">edit</a>
                     </li>
                 </ul>
                 </td>
@@ -35,7 +41,7 @@
 
         <ul>
         <li>
-            <a href="{{ path('destination_new') }}">
+            <a href="{{ path('vehicle_new') }}">
                 Create a new entry
             </a>
         </li>

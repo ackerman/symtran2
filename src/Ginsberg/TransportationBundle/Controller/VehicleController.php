@@ -7,21 +7,21 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Ginsberg\TransportationBundle\Entity\Program;
-use Ginsberg\TransportationBundle\Form\ProgramType;
+use Ginsberg\TransportationBundle\Entity\Vehicle;
+use Ginsberg\TransportationBundle\Form\VehicleType;
 
 /**
- * Program controller.
+ * Vehicle controller.
  *
- * @Route("/program")
+ * @Route("/vehicle")
  */
-class ProgramController extends Controller
+class VehicleController extends Controller
 {
 
     /**
-     * Lists all Program entities.
+     * Lists all Vehicle entities.
      *
-     * @Route("/", name="program")
+     * @Route("/", name="vehicle")
      * @Method("GET")
      * @Template()
      */
@@ -29,22 +29,22 @@ class ProgramController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('GinsbergTransportationBundle:Program')->findAll();
+        $entities = $em->getRepository('GinsbergTransportationBundle:Vehicle')->findAll();
 
         return array(
             'entities' => $entities,
         );
     }
     /**
-     * Creates a new Program entity.
+     * Creates a new Vehicle entity.
      *
-     * @Route("/", name="program_create")
+     * @Route("/", name="vehicle_create")
      * @Method("POST")
-     * @Template("GinsbergTransportationBundle:Program:new.html.twig")
+     * @Template("GinsbergTransportationBundle:Vehicle:new.html.twig")
      */
     public function createAction(Request $request)
     {
-        $entity = new Program();
+        $entity = new Vehicle();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
@@ -53,7 +53,7 @@ class ProgramController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('program_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('vehicle_show', array('id' => $entity->getId())));
         }
 
         return array(
@@ -63,16 +63,16 @@ class ProgramController extends Controller
     }
 
     /**
-    * Creates a form to create a Program entity.
+    * Creates a form to create a Vehicle entity.
     *
-    * @param Program $entity The entity
+    * @param Vehicle $entity The entity
     *
     * @return \Symfony\Component\Form\Form The form
     */
-    private function createCreateForm(Program $entity)
+    private function createCreateForm(Vehicle $entity)
     {
-        $form = $this->createForm(new ProgramType(), $entity, array(
-            'action' => $this->generateUrl('program_create'),
+        $form = $this->createForm(new VehicleType(), $entity, array(
+            'action' => $this->generateUrl('vehicle_create'),
             'method' => 'POST',
         ));
 
@@ -82,15 +82,15 @@ class ProgramController extends Controller
     }
 
     /**
-     * Displays a form to create a new Program entity.
+     * Displays a form to create a new Vehicle entity.
      *
-     * @Route("/new", name="program_new")
+     * @Route("/new", name="vehicle_new")
      * @Method("GET")
      * @Template()
      */
     public function newAction()
     {
-        $entity = new Program();
+        $entity = new Vehicle();
         $form   = $this->createCreateForm($entity);
 
         return array(
@@ -100,9 +100,9 @@ class ProgramController extends Controller
     }
 
     /**
-     * Finds and displays a Program entity.
+     * Finds and displays a Vehicle entity.
      *
-     * @Route("/{id}", name="program_show")
+     * @Route("/{id}", name="vehicle_show")
      * @Method("GET")
      * @Template()
      */
@@ -110,10 +110,10 @@ class ProgramController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('GinsbergTransportationBundle:Program')->find($id);
+        $entity = $em->getRepository('GinsbergTransportationBundle:Vehicle')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Program entity.');
+            throw $this->createNotFoundException('Unable to find Vehicle entity.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
@@ -125,9 +125,9 @@ class ProgramController extends Controller
     }
 
     /**
-     * Displays a form to edit an existing Program entity.
+     * Displays a form to edit an existing Vehicle entity.
      *
-     * @Route("/{id}/edit", name="program_edit")
+     * @Route("/{id}/edit", name="vehicle_edit")
      * @Method("GET")
      * @Template()
      */
@@ -135,10 +135,10 @@ class ProgramController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('GinsbergTransportationBundle:Program')->find($id);
+        $entity = $em->getRepository('GinsbergTransportationBundle:Vehicle')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Program entity.');
+            throw $this->createNotFoundException('Unable to find Vehicle entity.');
         }
 
         $editForm = $this->createEditForm($entity);
@@ -152,16 +152,16 @@ class ProgramController extends Controller
     }
 
     /**
-    * Creates a form to edit a Program entity.
+    * Creates a form to edit a Vehicle entity.
     *
-    * @param Program $entity The entity
+    * @param Vehicle $entity The entity
     *
     * @return \Symfony\Component\Form\Form The form
     */
-    private function createEditForm(Program $entity)
+    private function createEditForm(Vehicle $entity)
     {
-        $form = $this->createForm(new ProgramType(), $entity, array(
-            'action' => $this->generateUrl('program_update', array('id' => $entity->getId())),
+        $form = $this->createForm(new VehicleType(), $entity, array(
+            'action' => $this->generateUrl('vehicle_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));
 
@@ -170,20 +170,20 @@ class ProgramController extends Controller
         return $form;
     }
     /**
-     * Edits an existing Program entity.
+     * Edits an existing Vehicle entity.
      *
-     * @Route("/{id}", name="program_update")
+     * @Route("/{id}", name="vehicle_update")
      * @Method("PUT")
-     * @Template("GinsbergTransportationBundle:Program:edit.html.twig")
+     * @Template("GinsbergTransportationBundle:Vehicle:edit.html.twig")
      */
     public function updateAction(Request $request, $id)
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('GinsbergTransportationBundle:Program')->find($id);
+        $entity = $em->getRepository('GinsbergTransportationBundle:Vehicle')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Program entity.');
+            throw $this->createNotFoundException('Unable to find Vehicle entity.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
@@ -193,7 +193,7 @@ class ProgramController extends Controller
         if ($editForm->isValid()) {
             $em->flush();
 
-            return $this->redirect($this->generateUrl('program_edit', array('id' => $id)));
+            return $this->redirect($this->generateUrl('vehicle_edit', array('id' => $id)));
         }
 
         return array(
@@ -203,9 +203,9 @@ class ProgramController extends Controller
         );
     }
     /**
-     * Deletes a Program entity.
+     * Deletes a Vehicle entity.
      *
-     * @Route("/{id}", name="program_delete")
+     * @Route("/{id}", name="vehicle_delete")
      * @Method("DELETE")
      */
     public function deleteAction(Request $request, $id)
@@ -215,21 +215,21 @@ class ProgramController extends Controller
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('GinsbergTransportationBundle:Program')->find($id);
+            $entity = $em->getRepository('GinsbergTransportationBundle:Vehicle')->find($id);
 
             if (!$entity) {
-                throw $this->createNotFoundException('Unable to find Program entity.');
+                throw $this->createNotFoundException('Unable to find Vehicle entity.');
             }
 
             $em->remove($entity);
             $em->flush();
         }
 
-        return $this->redirect($this->generateUrl('program'));
+        return $this->redirect($this->generateUrl('vehicle'));
     }
 
     /**
-     * Creates a form to delete a Program entity by id.
+     * Creates a form to delete a Vehicle entity by id.
      *
      * @param mixed $id The entity id
      *
@@ -238,7 +238,7 @@ class ProgramController extends Controller
     private function createDeleteForm($id)
     {
         return $this->createFormBuilder()
-            ->setAction($this->generateUrl('program_delete', array('id' => $id)))
+            ->setAction($this->generateUrl('vehicle_delete', array('id' => $id)))
             ->setMethod('DELETE')
             ->add('submit', 'submit', array('label' => 'Delete'))
             ->getForm()

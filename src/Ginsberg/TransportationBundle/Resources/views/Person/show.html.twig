@@ -1,0 +1,68 @@
+{% extends '::base.html.twig' %}
+
+{% block body -%}
+    <h1>Person</h1>
+
+    <table class="record_properties">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ entity.id }}</td>
+            </tr>
+            <tr>
+                <th>First_name</th>
+                <td>{{ entity.firstname }}</td>
+            </tr>
+            <tr>
+                <th>Last_name</th>
+                <td>{{ entity.lastname }}</td>
+            </tr>
+            <tr>
+                <th>Uniqname</th>
+                <td>{{ entity.uniqname }}</td>
+            </tr>
+            <tr>
+                <th>Phone</th>
+                <td>{{ entity.phone }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>{{ entity.status }}</td>
+            </tr>
+            <tr>
+                <th>Date_approved</th>
+                <td>{{ entity.dateapproved|date('Y-m-d H:i:s') }}</td>
+            </tr>
+            <tr>
+                <th>Is_terms_agreed</th>
+                <td>{{ entity.istermsagreed }}</td>
+            </tr>
+            <tr>
+                <th>Is_ticket_unpaid</th>
+                <td>{{ entity.isticketunpaid }}</td>
+            </tr>
+            <tr>
+                <th>Created</th>
+                <td>{{ entity.created|date('Y-m-d H:i:s') }}</td>
+            </tr>
+            <tr>
+                <th>Modified</th>
+                <td>{{ entity.modified|date('Y-m-d H:i:s') }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+        <ul class="record_actions">
+    <li>
+        <a href="{{ path('person') }}">
+            Back to the list
+        </a>
+    </li>
+    <li>
+        <a href="{{ path('person_edit', { 'id': entity.id }) }}">
+            Edit
+        </a>
+    </li>
+    <li>{{ form(delete_form) }}</li>
+</ul>
+{% endblock %}
