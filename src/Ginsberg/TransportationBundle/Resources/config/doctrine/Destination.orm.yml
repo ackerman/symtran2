@@ -22,3 +22,7 @@ Ginsberg\TransportationBundle\Entity\Destination:
             joinColumn:
                 name: program_id
                 referencedColumnName: id
+    oneToMany:
+        reservations:
+            targetEntity: Reservation
+            mappedBy: destination

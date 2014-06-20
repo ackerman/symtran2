@@ -1,0 +1,31 @@
+Ginsberg\TransportationBundle\Entity\Ticket:
+    type: entity
+    table: ticket
+    id:
+        id:
+            type: integer
+            generator:
+              strategy: AUTO
+    fields:
+        ticket_date:
+          type: datetime
+        reason:
+          type: string
+          length: 255
+        location:
+          type: string
+          length: 255
+        amount:
+          type: decimal
+          scale: 2
+          precision: 6
+        is_paid:
+          type: boolean
+          nullable: true
+    manyToOne:
+      reservation:
+            targetEntity: Reservation
+            inversedBy: tickets
+            joinColumn:
+                name: reservation_id
+                referencedColumnName: id

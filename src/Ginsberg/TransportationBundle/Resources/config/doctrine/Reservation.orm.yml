@@ -1,0 +1,73 @@
+Ginsberg\TransportationBundle\Entity\Reservation:
+    type: entity
+    table: reservation
+    id:
+        id:
+            type: integer
+            generator:
+              strategy: AUTO
+    fields:
+        start:
+          type: datetime
+        end:
+          type: datetime
+        out:
+          type: datetime
+        in:
+          type: datetime
+        created:
+          type: datetime
+        modified:
+          type: datetime
+        seats_required:
+          type: smallint
+        destination_text:
+          type: string
+          length: 100
+          nullable: true
+        notes:
+          type: string
+          length: 255
+          nullable: true
+        is_noshow:
+          type: boolean
+          nullable: true
+    oneToMany:
+      tickets:
+            targetEntity: Ticket
+            mappedBy: reservation
+    manyToOne:
+      person:
+            targetEntity: Person
+            inversedBy: reservations
+            joinColumn:
+                name: person_id
+                referencedColumnName: id
+    manyToOne:
+      program:
+            targetEntity: Program
+            inversedBy: reservations
+            joinColumn:
+                name: program_id
+                referencedColumnName: id
+    manyToOne:
+      vehicle:
+            targetEntity: Vehicle
+            inversedBy: reservations
+            joinColumn:
+                name: vehicle_id
+                referencedColumnName: id
+    manyToOne:
+      series:
+            targetEntity: Series
+            inversedBy: reservations
+            joinColumn:
+                name: series_id
+                referencedColumnName: id
+    manyToOne:
+      destination:
+            targetEntity: Destination
+            inversedBy: reservations
+            joinColumn:
+                name: destination_id
+                referencedColumnName: id

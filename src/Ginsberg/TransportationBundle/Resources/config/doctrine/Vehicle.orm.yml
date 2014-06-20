@@ -1,0 +1,35 @@
+Ginsberg\TransportationBundle\Entity\Vehicle:
+    type: entity
+    table: vehicle
+    id:
+        id:
+            type: integer
+            generator:
+              strategy: AUTO
+    fields:
+        name:
+            type: string
+            length: 100
+        type:
+            type: string
+            length: 100
+        capacity:
+            type: smallint
+        notes:
+          type: string
+          length: 255
+          nullable: true
+        is_active:
+          type: boolean
+    oneToMany:
+      reservations:
+            targetEntity: Reservation
+            mappedBy: vehicle
+    manyToOne:
+      program:
+            targetEntity: Program
+            inversedBy: vehicles
+            joinColumn:
+                name: vehicile_id
+                referencedColumnName: id
+

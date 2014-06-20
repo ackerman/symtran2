@@ -1,0 +1,12 @@
+Ginsberg\TransportationBundle\Entity\Series:
+    type: entity
+    table: series
+    id:
+        id:
+            type: integer
+            generator:
+              strategy: AUTO
+    oneToMany:
+      reservations:
+            targetEntity: Reservation
+            mappedBy: series

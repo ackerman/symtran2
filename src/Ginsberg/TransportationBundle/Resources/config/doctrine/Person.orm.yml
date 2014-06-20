@@ -1,0 +1,37 @@
+Ginsberg\TransportationBundle\Entity\Person:
+    type: entity
+    table: person
+    id:
+        id:
+            type: integer
+            generator:
+              strategy: AUTO
+    fields:
+        first_name:
+            type: string
+            length: 100
+            nullable: false
+        last_name:
+            type: string
+            length: 100
+            nullable: false
+        uniqname:
+            type: string
+            length: 25
+            nullable: false
+        phone:
+          type: string
+          length: 15
+        is_active:
+          type: boolean
+    oneToMany:
+      reservations:
+            targetEntity: Reservation
+            mappedBy: person
+    manyToOne:
+      program:
+            targetEntity: Program
+            inversedBy: persons
+            joinColumn:
+                name: person_id
+                referencedColumnName: id
