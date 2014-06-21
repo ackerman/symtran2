@@ -16,6 +16,7 @@ Ginsberg\TransportationBundle\Entity\Person:
         uniqname:
             type: string
             length: 25
+            unique: true
         phone:
           type: string
           length: 20

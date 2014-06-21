@@ -1,0 +1,19 @@
+{# empty Twig template #}
+{% extends '::base.html.twig' %}
+{% block stylesheets %}
+  {% stylesheets 'bundles/ginsbergtransportation/css/*' filter='cssrewrite' %}
+    <link rel="stylesheet" href="{{ asset_url }}" />
+  {% endstylesheets %}
+{% endblock %}
+{% block nav %}
+  <li class="first" id="nav-people"><a href="{{ path('person') }}">People</a></li>
+  <li class="first" id="nav-reservations"><a href="{{ path('reservation') }}">Reservations</a></li>
+  <li class="first" id="nav-vehicles"><a href="{{ path('vehicle') }}">Vehicles</a></li>
+  <li class="first" id="nav-programs"><a href="{{ path('program') }}">Programs</a></li>
+  <li class="first" id="nav-destinations"><a href="{{ path('destination') }}">Destinations</a></li>
+  <li class="first" id="nav-reports"><a href="">Reports</a></li>
+{% endblock %}
+{% block body %}{% endblock %}
+{% block privacy %}{% endblock %}
+{% block javascripts %}{% endblock %}
+

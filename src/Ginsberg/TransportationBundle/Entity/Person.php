@@ -377,4 +377,19 @@ class Person
     {
         return $this->program;
     }
+    
+    /**
+     * To String
+     * 
+     * @return string First and Last Names
+     */
+    public function __toString() {
+      if ($this->getFirstName() && $this->getLastName()) {
+        return $this->getFirstName() . " " . $this->getLastName();
+      }
+      else 
+      {
+        return "";
+      }
+    }
 }

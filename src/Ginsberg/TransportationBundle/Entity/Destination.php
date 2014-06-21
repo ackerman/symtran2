@@ -155,4 +155,14 @@ class Destination
     {
         return $this->reservations;
     }
+    
+    /**
+     * Return a string identifying the entity
+     * 
+     * @return string The destination name
+     */
+    public function __toString()
+    {
+      return $this->getName() ? $this->getName() : "";
+    }
 }

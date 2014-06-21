@@ -1,0 +1,395 @@
+body {
+	margin: 0;
+	padding: 0;
+	font: normal 10pt Myriad Pro, Arial,Helvetica,sans-serif;
+	background:#eee !important;
+}
+
+#page {
+
+}
+
+header {
+	margin: 0;
+	padding: 0;
+	border-top: 5px solid #67a0b8;
+	background:#eee;
+	padding:15px;
+}
+
+header h1 {
+  width: 60%;
+  float: left;
+  text-align: left;
+}
+
+header h2 {
+  width: 40%;
+  float: right;
+  text-align: right;
+}
+
+.group:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+main {
+  padding: 20px;
+  margin-left:200px;
+  border:1px solid #ddd;
+  background:#fff;
+  margin-right:10px;
+  border-radius:6px;
+
+}
+
+main > h1 {
+  width: 25%;
+  text-align: left;
+}
+
+#logo {
+  text-indent:-9999px;
+  height:35px;
+  background:transparent url('../images/logo.png') no-repeat left top;
+}
+
+#logout {
+  display: inline;
+  float: right;
+  text-align: right;
+}
+
+/* Main Menu ============================================================== */
+
+nav {
+	padding: 20px 20px 20px 0;
+	width:180px;
+	float:left;
+	background:#eee;
+}
+
+nav ul {
+	margin:0px;
+	padding:0;
+}
+
+nav ul li {
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+
+nav ul li a {
+	font-size:14px;
+	text-decoration:none;
+	padding:5px 5px 5px 15px;
+	display:block;
+	border:0px none;
+	background:#fff;
+	padding:20px;
+	border:1px solid #ccc;
+	border-radius:10px;
+	margin-left:10px;
+	box-shadow:inset 0 0 7px #ccc;
+	margin-bottom:10px;
+}
+
+nav ul li a:hover, nav ul li.active a {
+  box-shadow:inset 0 0 7px #1F5A6E;
+  border:1px solid #1F5A6E;
+}
+
+nav .first a {
+  font-size:1.3em;
+}
+
+nav .sep {
+  margin-bottom:1.5em;
+}
+
+nav ul #nav-people a,
+nav ul #nav-reservations a,
+nav ul #nav-programs a,
+nav ul #nav-reports a,
+nav ul #nav-vehicles a,
+nav ul #nav-destinations a,
+nav ul #nav-installation a {
+  padding-left:48px;
+}
+
+nav ul #nav-people a {
+  background:#fff url(../images/icons/people-24.png) no-repeat 15px center;
+}
+
+nav ul #nav-reservations a {
+  background:#fff url(../images/icons/reservation-24.png) no-repeat 15px center;
+}
+
+nav ul #nav-vehicles a {
+  background:#fff url(../images/icons/car-24.png) no-repeat 15px center;
+}
+
+nav ul #nav-programs a {
+  background:#fff url(../images/icons/book-24.png) no-repeat 15px center;
+}
+
+nav ul #nav-reports a {
+  background:#fff url(../images/icons/graph-24.png) no-repeat 15px center;
+}
+
+nav ul #nav-destinations a {
+  background:#fff url(../images/icons/destinations-24.png) no-repeat 15px center;
+}
+
+nav ul #nav-installation a {
+  background:#fff url(../images/icons/power-24.png) no-repeat 15px center;
+}
+
+
+/* Basic Page Formatting ================================================== */
+h2 {
+  margin-bottom:.25em;
+  margin-top:1em;
+}
+
+table {
+
+}
+
+thead th {
+  border-top:2px solid #ddd;
+  border-bottom:1px solid #ddd;
+  background:#eee;
+  padding:10px 12px 6px 12px;
+}
+
+table td {
+  border-bottom:1px solid #ddd;
+  background:#fafafa;
+  padding:12px;
+}
+
+
+dl {
+  width:30em;
+}
+
+dl dt {
+	position: relative;
+	width: 10em;
+	display:inline-block;
+	margin:0 0 .5em 0;
+
+}
+
+dl dd {
+  width:18em;
+  display:inline-block;
+  margin:0 0 .5em 0;
+}
+
+#approval {
+  color:#6a8c1f;
+  border-left:2px solid #ddd;
+  padding-left:38px;
+  margin-left:10px;
+  background:transparent url(../images/icons/yes-24-green.png) no-repeat 10px top;
+}
+
+#approval.not-approved {
+  color:#68000f;
+  background:transparent url(../images/icons/stop-24-red.png) no-repeat 10px top;
+
+}
+
+#approval.pending {
+  color:#fc7d00;
+  background:transparent url(../images/icons/question-24-orange.png) no-repeat 10px top;
+
+}
+
+#tools {
+  margin-bottom:1em;
+}
+
+.button a {
+  display:inline-block;
+  padding:4px 10px 2px 10px;
+  border:1px solid #ccc;
+  box-shadow:inset 0 0 7px #ccc;
+  border-radius:6px;
+}
+
+.button a:hover {
+  border:1px solid #1f5a6e;
+  box-shadow:inset 0 0 7px #1f5a6e;
+}
+
+.edit a {
+  background:#fff url(../images/icons/edit-16-white.png) no-repeat 8px center;
+}
+
+.delete a {
+  background:#fff url(../images/icons/delete-16-white.png) no-repeat 8px center;
+}
+
+.back a {
+  background:#fff;
+  color:#1f5a6e;
+}
+
+.back {
+  display:inline-block;
+  margin-bottom:10px;
+  background:#fff url(../images/icons/back-r.png) no-repeat right center;
+}
+
+.back a {
+  background:#fff url(../images/icons/back-l.png) no-repeat 10px center;
+  height:24px;
+  border:0px none;
+  line-height:24px;
+  padding-left:24px;
+}
+
+.next {
+  float:right;
+}
+.next a {
+  background:#fff url(../images/icons/next-16-blue.png) no-repeat right center;
+  padding-right:25px;
+  color:#1f5a6e;
+  font-weight:normal;
+  border:0px none;
+}
+
+.error {
+	color: #FF0000;
+}
+
+.hide {
+  display: none;
+}
+
+.show {
+  display: block;
+}
+
+.yiiPager li {
+  display:inline;
+  width:20px;
+}
+
+/* Flash Messages ========================================================= */
+
+div.flash-error, div.flash-notice, div.flash-success {
+	padding:.8em;
+	margin-bottom:1em;
+	border:2px solid #ddd;
+}
+
+div.flash-error {
+	background:#FBE3E4;
+	color:#8a1f11;
+	border-color:#FBC2C4;
+}
+
+div.flash-notice {
+	background:#FFF6BF;
+	color:#514721;
+	border-color:#FFD324;
+}
+
+div.flash-success {
+	background:#E6EFC2;
+	color:#264409;
+	border-color:#C6D880;
+}
+
+div.flash-error a {
+	color:#8a1f11;
+}
+
+div.flash-notice a {
+	color:#514721;
+}
+
+div.flash-success a {
+	color:#264409;
+}
+
+div.form .rememberMe label {
+	display: inline;
+}
+
+
+
+/* Misc. Page Formatting ================================================== */
+
+.view {
+	padding: 10px;
+	margin: 10px 0;
+	border: 1px solid #C9E0ED;
+}
+
+.vehicle-view td {
+  border-bottom:0px none;
+  padding-bottom:0;
+}
+
+.breadcrumbs {
+	font-size: 0.9em;
+	padding: 5px 20px;
+}
+
+.breadcrumbs span {
+	font-weight: bold;
+}
+
+.search-form {
+	padding: 10px;
+	margin: 10px 0;
+	background: #eee;
+}
+
+.tickets, .tickets a {
+	font-weight: bold;
+	color: #FF0000 !important;
+}
+
+/* Calendar View of Reservations Formatting ============================== */
+#calendar_container {width: 100%; border: 1px solid gray; overflow-y: hidden; overflow-x: scroll;}
+#calendar_header {overflow: hidden; height: 15px; line-height: 15px; padding: 5px;}
+.calendar_head_item {width: 137px; float: left; text-align: center; font-weight: bold;}
+#calendar_head_time {width: 95px;}
+#calendar_trip_container {overflow: hidden; border-top: 1px solid #aaaaaa; border-right: 1px solid #aaaaaa;}
+.calendar_times_div {float: left; width: 95px; margin-left: 0;}
+div.calendar_time {height: 38px; vertical-align: top; margin:0; padding: 0 5px 0 0; text-align: right; border: none;}
+
+.calendar_time_first { height: 30px !important}
+
+#calendar_vehicle_container {position: relative; float: left;}
+.calendar_line {height: 0px; border-bottom: 1px solid #dddddd; width: 100%; position: absolute; left: 0;}
+
+/* The lines indicating the time of day */
+#calendar_8am {top: 38px; }
+#calendar_9am {top: 76px; }
+#calendar_10am {top: 114px; }
+#calendar_11am {top: 152px; }
+#calendar_12pm {top: 190px; }
+#calendar_1pm {top: 228px; }
+#calendar_2pm {top: 266px; }
+#calendar_3pm {top: 304px; }
+#calendar_4pm {top: 342px; }
+#calendar_5pm {top: 380px; }
+#calendar_6pm {top: 418px; }
+#calendar_7pm {top: 456px; }
+#calendar_8pm {top: 494px; }
+#calendar_9pm {top: 532px; }
+#calendar_10pm {top: 570px; }
+#calendar_11pm {top: 608px; }
+.calendar_vehicle {float: left; width: 120px; height: 646px; border-left: 1px solid #aaaaaa; border-bottom: 1px solid #aaaaaa; border-right: 1px solid #aaaaaa; margin-left: 15px;}
+.calendar_trip {position: absolute; width: 120px; background-color: #cccccc; border: 1px solid #aaaaaa;}

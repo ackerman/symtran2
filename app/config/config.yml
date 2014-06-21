@@ -33,7 +33,7 @@ twig:
 assetic:
     debug:          "%kernel.debug%"
     use_controller: false
-    bundles:        [ ]
+    bundles:        ['GinsbergTransportationBundle']
     #java: /usr/bin/java
     filters:
         cssrewrite: ~
@@ -69,8 +69,8 @@ swiftmailer:
     spool:     { type: memory }
 
 # Stof Doctrine Extension Bundle (provides Timestampable)
-stof_doctrine_extensions:
-  default_locale: en_US
-  orm:
-    other:
-      timestampable: true
+#stof_doctrine_extensions:
+#  default_locale: en_US
+#  orm:
+#    other:
+#      timestampable: true
