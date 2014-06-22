@@ -110,4 +110,59 @@ class Destination
     {
         return $this->program;
     }
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $reservations;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->reservations = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add reservations
+     *
+     * @param \Ginsberg\TransportationBundle\Entity\Reservation $reservations
+     * @return Destination
+     */
+    public function addReservation(\Ginsberg\TransportationBundle\Entity\Reservation $reservations)
+    {
+        $this->reservations[] = $reservations;
+
+        return $this;
+    }
+
+    /**
+     * Remove reservations
+     *
+     * @param \Ginsberg\TransportationBundle\Entity\Reservation $reservations
+     */
+    public function removeReservation(\Ginsberg\TransportationBundle\Entity\Reservation $reservations)
+    {
+        $this->reservations->removeElement($reservations);
+    }
+
+    /**
+     * Get reservations
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getReservations()
+    {
+        return $this->reservations;
+    }
+    
+    /**
+     * Return a string identifying the entity
+     * 
+     * @return string The destination name
+     */
+    public function __toString()
+    {
+      return $this->getName() ? $this->getName() : "";
+    }
 }

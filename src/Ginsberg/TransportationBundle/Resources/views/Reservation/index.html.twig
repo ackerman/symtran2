@@ -1,4 +1,4 @@
-{% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
+{% extends '::base.html.twig' %}
 
 {% block body -%}
     <h1>Reservation list</h1>
@@ -9,8 +9,8 @@
                 <th>Id</th>
                 <th>Start</th>
                 <th>End</th>
-                <th>Out</th>
-                <th>In</th>
+                <th>Out_datetime</th>
+                <th>In_datetime</th>
                 <th>Created</th>
                 <th>Modified</th>
                 <th>Seats_required</th>
@@ -26,8 +26,8 @@
                 <td><a href="{{ path('reservation_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
                 <td>{% if entity.start %}{{ entity.start|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if entity.end %}{{ entity.end|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if entity.out %}{{ entity.out|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if entity.in %}{{ entity.in|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.outdatetime %}{{ entity.outdatetime|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.indatetime %}{{ entity.indatetime|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if entity.created %}{{ entity.created|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if entity.modified %}{{ entity.modified|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{{ entity.seatsrequired }}</td>

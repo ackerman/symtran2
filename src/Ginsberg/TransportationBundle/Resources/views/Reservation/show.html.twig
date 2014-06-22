@@ -1,4 +1,4 @@
-{% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
+{% extends '::base.html.twig' %}
 
 {% block body -%}
     <h1>Reservation</h1>
@@ -18,12 +18,12 @@
                 <td>{{ entity.end|date('Y-m-d H:i:s') }}</td>
             </tr>
             <tr>
-                <th>Out</th>
-                <td>{{ entity.out|date('Y-m-d H:i:s') }}</td>
+                <th>Out_datetime</th>
+                <td>{{ entity.outdatetime|date('Y-m-d H:i:s') }}</td>
             </tr>
             <tr>
-                <th>In</th>
-                <td>{{ entity.in|date('Y-m-d H:i:s') }}</td>
+                <th>In_datetime</th>
+                <td>{{ entity.indatetime|date('Y-m-d H:i:s') }}</td>
             </tr>
             <tr>
                 <th>Created</th>

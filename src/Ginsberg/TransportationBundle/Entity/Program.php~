@@ -44,6 +44,12 @@ class Program
      * @ORM\OneToMany(targetEntity="Destination", mappedBy="program")
      */
     private $destinations;
+    
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     * @ORM\OneToMany(targetEntity="Reservation", mappedBy="program")
+     */
+    private $reservations;
 
     /**
      * Constructor
@@ -51,6 +57,7 @@ class Program
     public function __construct()
     {
         $this->destinations = new ArrayCollection();
+        $this->reservations = new ArrayCollection();
     }
 
     /**

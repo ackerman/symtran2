@@ -44,6 +44,12 @@ class Program
      * @ORM\OneToMany(targetEntity="Destination", mappedBy="program")
      */
     private $destinations;
+    
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     * @ORM\OneToMany(targetEntity="Reservation", mappedBy="program")
+     */
+    private $reservations;
 
     /**
      * Constructor
@@ -51,6 +57,7 @@ class Program
     public function __construct()
     {
         $this->destinations = new ArrayCollection();
+        $this->reservations = new ArrayCollection();
     }
 
     /**
@@ -167,5 +174,114 @@ class Program
     
     public function __toString() {
       return $this->getName();
+    }
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $persons;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $vehicles;
+
+
+    /**
+     * Add persons
+     *
+     * @param \Ginsberg\TransportationBundle\Entity\Person $persons
+     * @return Program
+     */
+    public function addPerson(\Ginsberg\TransportationBundle\Entity\Person $persons)
+    {
+        $this->persons[] = $persons;
+
+        return $this;
+    }
+
+    /**
+     * Remove persons
+     *
+     * @param \Ginsberg\TransportationBundle\Entity\Person $persons
+     */
+    public function removePerson(\Ginsberg\TransportationBundle\Entity\Person $persons)
+    {
+        $this->persons->removeElement($persons);
+    }
+
+    /**
+     * Get persons
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getPersons()
+    {
+        return $this->persons;
+    }
+
+    /**
+     * Add vehicles
+     *
+     * @param \Ginsberg\TransportationBundle\Entity\Vehicle $vehicles
+     * @return Program
+     */
+    public function addVehicle(\Ginsberg\TransportationBundle\Entity\Vehicle $vehicles)
+    {
+        $this->vehicles[] = $vehicles;
+
+        return $this;
+    }
+
+    /**
+     * Remove vehicles
+     *
+     * @param \Ginsberg\TransportationBundle\Entity\Vehicle $vehicles
+     */
+    public function removeVehicle(\Ginsberg\TransportationBundle\Entity\Vehicle $vehicles)
+    {
+        $this->vehicles->removeElement($vehicles);
+    }
+
+    /**
+     * Get vehicles
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getVehicles()
+    {
+        return $this->vehicles;
+    }
+
+    /**
+     * Add reservations
+     *
+     * @param \Ginsberg\TransportationBundle\Entity\Reservation $reservations
+     * @return Program
+     */
+    public function addReservation(\Ginsberg\TransportationBundle\Entity\Reservation $reservations)
+    {
+        $this->reservations[] = $reservations;
+
+        return $this;
+    }
+
+    /**
+     * Remove reservations
+     *
+     * @param \Ginsberg\TransportationBundle\Entity\Reservation $reservations
+     */
+    public function removeReservation(\Ginsberg\TransportationBundle\Entity\Reservation $reservations)
+    {
+        $this->reservations->removeElement($reservations);
+    }
+
+    /**
+     * Get reservations
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getReservations()
+    {
+        return $this->reservations;
     }
 }

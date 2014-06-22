@@ -11,10 +11,10 @@ Ginsberg\TransportationBundle\Entity\Reservation:
           type: datetime
         end:
           type: datetime
-        out:
+        out_datetime:
           type: datetime
           nullable: true
-        in:
+        in_datetime:
           type: datetime
           nullable: true
         created:
@@ -40,27 +40,18 @@ Ginsberg\TransportationBundle\Entity\Reservation:
             targetEntity: Ticket
             mappedBy: reservation
     manyToOne:
-      person:
-            targetEntity: Person
-            inversedBy: reservations
-            joinColumn:
-                name: person_id
-                referencedColumnName: id
-    manyToOne:
       program:
             targetEntity: Program
             inversedBy: reservations
             joinColumn:
                 name: program_id
                 referencedColumnName: id
-    manyToOne:
       vehicle:
             targetEntity: Vehicle
             inversedBy: reservations
             joinColumn:
                 name: vehicle_id
                 referencedColumnName: id
-    manyToOne:
       series:
             targetEntity: Series
             inversedBy: reservations
@@ -68,7 +59,6 @@ Ginsberg\TransportationBundle\Entity\Reservation:
                 name: series_id
                 referencedColumnName: id
                 nullable: true
-    manyToOne:
       destination:
             targetEntity: Destination
             inversedBy: reservations
@@ -76,3 +66,9 @@ Ginsberg\TransportationBundle\Entity\Reservation:
                 name: destination_id
                 referencedColumnName: id
                 nullable: true
+      person:
+            targetEntity: Person
+            inversedBy: reservations
+            joinColumn:
+                name: person_id
+                referencedColumnName: id

@@ -23,15 +23,12 @@ Ginsberg\TransportationBundle\Entity\Program:
         destinations:
             targetEntity: Destination
             mappedBy: program
-    oneToMany:
         persons:
             targetEntity: Person
             mappedBy: program
-    oneToMany:
         vehicles:
             targetEntity: Vehicle
             mappedBy: program
-    oneToMany:
         reservations:
             targetEntity: Reservation
             mappedBy: program

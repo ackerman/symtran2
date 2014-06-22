@@ -73,6 +73,13 @@ class Reservation
      * @var \Ginsberg\TransportationBundle\Entity\Person
      */
     private $person;
+    
+    /**
+     * @var \Ginsberg\TransportationBundle\Entity\Program
+     * @ORM\ManyToOne(targetEntity="Program", inversedBy="reservations")
+     * @ORM\JoinColumn(name="program_id", referenceColumnName="id")
+     */
+    private $program;
 
     /**
      * Constructor
@@ -376,5 +383,168 @@ class Reservation
     public function getPerson()
     {
         return $this->person;
+    }
+    /**
+     * @var \DateTime
+     */
+    private $out_datetime;
+
+    /**
+     * @var \DateTime
+     */
+    private $in_datetime;
+
+
+    /**
+     * Set out_datetime
+     *
+     * @param \DateTime $outDatetime
+     * @return Reservation
+     */
+    public function setOutDatetime($outDatetime)
+    {
+        $this->out_datetime = $outDatetime;
+
+        return $this;
+    }
+
+    /**
+     * Get out_datetime
+     *
+     * @return \DateTime 
+     */
+    public function getOutDatetime()
+    {
+        return $this->out_datetime;
+    }
+
+    /**
+     * Set in_datetime
+     *
+     * @param \DateTime $inDatetime
+     * @return Reservation
+     */
+    public function setInDatetime($inDatetime)
+    {
+        $this->in_datetime = $inDatetime;
+
+        return $this;
+    }
+
+    /**
+     * Get in_datetime
+     *
+     * @return \DateTime 
+     */
+    public function getInDatetime()
+    {
+        return $this->in_datetime;
+    }
+
+    /**
+     * Set program
+     *
+     * @param \Ginsberg\TransportationBundle\Entity\Program $program
+     * @return Reservation
+     */
+    public function setProgram(\Ginsberg\TransportationBundle\Entity\Program $program = null)
+    {
+        $this->program = $program;
+
+        return $this;
+    }
+
+    /**
+     * Get program
+     *
+     * @return \Ginsberg\TransportationBundle\Entity\Program 
+     */
+    public function getProgram()
+    {
+        return $this->program;
+    }
+    /**
+     * @var \Ginsberg\TransportationBundle\Entity\Vehicle
+     */
+    private $vehicle;
+
+
+    /**
+     * Set vehicle
+     *
+     * @param \Ginsberg\TransportationBundle\Entity\Vehicle $vehicle
+     * @return Reservation
+     */
+    public function setVehicle(\Ginsberg\TransportationBundle\Entity\Vehicle $vehicle = null)
+    {
+        $this->vehicle = $vehicle;
+
+        return $this;
+    }
+
+    /**
+     * Get vehicle
+     *
+     * @return \Ginsberg\TransportationBundle\Entity\Vehicle 
+     */
+    public function getVehicle()
+    {
+        return $this->vehicle;
+    }
+    /**
+     * @var \Ginsberg\TransportationBundle\Entity\Series
+     */
+    private $series;
+
+    /**
+     * @var \Ginsberg\TransportationBundle\Entity\Destination
+     */
+    private $destination;
+
+
+    /**
+     * Set series
+     *
+     * @param \Ginsberg\TransportationBundle\Entity\Series $series
+     * @return Reservation
+     */
+    public function setSeries(\Ginsberg\TransportationBundle\Entity\Series $series = null)
+    {
+        $this->series = $series;
+
+        return $this;
+    }
+
+    /**
+     * Get series
+     *
+     * @return \Ginsberg\TransportationBundle\Entity\Series 
+     */
+    public function getSeries()
+    {
+        return $this->series;
+    }
+
+    /**
+     * Set destination
+     *
+     * @param \Ginsberg\TransportationBundle\Entity\Destination $destination
+     * @return Reservation
+     */
+    public function setDestination(\Ginsberg\TransportationBundle\Entity\Destination $destination = null)
+    {
+        $this->destination = $destination;
+
+        return $this;
+    }
+
+    /**
+     * Get destination
+     *
+     * @return \Ginsberg\TransportationBundle\Entity\Destination 
+     */
+    public function getDestination()
+    {
+        return $this->destination;
     }
 }
