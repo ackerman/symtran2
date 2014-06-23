@@ -272,4 +272,13 @@ class Program
     {
         return $this->reservations;
     }
+    
+    /**
+     * To string
+     * 
+     * @return string The Program name
+     */
+    public function __toString() {
+      return $this->getName();
+    }
 }

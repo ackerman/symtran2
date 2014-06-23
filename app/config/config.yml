@@ -1,6 +1,7 @@
 imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
+    - { resource: doctrine_extensions.yml }
 
 framework:
     #esi:             ~
@@ -72,5 +73,7 @@ swiftmailer:
 #stof_doctrine_extensions:
 #  default_locale: en_US
 #  orm:
+#    default:
+#      timestampable: false
 #    other:
 #      timestampable: true

@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Reservation
  * 
  * @ORM\Entity(repositoryClass="Ginsberg\TransportationBundle\Entity\ReservationRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Reservation
 {
@@ -198,10 +199,11 @@ class Reservation
      *
      * @param \DateTime $created
      * @return Reservation
+     * @ORM\PrePersist
      */
-    public function setCreated($created)
+    public function setCreated()
     {
-        $this->created = $created;
+        $this->created = date('Y-m-d H:i:s');
 
         return $this;
     }
@@ -221,10 +223,11 @@ class Reservation
      *
      * @param \DateTime $modified
      * @return Reservation
+     * @ORM\PreUpdate
      */
-    public function setModified($modified)
+    public function setModified()
     {
-        $this->modified = $modified;
+        $this->modified = date('Y-m-d H:i:s');
 
         return $this;
     }

@@ -3,7 +3,14 @@
 {% block body -%}
     <h1>Person edit</h1>
 
-    {{ form(edit_form) }}
+    {{ form_row(form.first_name) }}
+    {{ form_row(form.last_name) }}
+    {{ form_row(form.uniqname) }}
+    {{ form_row(form.phone) }}
+    {{ form_row(form.status) }}
+    {{ form_row(form.date_approved) }}
+    {{ form_row(form.is_ticket_unpaid) }}
+    {{ form_row(form.program) }}
 
         <ul class="record_actions">
     <li>

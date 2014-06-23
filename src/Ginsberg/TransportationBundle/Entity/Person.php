@@ -62,7 +62,7 @@ class Person
     private $created;
 
     /**
-     * @var datatime
+     * @var \DateTime
      */
     private $modified;
 
@@ -283,10 +283,11 @@ class Person
      *
      * @param \DateTime $created
      * @return Person
+     * @ORM\PrePersist
      */
-    public function setCreated($created)
+    public function setCreated()
     {
-        $this->created = $created;
+        $this->created = date('Y-m-d H:i:s');
 
         return $this;
     }
@@ -304,12 +305,13 @@ class Person
     /**
      * Set modified
      *
-     * @param \datatime $modified
+     * @param \DateTime $modified
      * @return Person
+     * @ORM\PreUpdate
      */
-    public function setModified(\datatime $modified)
+    public function setModified()
     {
-        $this->modified = $modified;
+        $this->modified = date('Y-m-d H:i:s');
 
         return $this;
     }
@@ -317,7 +319,7 @@ class Person
     /**
      * Get modified
      *
-     * @return \datatime 
+     * @return \DateTime 
      */
     public function getModified()
     {
