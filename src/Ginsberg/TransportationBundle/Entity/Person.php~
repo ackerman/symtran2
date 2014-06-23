@@ -3,9 +3,12 @@
 namespace Ginsberg\TransportationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Person
+ * 
+ * @ORM\Entity(repositoryClass="Ginsberg\TransportationBundle\Entity\PersonRepository")
  */
 class Person
 {
@@ -56,11 +59,15 @@ class Person
 
     /**
      * @var \DateTime
+     * 
+     * @Gedmo\Timestampable(on="create")
      */
     private $created;
 
     /**
-     * @var datatime
+     * @var \DateTime
+     * 
+     * @Gedmo\Timestampable(on="update")
      */
     private $modified;
 
@@ -302,10 +309,10 @@ class Person
     /**
      * Set modified
      *
-     * @param \datatime $modified
+     * @param \DateTime $modified
      * @return Person
      */
-    public function setModified(\datatime $modified)
+    public function setModified(\DateTime $modified)
     {
         $this->modified = $modified;
 
@@ -315,7 +322,7 @@ class Person
     /**
      * Get modified
      *
-     * @return \datatime 
+     * @return \DateTime 
      */
     public function getModified()
     {
