@@ -50,6 +50,18 @@ class Program
      * @ORM\OneToMany(targetEntity="Reservation", mappedBy="program")
      */
     private $reservations;
+    
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     * @ORM\OneToMany(targetEntity="Vehicle", mappedBy="program")
+     */
+    private $vehicles;
+    
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     * @ORM\OneToMany(targetEntity="Person", mappedBy="program")
+     */
+    private $persons;
 
     /**
      * Constructor
@@ -58,6 +70,8 @@ class Program
     {
         $this->destinations = new ArrayCollection();
         $this->reservations = new ArrayCollection();
+        $this->vehicles = new ArrayCollection();
+        $this->persons = new ArrayCollection();
     }
 
     /**
