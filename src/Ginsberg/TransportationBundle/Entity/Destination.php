@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Destination
+ * 
+ * @ORM\Entity(repositoryClass="Ginsberg\TransportationBundle\Entity\DestinationRepository")
  */
 class Destination
 {

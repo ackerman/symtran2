@@ -1,0 +1,63 @@
+Ginsberg\TransportationBundle\Entity\Installation:
+    type: entity
+    repositoryClass: Ginsberg\TransportationBundle\Entity\InstallationRepository
+    table: installation
+    id:
+        id:
+            type: integer
+            generator:
+              strategy: AUTO
+    fields:
+        name:
+            type: string
+            length: 255
+            unique: true
+            nullable: false
+        open:
+            type: boolean
+            nullable: true
+        reservations_open:
+            type: string
+            length: 255
+            nullable: true
+        cars_available:
+          type: string
+          length: 255
+          nullable: true
+        fall_start:
+          type: datetime
+          nullable: true
+        thanksgiving_start:
+          type: datetime
+          nullable: true
+        thanksgiving_end:
+          type: datetime
+          nullable: true
+        fall_end:
+          type: datetime
+          nullable: true
+        winter_start:
+          type: datetime
+          nullable: true
+        mlk_start:
+          type: datetime
+          nullable: true
+        mlk_end:
+          type: datetime
+          nullable: true
+        springbreak_start:
+          type: datetime
+          nullable: true
+        springbreak_end:
+          type: datetime
+          nullable: true
+        winter_end:
+          type: datetime
+          nullable: true
+        fall_back:
+          type: datetime
+          nullable: true
+        spring_forward:
+          type: datetime
+          nullable: true
+    

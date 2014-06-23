@@ -1,5 +1,6 @@
 Ginsberg\TransportationBundle\Entity\Reservation:
     type: entity
+    repositoryClass: Ginsberg\TransportationBundle\Entity\ReservationRepository
     table: reservation
     id:
         id:
@@ -11,10 +12,10 @@ Ginsberg\TransportationBundle\Entity\Reservation:
           type: datetime
         end:
           type: datetime
-        out_datetime:
+        checkout:
           type: datetime
           nullable: true
-        in_datetime:
+        checkin:
           type: datetime
           nullable: true
         created:

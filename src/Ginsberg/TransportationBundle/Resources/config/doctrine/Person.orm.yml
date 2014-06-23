@@ -1,5 +1,6 @@
 Ginsberg\TransportationBundle\Entity\Person:
     type: entity
+    repositoryClass: Ginsberg\TransportationBundle\Entity\PersonRepository
     table: person
     id:
         id:

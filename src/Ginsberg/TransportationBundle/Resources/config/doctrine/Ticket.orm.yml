@@ -1,5 +1,6 @@
 Ginsberg\TransportationBundle\Entity\Ticket:
     type: entity
+    repositoryClass: Ginsberg\TransportationBundle\Entity\TicketRepository
     table: ticket
     id:
         id:

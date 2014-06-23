@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Reservation
+ * 
+ * @ORM\Entity(repositoryClass="Ginsberg\TransportationBundle\Entity\ReservationRepository")
  */
 class Reservation
 {
@@ -546,5 +548,61 @@ class Reservation
     public function getDestination()
     {
         return $this->destination;
+    }
+    /**
+     * @var \DateTime
+     */
+    private $checkout;
+
+    /**
+     * @var \DateTime
+     */
+    private $checkin;
+
+
+    /**
+     * Set checkout
+     *
+     * @param \DateTime $checkout
+     * @return Reservation
+     */
+    public function setCheckout($checkout)
+    {
+        $this->checkout = $checkout;
+
+        return $this;
+    }
+
+    /**
+     * Get checkout
+     *
+     * @return \DateTime 
+     */
+    public function getCheckout()
+    {
+        return $this->checkout;
+    }
+
+    /**
+     * Set checkin
+     *
+     * @param \DateTime $checkin
+     * @return Reservation
+     */
+    public function setCheckin($checkin)
+    {
+        $this->checkin = $checkin;
+
+        return $this;
+    }
+
+    /**
+     * Get checkin
+     *
+     * @return \DateTime 
+     */
+    public function getCheckin()
+    {
+        return $this->checkin;
     }
 }

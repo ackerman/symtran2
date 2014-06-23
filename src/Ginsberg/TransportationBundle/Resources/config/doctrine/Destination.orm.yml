@@ -1,5 +1,6 @@
 Ginsberg\TransportationBundle\Entity\Destination:
     type: entity
+    repositoryClass: Ginsberg\TransportationBundle\Entity\DestinationRepository
     table: destination
     id:
         id:

@@ -1,5 +1,6 @@
 Ginsberg\TransportationBundle\Entity\Program:
     type: entity
+    repositoryClass: Ginsberg\TransportationBundle\Entity\ProgramRepository
     table: program
     id:
         id:

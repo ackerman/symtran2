@@ -3,75 +3,63 @@
 namespace Ginsberg\TransportationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Program
  * 
- * @ORM\Entity
- * @ORM\Table(name="program")
+ * @ORM\Entity(repositoryClass="Ginsberg\TransportationBundle\Entity\ProgramRepository")
  */
 class Program
 {
     /**
      * @var integer
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @var string
-     * @ORM\Column(type="string", length=255)
      */
     private $name;
 
     /**
      * @var integer
-     * @ORM\Column(type="integer")
      */
     private $shortcode;
 
     /**
      * @var string
-     * @ORM\Column(type="string", length=255)
      */
     private $eligibility_group;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
-     * @ORM\OneToMany(targetEntity="Destination", mappedBy="program")
      */
     private $destinations;
-    
+
     /**
      * @var \Doctrine\Common\Collections\Collection
-     * @ORM\OneToMany(targetEntity="Reservation", mappedBy="program")
-     */
-    private $reservations;
-    
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     * @ORM\OneToMany(targetEntity="Vehicle", mappedBy="program")
-     */
-    private $vehicles;
-    
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     * @ORM\OneToMany(targetEntity="Person", mappedBy="program")
      */
     private $persons;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $vehicles;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $reservations;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->destinations = new ArrayCollection();
-        $this->reservations = new ArrayCollection();
-        $this->vehicles = new ArrayCollection();
-        $this->persons = new ArrayCollection();
+        $this->destinations = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->persons = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->vehicles = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->reservations = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -185,20 +173,6 @@ class Program
     {
         return $this->destinations;
     }
-    
-    public function __toString() {
-      return $this->getName();
-    }
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     */
-    private $persons;
-
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     */
-    private $vehicles;
-
 
     /**
      * Add persons

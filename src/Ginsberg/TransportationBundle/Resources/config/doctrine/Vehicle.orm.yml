@@ -1,5 +1,6 @@
 Ginsberg\TransportationBundle\Entity\Vehicle:
     type: entity
+    repositoryClass: Ginsberg\TransportationBundle\Entity\VehicleRepository
     table: vehicle
     id:
         id:
