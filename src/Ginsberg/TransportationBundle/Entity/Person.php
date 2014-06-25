@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Person
  * 
  * @ORM\Entity(repositoryClass="Ginsberg\TransportationBundle\Entity\PersonRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Person
 {
@@ -283,11 +284,10 @@ class Person
      *
      * @param \DateTime $created
      * @return Person
-     * @ORM\PrePersist
      */
-    public function setCreated()
+    public function setCreated($created)
     {
-        $this->created = date('Y-m-d H:i:s');
+        $this->created = new \DateTime($created);
 
         return $this;
     }
@@ -307,11 +307,10 @@ class Person
      *
      * @param \DateTime $modified
      * @return Person
-     * @ORM\PreUpdate
      */
-    public function setModified()
+    public function setModified($modified)
     {
-        $this->modified = date('Y-m-d H:i:s');
+        $this->modified = new \DateTime();
 
         return $this;
     }
@@ -395,5 +394,28 @@ class Person
       {
         return "";
       }
+    }
+      
+    /**
+     * Set time of creation
+     * 
+     * @ORM\PrePersist
+     */
+    public function setCreatedValue()
+    {
+      if (!$this->getCreated())
+      {
+        $this->setCreated(new \DateTime());
+      }
+    }
+    
+    /**
+     * Set time of modification
+     * 
+     * @ORM\PreUpdate
+     */
+    public function setModifiedValue()
+    {
+      $this->setModified(new \DateTime());
     }
 }
