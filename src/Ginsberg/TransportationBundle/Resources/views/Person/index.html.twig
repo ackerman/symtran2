@@ -16,6 +16,7 @@
                 <th>First_name</th>
                 <th>Last_name</th>
                 <th>Uniqname</th>
+                <th>Program</th>
                 <th>Phone</th>
                 <th>Status</th>
                 <th>Date_approved</th>
@@ -33,6 +34,7 @@
                 <td>{{ entity.firstname }}</td>
                 <td>{{ entity.lastname }}</td>
                 <td>{{ entity.uniqname }}</td>
+                <td>{{ entity.program }}</td>
                 <td>{{ entity.phone }}</td>
                 <td>{{ entity.status }}</td>
                 <td>{% if entity.dateapproved %}{{ entity.dateapproved|date('Y-m-d H:i:s') }}{% endif %}</td>

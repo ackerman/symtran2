@@ -3,6 +3,7 @@
 namespace Ginsberg\TransportationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Person
@@ -19,6 +20,7 @@ class Person
 
     /**
      * @var string
+     * @Assert\NotBlank()
      */
     private $first_name;
 
@@ -74,6 +76,9 @@ class Person
 
     /**
      * @var \Ginsberg\TransportationBundle\Entity\Program
+     * @ORM\ManyToOne(targetEntity="Program", inversedBy="persons")
+     * @ORM\JoinColumn(name="program_id", referencedColumnName="id", nullable=false)
+     * @Assert\NotBlank()
      */
     private $program;
 
@@ -82,7 +87,7 @@ class Person
      */
     public function __construct()
     {
-        $this->reservations = new \Doctrine\Common\Collections\ArrayCollection();
+      $this->reservations = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -216,7 +221,7 @@ class Person
      * @param \DateTime $dateApproved
      * @return Person
      */
-    public function setDateApproved($dateApproved)
+    public function setDateApproved($dateApproved = null)
     {
         $this->date_approved = $dateApproved;
 
@@ -287,7 +292,7 @@ class Person
      */
     public function setCreated($created)
     {
-        $this->created = new \DateTime($created);
+        $this->created = $created;
 
         return $this;
     }
@@ -308,7 +313,7 @@ class Person
      * @param \DateTime $modified
      * @return Person
      */
-    public function setModified($modified)
+    public function setModified($modified = null)
     {
         $this->modified = new \DateTime();
 
@@ -393,19 +398,6 @@ class Person
       else 
       {
         return "";
-      }
-    }
-      
-    /**
-     * Set time of creation
-     * 
-     * @ORM\PrePersist
-     */
-    public function setCreatedValue()
-    {
-      if (!$this->getCreated())
-      {
-        $this->setCreated(new \DateTime());
       }
     }
     

@@ -1,0 +1,4 @@
+Ginsberg\TransportationBundle\Entity\Person:
+  properties:
+    program:
+      - NotBlank: ~

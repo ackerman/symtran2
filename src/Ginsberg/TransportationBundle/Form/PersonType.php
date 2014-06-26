@@ -23,8 +23,8 @@ class PersonType extends AbstractType
             ->add('date_approved')
             ->add('is_terms_agreed')
             ->add('is_ticket_unpaid')
-            ->add('created')
-            ->add('modified')
+            ->add('created', 'datetime', array('widget' => 'text', 'empty_value' => 'Enter a date', 'read_only' => true))
+            ->add('modified', 'datetime', array('widget' => 'text', 'empty_value' => 'Enter a date', 'read_only' => true))
             ->add('program')
         ;
     }

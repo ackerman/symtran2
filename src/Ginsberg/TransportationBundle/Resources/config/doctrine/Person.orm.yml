@@ -50,3 +50,4 @@ Ginsberg\TransportationBundle\Entity\Person:
             joinColumn:
                 name: program_id
                 referencedColumnName: id
+                nullable: false

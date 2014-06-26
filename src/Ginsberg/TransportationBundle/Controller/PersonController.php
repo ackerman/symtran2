@@ -91,6 +91,7 @@ class PersonController extends Controller
     public function newAction()
     {
         $entity = new Person();
+        $entity->setCreated(new \DateTime());
         $form   = $this->createCreateForm($entity);
 
         return array(
