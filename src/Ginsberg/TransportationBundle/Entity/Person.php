@@ -402,6 +402,16 @@ class Person
     }
     
     /**
+     * Set time of creation
+     * 
+     * @ORM\PrePersist
+     */
+    public function setCreatedValue()
+    {
+      $this->setCreated(new \DateTime());
+    }
+    
+    /**
      * Set time of modification
      * 
      * @ORM\PreUpdate

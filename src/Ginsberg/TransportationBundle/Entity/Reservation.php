@@ -80,7 +80,7 @@ class Reservation
     /**
      * @var \Ginsberg\TransportationBundle\Entity\Program
      * @ORM\ManyToOne(targetEntity="Program", inversedBy="reservations")
-     * @ORM\JoinColumn(name="program_id", referenceColumnName="id")
+     * @ORM\JoinColumn(name="program_id", referencedColumnName="id", nullable=false)
      */
     private $program;
 
@@ -108,7 +108,7 @@ class Reservation
      * @param \DateTime $start
      * @return Reservation
      */
-    public function setStart($start)
+    public function setStart($start = null)
     {
         $this->start = $start;
 
@@ -199,11 +199,10 @@ class Reservation
      *
      * @param \DateTime $created
      * @return Reservation
-     * @ORM\PrePersist
      */
-    public function setCreated()
+    public function setCreated($created)
     {
-        $this->created = date('Y-m-d H:i:s');
+        $this->created = $created;
 
         return $this;
     }
@@ -225,9 +224,9 @@ class Reservation
      * @return Reservation
      * @ORM\PreUpdate
      */
-    public function setModified()
+    public function setModified($modified = null)
     {
-        $this->modified = date('Y-m-d H:i:s');
+        $this->modified = $modified;
 
         return $this;
     }

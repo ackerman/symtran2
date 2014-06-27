@@ -50,6 +50,10 @@ class PersonController extends Controller
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
+            
+            // Can't get PrePersist to work, so setting created here
+            $entity->setCreated(new \DateTime());
+            
             $em->persist($entity);
             $em->flush();
 
@@ -91,7 +95,6 @@ class PersonController extends Controller
     public function newAction()
     {
         $entity = new Person();
-        $entity->setCreated(new \DateTime());
         $form   = $this->createCreateForm($entity);
 
         return array(

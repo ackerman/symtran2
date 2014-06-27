@@ -20,7 +20,13 @@ class PersonType extends AbstractType
             ->add('uniqname')
             ->add('phone')
             ->add('status')
-            ->add('date_approved')
+            ->add('date_approved', 'datetime', array(
+                'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd hh:mm:ss',
+                'attr' => array(
+                    'class' => 'datetime',
+                  )
+                ))
             ->add('is_terms_agreed')
             ->add('is_ticket_unpaid')
             ->add('created', 'datetime', array('widget' => 'text', 'empty_value' => 'Enter a date', 'read_only' => true))

@@ -47,12 +47,14 @@ Ginsberg\TransportationBundle\Entity\Reservation:
             joinColumn:
                 name: program_id
                 referencedColumnName: id
+                nullable: false
       vehicle:
             targetEntity: Vehicle
             inversedBy: reservations
             joinColumn:
                 name: vehicle_id
                 referencedColumnName: id
+                nullable: true
       series:
             targetEntity: Series
             inversedBy: reservations
@@ -73,3 +75,4 @@ Ginsberg\TransportationBundle\Entity\Reservation:
             joinColumn:
                 name: person_id
                 referencedColumnName: id
+                nullable: false

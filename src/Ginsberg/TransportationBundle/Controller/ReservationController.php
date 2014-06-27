@@ -91,6 +91,7 @@ class ReservationController extends Controller
     public function newAction()
     {
         $entity = new Reservation();
+        $entity->setCreated(new \DateTime());
         $form   = $this->createCreateForm($entity);
 
         return array(

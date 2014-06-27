@@ -31,7 +31,7 @@
             </tr>
             <tr>
                 <th>Date_approved</th>
-                <td>{{ entity.dateapproved|date('Y-m-d H:i:s') }}</td>
+                <td>{{ entity.dateapproved is empty ? "" : entity.dateapproved|date('Y-m-d H:i:s') }}</td>
             </tr>
             <tr>
                 <th>Is_terms_agreed</th>

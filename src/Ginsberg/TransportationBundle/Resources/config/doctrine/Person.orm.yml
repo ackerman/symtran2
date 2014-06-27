@@ -51,3 +51,4 @@ Ginsberg\TransportationBundle\Entity\Person:
                 name: program_id
                 referencedColumnName: id
                 nullable: false
+    lifeCycleCallbacks: [ setModifiedValue, setCreatedValue ]
