@@ -3,13 +3,13 @@
 {% block body -%}
     <h1>Person edit</h1>
     {{ form_start(edit_form) }}
-      {{ form_row(edit_form.first_name) }}
-      {{ form_row(edit_form.last_name) }}
+      {{ form_row(edit_form.firstName) }}
+      {{ form_row(edit_form.lastName) }}
       {{ form_row(edit_form.uniqname) }}
       {{ form_row(edit_form.phone) }}
       {{ form_row(edit_form.status) }}
-      {{ form_row(edit_form.date_approved) }}
-      {{ form_row(edit_form.is_ticket_unpaid) }}
+      {{ form_row(edit_form.dateApproved) }}
+      {{ form_row(edit_form.hasUnpaidTicket) }}
       {{ form_row(edit_form.program) }}
       {{ form_row(edit_form._token) }}
       {{ form_row(edit_form.created) }}

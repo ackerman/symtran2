@@ -3,7 +3,6 @@
 namespace Ginsberg\TransportationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Person
@@ -19,7 +18,6 @@ class Person
 
     /**
      * @var string
-     * @Assert\NotBlank()
      */
     private $firstName;
 
@@ -54,7 +52,7 @@ class Person
     private $isTermsAgreed;
 
     /**
-     * @var boolean
+     * @var integer
      */
     private $hasUnpaidTicket;
 
@@ -75,9 +73,6 @@ class Person
 
     /**
      * @var \Ginsberg\TransportationBundle\Entity\Program
-     * @ORM\ManyToOne(targetEntity="Program", inversedBy="persons")
-     * @ORM\JoinColumn(name="program_id", referencedColumnName="id", nullable=false)
-     * @Assert\NotBlank()
      */
     private $program;
     
@@ -92,7 +87,7 @@ class Person
      */
     public function __construct()
     {
-      $this->reservations = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->reservations = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -129,26 +124,26 @@ class Person
     }
 
     /**
-     * Set lasttName
+     * Set lastName
      *
      * @param string $lastName
      * @return Person
      */
     public function setLastName($lastName)
     {
-        $this->lasttName = $lastName;
+        $this->lastName = $lastName;
 
         return $this;
     }
 
     /**
-     * Get lasttName
+     * Get lastName
      *
      * @return string 
      */
     public function getLastName()
     {
-        return $this->lasttName;
+        return $this->lastName;
     }
 
     /**
@@ -269,7 +264,7 @@ class Person
     /**
      * Set hasUnpaidTicket
      *
-     * @param boolean $isTicketUnpaid
+     * @param integer $hasUnpaidTicket
      * @return Person
      */
     public function setHasUnpaidTicket($hasUnpaidTicket)
@@ -282,7 +277,7 @@ class Person
     /**
      * Get hasUnpaidTicket
      *
-     * @return boolean 
+     * @return integer 
      */
     public function getHasUnpaidTicket()
     {
@@ -318,9 +313,9 @@ class Person
      * @param \DateTime $modified
      * @return Person
      */
-    public function setModified($modified = null)
+    public function setModified($modified = NULL)
     {
-        $this->modified = new \DateTime();
+        $this->modified = $modified;
 
         return $this;
     }
@@ -374,7 +369,7 @@ class Person
      * @param \Ginsberg\TransportationBundle\Entity\Program $program
      * @return Person
      */
-    public function setProgram(\Ginsberg\TransportationBundle\Entity\Program $program = null)
+    public function setProgram(\Ginsberg\TransportationBundle\Entity\Program $program)
     {
         $this->program = $program;
 
@@ -390,35 +385,15 @@ class Person
     {
         return $this->program;
     }
-    
     /**
-     * To String
-     * 
-     * @return string First and Last Names
-     */
-    public function __toString() {
-      if ($this->getFirstName() && $this->getLastName()) {
-        return $this->getFirstName() . " " . $this->getLastName();
-      }
-      else 
-      {
-        return "";
-      }
-    }
-    
-    /**
-     * Set time of creation
-     * 
      * @ORM\PrePersist
      */
     public function setCreatedValue()
     {
       $this->setCreated(new \DateTime());
     }
-    
+
     /**
-     * Set time of modification
-     * 
      * @ORM\PreUpdate
      */
     public function setModifiedValue()

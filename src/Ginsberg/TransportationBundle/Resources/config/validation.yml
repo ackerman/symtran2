@@ -1,13 +1,3 @@
-Ginsberg\TransportationBundle\Entity\Person:
-  properties:
-    program:
-      - NotBlank: ~
-    phone:
-      - Range:
-          min: 10
-          max: 15
-          minMessage: Please enter a valid US phone number, including area code
-          maxMessage: Please enter a valid US phone number, indluding area code
 Ginsberg\TransportationBundle\Entity\Program:
   properites:
     name:

@@ -120,6 +120,8 @@ class PersonController extends Controller
             throw $this->createNotFoundException('Unable to find Person entity.');
         }
         
+        //$entity->findMe();
+        //$entity->testMe();
         $deleteForm = $this->createDeleteForm($id);
 
         return array(

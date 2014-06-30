@@ -19,9 +19,9 @@
                 <th>Program</th>
                 <th>Phone</th>
                 <th>Status</th>
-                <th>Date_approved</th>
-                <th>Is_terms_agreed</th>
-                <th>Is_ticket_unpaid</th>
+                <th>Date Approved</th>
+                <th>Terms Agreed</th>
+                <th>Tickets</th>
                 <th>Created</th>
                 <th>Modified</th>
                 <th>Actions</th>
@@ -31,15 +31,15 @@
         {% for entity in entities %}
             <tr>
                 <td><a href="{{ path('person_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
-                <td>{{ entity.firstname }}</td>
-                <td>{{ entity.lastname }}</td>
+                <td>{{ entity.firstName }}</td>
+                <td>{{ entity.lastName }}</td>
                 <td>{{ entity.uniqname }}</td>
                 <td>{{ entity.program }}</td>
                 <td>{{ entity.phone }}</td>
                 <td>{{ entity.status }}</td>
-                <td>{% if entity.dateapproved %}{{ entity.dateapproved|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{{ entity.istermsagreed }}</td>
-                <td>{{ entity.isticketunpaid }}</td>
+                <td>{% if entity.dateApproved %}{{ entity.dateApproved|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ entity.isTermsAgreed }}</td>
+                <td>{{ entity.hasUnpaidTicket }}</td>
                 <td>{% if entity.created %}{{ entity.created|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if entity.modified %}{{ entity.modified|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>

@@ -12,8 +12,8 @@ use Doctrine\ORM\EntityRepository;
  */
 class PersonRepository extends EntityRepository
 {
-  
-  public function findMe() {
-    print_r("Here I am!");
+  public function findMe() 
+  {
+    print_r("I am here!");
   }
 }

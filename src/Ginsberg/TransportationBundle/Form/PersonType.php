@@ -15,20 +15,20 @@ class PersonType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('first_name')
-            ->add('last_name')
+            ->add('firstName')
+            ->add('lastName')
             ->add('uniqname')
             ->add('phone')
             ->add('status')
-            ->add('date_approved', 'datetime', array(
+            ->add('dateApproved', 'datetime', array(
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd hh:mm a',
                 'attr' => array(
                     'class' => 'datetime',
                   )
                 ))
-            ->add('is_terms_agreed')
-            ->add('is_ticket_unpaid')
+            ->add('isTermsAgreed')
+            ->add('hasUnpaidTicket')
             ->add('created', 'datetime', array('widget' => 'text', 'empty_value' => 'Enter a date', 'read_only' => true))
             ->add('modified', 'datetime', array('widget' => 'text', 'empty_value' => 'Enter a date', 'read_only' => true))
             ->add('program')
