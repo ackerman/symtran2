@@ -23,3 +23,14 @@ Ginsberg\TransportationBundle\Entity\Program:
       - Length:
           min: 4
           max: 255
+Ginsberg\TransportationBundle\Entity\Destination:
+  properties:
+    name:
+      - NotBlank: ~
+      - Length:
+          min: 4
+          max: 255
+    program:
+      - NotBlank: ~
+    
+      

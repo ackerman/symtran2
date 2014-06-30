@@ -29,8 +29,9 @@ class DestinationController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('GinsbergTransportationBundle:Destination')->findAll();
-
+        //$entities = $em->getRepository('GinsbergTransportationBundle:Destination')->findAll();
+        $entities = $this->getDoctrine()->getRepository('GinsbergTransportationBundle:Destination')
+            ->findByProgramSortedByProgram(TRUE);
         return array(
             'entities' => $entities,
         );

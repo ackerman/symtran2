@@ -167,4 +167,5 @@ class Destination
     {
       return $this->getName() ? $this->getName() : "";
     }
+ 
 }
