@@ -4,13 +4,13 @@
     <h1>Add a Person</h1>
     {{ form_start(form) }}
       {{ form_errors(form) }}
-      {{ form_row(form.first_name) }}
-      {{ form_row(form.last_name) }}
+      {{ form_row(form.firstName) }}
+      {{ form_row(form.lastName) }}
       {{ form_row(form.uniqname) }}
       {{ form_row(form.phone) }}
       {{ form_row(form.status) }}
-      {{ form_row(form.date_approved) }}
-      {{ form_row(form.is_ticket_unpaid) }}
+      {{ form_row(form.dateApproved) }}
+      {{ form_row(form.hasUnpaidTicket) }}
       {{ form_row(form.program) }}
       {{ form_row(form._token) }}
       {{ form_row(form.created) }}

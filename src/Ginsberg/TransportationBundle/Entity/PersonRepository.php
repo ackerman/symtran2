@@ -12,8 +12,19 @@ use Doctrine\ORM\EntityRepository;
  */
 class PersonRepository extends EntityRepository
 {
-  public function findMe() 
+  public function findMe() {
+    print_r("Here");
+  }
+  
+  public function findByPendingSortedByCreated($status) 
   {
-    print_r("I am here!");
+    $dql = "SELECT p FROM GinsbergTransportationBundle:Person p WHERE p.status = :status ORDER BY p.created ASC";
+    $query = $this->getEntityManager()->createQuery($dql)->setParameter('status', $status);
+
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
   }
 }

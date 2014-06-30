@@ -28,8 +28,9 @@ class PersonController extends Controller
     public function indexAction()
     {
         $em = $this->getDoctrine()->getManager();
-
-        $entities = $em->getRepository('GinsbergTransportationBundle:Person')->findAll();
+        
+        $entities = $em->getRepository('GinsbergTransportationBundle:Person')->findByPendingSortedByCreated('pending');
+        //$entities = $em->getRepository('GinsbergTransportationBundle:Person')->findAll();
 
         return array(
             'entities' => $entities,
@@ -120,7 +121,7 @@ class PersonController extends Controller
             throw $this->createNotFoundException('Unable to find Person entity.');
         }
         
-        //$entity->findMe();
+        $em->getRepository('GinsbergTransportationBundle:Person')->findMe();
         //$entity->testMe();
         $deleteForm = $this->createDeleteForm($id);
 
@@ -249,5 +250,9 @@ class PersonController extends Controller
             ->add('submit', 'submit', array('label' => 'Delete'))
             ->getForm()
         ;
+    }
+    
+    public function searchAction() {
+      
     }
 }

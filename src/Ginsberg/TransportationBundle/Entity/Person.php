@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Person
  * 
  * @ORM\HasLifecycleCallbacks()
+ * @ORM\Entity(repositoryClass="Ginsberg\TransportationBundle\Entity\PersonRepository")
  */
 class Person
 {
@@ -399,5 +400,16 @@ class Person
     public function setModifiedValue()
     {
       $this->setModified(new \DateTime());
+    }
+    
+    public function findByStatus($status) {
+      $dql = "SELECT p, prog FROM GinsbergTransportationBundle:Person p JOIN d.program prog WHERE p.status = :status ORDER BY p.created ASC";
+        $query = getEntityManager()->createQuery($dql)->setParameter('status', $status);
+        
+        try {
+          return $query->getResult();
+        } catch (\Doctrine\ORM\NoResultException $ex) {
+          return null;
+        }
     }
 }

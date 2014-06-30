@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityRepository;
  */
 class DestinationRepository extends EntityRepository
 {
-  public function findByProgramSortedByProgram($param) 
+  public function findByProgramsSortedByProgram($param) 
     {
       $dql = 'SELECT d, p FROM GinsbergTransportationBundle:Destination d JOIN d.program p ORDER BY p.name ASC, d.name ASC';
       $query = $this->getEntityManager()->createQuery($dql);
