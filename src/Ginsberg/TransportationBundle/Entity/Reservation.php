@@ -30,12 +30,12 @@ class Reservation
     /**
      * @var \DateTime
      */
-    private $out;
+    private $checkout;
 
     /**
      * @var \DateTime
      */
-    private $in;
+    private $checkin;
 
     /**
      * @var \DateTime
@@ -50,12 +50,12 @@ class Reservation
     /**
      * @var integer
      */
-    private $seats_required;
+    private $seatsRequired;
 
     /**
      * @var string
      */
-    private $destination_text;
+    private $destinationText;
 
     /**
      * @var string
@@ -65,7 +65,7 @@ class Reservation
     /**
      * @var boolean
      */
-    private $is_noshow;
+    private $isNoShow;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -154,9 +154,9 @@ class Reservation
      * @param \DateTime $out
      * @return Reservation
      */
-    public function setOut($out)
+    public function setCheckout($checkout)
     {
-        $this->out = $out;
+        $this->checkout = $checkout;
 
         return $this;
     }
@@ -166,20 +166,20 @@ class Reservation
      *
      * @return \DateTime 
      */
-    public function getOut()
+    public function getCheckout()
     {
-        return $this->out;
+        return $this->checkout;
     }
 
     /**
      * Set in
      *
-     * @param \DateTime $in
+     * @param \DateTime $checkin
      * @return Reservation
      */
-    public function setIn($in)
+    public function setCheckin($checkin)
     {
-        $this->in = $in;
+        $this->checkin = $checkin;
 
         return $this;
     }
@@ -189,9 +189,9 @@ class Reservation
      *
      * @return \DateTime 
      */
-    public function getIn()
+    public function getCheckin()
     {
-        return $this->in;
+        return $this->checkin;
     }
 
     /**
@@ -249,7 +249,7 @@ class Reservation
      */
     public function setSeatsRequired($seatsRequired)
     {
-        $this->seats_required = $seatsRequired;
+        $this->seatsRequired = $seatsRequired;
 
         return $this;
     }
@@ -261,7 +261,7 @@ class Reservation
      */
     public function getSeatsRequired()
     {
-        return $this->seats_required;
+        return $this->seatsRequired;
     }
 
     /**
@@ -272,7 +272,7 @@ class Reservation
      */
     public function setDestinationText($destinationText)
     {
-        $this->destination_text = $destinationText;
+        $this->destinationText = $destinationText;
 
         return $this;
     }
@@ -284,7 +284,7 @@ class Reservation
      */
     public function getDestinationText()
     {
-        return $this->destination_text;
+        return $this->destinationText;
     }
 
     /**
@@ -316,9 +316,9 @@ class Reservation
      * @param boolean $isNoshow
      * @return Reservation
      */
-    public function setIsNoshow($isNoshow)
+    public function setIsNoShow($isNoShow)
     {
-        $this->is_noshow = $isNoshow;
+        $this->isNoShow = $isNoShow;
 
         return $this;
     }
@@ -328,9 +328,9 @@ class Reservation
      *
      * @return boolean 
      */
-    public function getIsNoshow()
+    public function getIsNoShow()
     {
-        return $this->is_noshow;
+        return $this->isNoShow;
     }
 
     /**
@@ -387,62 +387,6 @@ class Reservation
     public function getPerson()
     {
         return $this->person;
-    }
-    /**
-     * @var \DateTime
-     */
-    private $out_datetime;
-
-    /**
-     * @var \DateTime
-     */
-    private $in_datetime;
-
-
-    /**
-     * Set out_datetime
-     *
-     * @param \DateTime $outDatetime
-     * @return Reservation
-     */
-    public function setOutDatetime($outDatetime)
-    {
-        $this->out_datetime = $outDatetime;
-
-        return $this;
-    }
-
-    /**
-     * Get out_datetime
-     *
-     * @return \DateTime 
-     */
-    public function getOutDatetime()
-    {
-        return $this->out_datetime;
-    }
-
-    /**
-     * Set in_datetime
-     *
-     * @param \DateTime $inDatetime
-     * @return Reservation
-     */
-    public function setInDatetime($inDatetime)
-    {
-        $this->in_datetime = $inDatetime;
-
-        return $this;
-    }
-
-    /**
-     * Get in_datetime
-     *
-     * @return \DateTime 
-     */
-    public function getInDatetime()
-    {
-        return $this->in_datetime;
     }
 
     /**
@@ -551,60 +495,5 @@ class Reservation
     {
         return $this->destination;
     }
-    /**
-     * @var \DateTime
-     */
-    private $checkout;
-
-    /**
-     * @var \DateTime
-     */
-    private $checkin;
-
-
-    /**
-     * Set checkout
-     *
-     * @param \DateTime $checkout
-     * @return Reservation
-     */
-    public function setCheckout($checkout)
-    {
-        $this->checkout = $checkout;
-
-        return $this;
-    }
-
-    /**
-     * Get checkout
-     *
-     * @return \DateTime 
-     */
-    public function getCheckout()
-    {
-        return $this->checkout;
-    }
-
-    /**
-     * Set checkin
-     *
-     * @param \DateTime $checkin
-     * @return Reservation
-     */
-    public function setCheckin($checkin)
-    {
-        $this->checkin = $checkin;
-
-        return $this;
-    }
-
-    /**
-     * Get checkin
-     *
-     * @return \DateTime 
-     */
-    public function getCheckin()
-    {
-        return $this->checkin;
-    }
+    
 }

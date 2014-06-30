@@ -21,12 +21,12 @@ class Person
      * @var string
      * @Assert\NotBlank()
      */
-    private $first_name;
+    private $firstName;
 
     /**
      * @var string
      */
-    private $last_name;
+    private $lastName;
 
     /**
      * @var string
@@ -46,17 +46,17 @@ class Person
     /**
      * @var \DateTime
      */
-    private $date_approved;
+    private $dateApproved;
 
     /**
      * @var boolean
      */
-    private $is_terms_agreed;
+    private $isTermsAgreed;
 
     /**
      * @var boolean
      */
-    private $is_ticket_unpaid;
+    private $hasUnpaidTicket;
 
     /**
      * @var \DateTime
@@ -80,6 +80,12 @@ class Person
      * @Assert\NotBlank()
      */
     private $program;
+    
+    public $status_options = Array(
+      'pending' =>'pending',
+      'rejected'=>'rejected',
+      'approved'=>'approved',
+    );
 
     /**
      * Constructor
@@ -100,49 +106,49 @@ class Person
     }
 
     /**
-     * Set first_name
+     * Set firstName
      *
      * @param string $firstName
      * @return Person
      */
     public function setFirstName($firstName)
     {
-        $this->first_name = $firstName;
+        $this->firstName = $firstName;
 
         return $this;
     }
 
     /**
-     * Get first_name
+     * Get firstName
      *
      * @return string 
      */
     public function getFirstName()
     {
-        return $this->first_name;
+        return $this->firstName;
     }
 
     /**
-     * Set last_name
+     * Set lasttName
      *
      * @param string $lastName
      * @return Person
      */
     public function setLastName($lastName)
     {
-        $this->last_name = $lastName;
+        $this->lasttName = $lastName;
 
         return $this;
     }
 
     /**
-     * Get last_name
+     * Get lasttName
      *
      * @return string 
      */
     public function getLastName()
     {
-        return $this->last_name;
+        return $this->lasttName;
     }
 
     /**
@@ -215,72 +221,72 @@ class Person
     }
 
     /**
-     * Set date_approved
+     * Set dateApproved
      *
      * @param \DateTime $dateApproved
      * @return Person
      */
     public function setDateApproved($dateApproved = null)
     {
-        $this->date_approved = $dateApproved;
+        $this->dateApproved = $dateApproved;
 
         return $this;
     }
 
     /**
-     * Get date_approved
+     * Get dateApproved
      *
      * @return \DateTime 
      */
     public function getDateApproved()
     {
-        return $this->date_approved;
+        return $this->dateApproved;
     }
 
     /**
-     * Set is_terms_agreed
+     * Set isTermsAgreed
      *
      * @param boolean $isTermsAgreed
      * @return Person
      */
     public function setIsTermsAgreed($isTermsAgreed)
     {
-        $this->is_terms_agreed = $isTermsAgreed;
+        $this->isTermsAgreed = $isTermsAgreed;
 
         return $this;
     }
 
     /**
-     * Get is_terms_agreed
+     * Get isTermsAgreed
      *
      * @return boolean 
      */
     public function getIsTermsAgreed()
     {
-        return $this->is_terms_agreed;
+        return $this->isTermsAgreed;
     }
 
     /**
-     * Set is_ticket_unpaid
+     * Set hasUnpaidTicket
      *
      * @param boolean $isTicketUnpaid
      * @return Person
      */
-    public function setIsTicketUnpaid($isTicketUnpaid)
+    public function setHasUnpaidTicket($hasUnpaidTicket)
     {
-        $this->is_ticket_unpaid = $isTicketUnpaid;
+        $this->hasUnpaidTicket = $hasUnpaidTicket;
 
         return $this;
     }
 
     /**
-     * Get is_ticket_unpaid
+     * Get hasUnpaidTicket
      *
      * @return boolean 
      */
-    public function getIsTicketUnpaid()
+    public function getHasUnpaidTicket()
     {
-        return $this->is_ticket_unpaid;
+        return $this->hasUnpaidTicket;
     }
 
     /**

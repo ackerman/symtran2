@@ -8,10 +8,10 @@ Ginsberg\TransportationBundle\Entity\Person:
             generator:
               strategy: AUTO
     fields:
-        first_name:
+        firstName:
             type: string
             length: 100
-        last_name:
+        lastName:
             type: string
             length: 100
         uniqname:
@@ -26,14 +26,14 @@ Ginsberg\TransportationBundle\Entity\Person:
           type: string
           length: 100
           nullable: true
-        date_approved:
+        dateApproved:
           type: datetime
           nullable: true
-        is_terms_agreed:
+        isTermsAgreed:
           type: boolean
           nullable: true
-        is_ticket_unpaid:
-          type: boolean
+        hasUnpaidTicket:
+          type: smallint
           nullable: true
         created:
           type: datetime

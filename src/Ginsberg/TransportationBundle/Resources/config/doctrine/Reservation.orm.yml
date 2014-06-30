@@ -23,9 +23,9 @@ Ginsberg\TransportationBundle\Entity\Reservation:
         modified:
           type: datetime
           nullable: true
-        seats_required:
+        seatsRequired:
           type: smallint
-        destination_text:
+        destinationText:
           type: string
           length: 100
           nullable: true
@@ -33,7 +33,7 @@ Ginsberg\TransportationBundle\Entity\Reservation:
           type: string
           length: 255
           nullable: true
-        is_noshow:
+        isNoShow:
           type: boolean
           nullable: true
     oneToMany:
