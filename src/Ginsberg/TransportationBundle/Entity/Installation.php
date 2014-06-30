@@ -24,77 +24,77 @@ class Installation
     /**
      * @var boolean
      */
-    private $open;
+    private $isOpen;
 
     /**
      * @var string
      */
-    private $reservations_open;
+    private $reservationsOpen;
 
     /**
      * @var string
      */
-    private $cars_available;
+    private $carsAvailable;
 
     /**
      * @var \DateTime
      */
-    private $fall_start;
+    private $fallStart;
 
     /**
      * @var \DateTime
      */
-    private $thanksgiving_start;
+    private $thanksgivingStart;
 
     /**
      * @var \DateTime
      */
-    private $thanksgiving_end;
+    private $thanksgivingEnd;
 
     /**
      * @var \DateTime
      */
-    private $fall_end;
+    private $fallEnd;
 
     /**
      * @var \DateTime
      */
-    private $winter_start;
+    private $winterStart;
 
     /**
      * @var \DateTime
      */
-    private $mlk_start;
+    private $mlkStart;
 
     /**
      * @var \DateTime
      */
-    private $mlk_end;
+    private $mlkEnd;
 
     /**
      * @var \DateTime
      */
-    private $springbreak_start;
+    private $springbreakStart;
 
     /**
      * @var \DateTime
      */
-    private $springbreak_end;
+    private $springbreakEnd;
 
     /**
      * @var \DateTime
      */
-    private $winter_end;
+    private $winterEnd;
 
     /**
      * @var \DateTime
      */
-    private $fall_back;
+    private $fallBack;
 
     /**
      * @var \DateTime
      */
-    private $spring_forward;
+    private $springForward;
 
 
     /**
@@ -136,9 +136,9 @@ class Installation
      * @param boolean $open
      * @return Installation
      */
-    public function setOpen($open)
+    public function setIsOpen($isOpen)
     {
-        $this->open = $open;
+        $this->isOpen = $isOpen;
 
         return $this;
     }
@@ -148,330 +148,330 @@ class Installation
      *
      * @return boolean 
      */
-    public function getOpen()
+    public function getIsOpen()
     {
-        return $this->open;
+        return $this->isOpen;
     }
 
     /**
-     * Set reservations_open
+     * Set reservationsOpen
      *
      * @param string $reservationsOpen
      * @return Installation
      */
     public function setReservationsOpen($reservationsOpen)
     {
-        $this->reservations_open = $reservationsOpen;
+        $this->reservationsOpen = $reservationsOpen;
 
         return $this;
     }
 
     /**
-     * Get reservations_open
+     * Get reservationsOpen
      *
      * @return string 
      */
     public function getReservationsOpen()
     {
-        return $this->reservations_open;
+        return $this->reservationsOpen;
     }
 
     /**
-     * Set cars_available
+     * Set carsAvailable
      *
      * @param string $carsAvailable
      * @return Installation
      */
     public function setCarsAvailable($carsAvailable)
     {
-        $this->cars_available = $carsAvailable;
+        $this->carsAvailable = $carsAvailable;
 
         return $this;
     }
 
     /**
-     * Get cars_available
+     * Get carsAvailable
      *
      * @return string 
      */
     public function getCarsAvailable()
     {
-        return $this->cars_available;
+        return $this->carsAvailable;
     }
 
     /**
-     * Set fall_start
+     * Set fallStart
      *
      * @param \DateTime $fallStart
      * @return Installation
      */
     public function setFallStart($fallStart)
     {
-        $this->fall_start = $fallStart;
+        $this->fallStart = $fallStart;
 
         return $this;
     }
 
     /**
-     * Get fall_start
+     * Get fallStart
      *
      * @return \DateTime 
      */
     public function getFallStart()
     {
-        return $this->fall_start;
+        return $this->fallStart;
     }
 
     /**
-     * Set thanksgiving_start
+     * Set thanksgivingStart
      *
      * @param \DateTime $thanksgivingStart
      * @return Installation
      */
     public function setThanksgivingStart($thanksgivingStart)
     {
-        $this->thanksgiving_start = $thanksgivingStart;
+        $this->thanksgivingStart = $thanksgivingStart;
 
         return $this;
     }
 
     /**
-     * Get thanksgiving_start
+     * Get thanksgivingStart
      *
      * @return \DateTime 
      */
     public function getThanksgivingStart()
     {
-        return $this->thanksgiving_start;
+        return $this->thanksgivingStart;
     }
 
     /**
-     * Set thanksgiving_end
+     * Set thanksgivingEnd
      *
      * @param \DateTime $thanksgivingEnd
      * @return Installation
      */
     public function setThanksgivingEnd($thanksgivingEnd)
     {
-        $this->thanksgiving_end = $thanksgivingEnd;
+        $this->thanksgivingEnd = $thanksgivingEnd;
 
         return $this;
     }
 
     /**
-     * Get thanksgiving_end
+     * Get thanksgivingEnd
      *
      * @return \DateTime 
      */
     public function getThanksgivingEnd()
     {
-        return $this->thanksgiving_end;
+        return $this->thanksgivingEnd;
     }
 
     /**
-     * Set fall_end
+     * Set fallEnd
      *
      * @param \DateTime $fallEnd
      * @return Installation
      */
     public function setFallEnd($fallEnd)
     {
-        $this->fall_end = $fallEnd;
+        $this->fallEnd = $fallEnd;
 
         return $this;
     }
 
     /**
-     * Get fall_end
+     * Get fallEnd
      *
      * @return \DateTime 
      */
     public function getFallEnd()
     {
-        return $this->fall_end;
+        return $this->fallEnd;
     }
 
     /**
-     * Set winter_start
+     * Set winterStart
      *
      * @param \DateTime $winterStart
      * @return Installation
      */
     public function setWinterStart($winterStart)
     {
-        $this->winter_start = $winterStart;
+        $this->winterStart = $winterStart;
 
         return $this;
     }
 
     /**
-     * Get winter_start
+     * Get winterStart
      *
      * @return \DateTime 
      */
     public function getWinterStart()
     {
-        return $this->winter_start;
+        return $this->winterStart;
     }
 
     /**
-     * Set mlk_start
+     * Set mlkStart
      *
      * @param \DateTime $mlkStart
      * @return Installation
      */
     public function setMlkStart($mlkStart)
     {
-        $this->mlk_start = $mlkStart;
+        $this->mlkStart = $mlkStart;
 
         return $this;
     }
 
     /**
-     * Get mlk_start
+     * Get mlkStart
      *
      * @return \DateTime 
      */
     public function getMlkStart()
     {
-        return $this->mlk_start;
+        return $this->mlkStart;
     }
 
     /**
-     * Set mlk_end
+     * Set mlkEnd
      *
      * @param \DateTime $mlkEnd
      * @return Installation
      */
     public function setMlkEnd($mlkEnd)
     {
-        $this->mlk_end = $mlkEnd;
+        $this->mlkEnd = $mlkEnd;
 
         return $this;
     }
 
     /**
-     * Get mlk_end
+     * Get mlkEnd
      *
      * @return \DateTime 
      */
     public function getMlkEnd()
     {
-        return $this->mlk_end;
+        return $this->mlkEnd;
     }
 
     /**
-     * Set springbreak_start
+     * Set springbreakStart
      *
      * @param \DateTime $springbreakStart
      * @return Installation
      */
     public function setSpringbreakStart($springbreakStart)
     {
-        $this->springbreak_start = $springbreakStart;
+        $this->springbreakStart = $springbreakStart;
 
         return $this;
     }
 
     /**
-     * Get springbreak_start
+     * Get springbreakStart
      *
      * @return \DateTime 
      */
     public function getSpringbreakStart()
     {
-        return $this->springbreak_start;
+        return $this->springbreakStart;
     }
 
     /**
-     * Set springbreak_end
+     * Set springbreakEnd
      *
      * @param \DateTime $springbreakEnd
      * @return Installation
      */
     public function setSpringbreakEnd($springbreakEnd)
     {
-        $this->springbreak_end = $springbreakEnd;
+        $this->springbreakEnd = $springbreakEnd;
 
         return $this;
     }
 
     /**
-     * Get springbreak_end
+     * Get springbreakEnd
      *
      * @return \DateTime 
      */
     public function getSpringbreakEnd()
     {
-        return $this->springbreak_end;
+        return $this->springbreakEnd;
     }
 
     /**
-     * Set winter_end
+     * Set winterEnd
      *
      * @param \DateTime $winterEnd
      * @return Installation
      */
     public function setWinterEnd($winterEnd)
     {
-        $this->winter_end = $winterEnd;
+        $this->winterEnd = $winterEnd;
 
         return $this;
     }
 
     /**
-     * Get winter_end
+     * Get winterEnd
      *
      * @return \DateTime 
      */
     public function getWinterEnd()
     {
-        return $this->winter_end;
+        return $this->winterEnd;
     }
 
     /**
-     * Set fall_back
+     * Set fallBack
      *
      * @param \DateTime $fallBack
      * @return Installation
      */
     public function setFallBack($fallBack)
     {
-        $this->fall_back = $fallBack;
+        $this->fallBack = $fallBack;
 
         return $this;
     }
 
     /**
-     * Get fall_back
+     * Get fallBack
      *
      * @return \DateTime 
      */
     public function getFallBack()
     {
-        return $this->fall_back;
+        return $this->fallBack;
     }
 
     /**
-     * Set spring_forward
+     * Set springForward
      *
      * @param \DateTime $springForward
      * @return Installation
      */
     public function setSpringForward($springForward)
     {
-        $this->spring_forward = $springForward;
+        $this->springForward = $springForward;
 
         return $this;
     }
 
     /**
-     * Get spring_forward
+     * Get springForward
      *
      * @return \DateTime 
      */
     public function getSpringForward()
     {
-        return $this->spring_forward;
+        return $this->springForward;
     }
 }
