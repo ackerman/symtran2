@@ -16,8 +16,8 @@ class ProgramType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('shortcode')
-            ->add('eligibility_group')
+            ->add('shortcode', 'text', array('label' => 'Shortcode Mask'))
+            ->add('eligibilityGroup', 'text', array('label' => 'The name of the MCommunity Eligiblity Group (not the email)'))
         ;
     }
     

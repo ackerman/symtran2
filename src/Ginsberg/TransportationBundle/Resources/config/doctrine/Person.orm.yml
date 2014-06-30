@@ -21,6 +21,7 @@ Ginsberg\TransportationBundle\Entity\Person:
         phone:
           type: string
           length: 20
+          nullable: true
         status:
           type: string
           length: 100
@@ -51,4 +52,6 @@ Ginsberg\TransportationBundle\Entity\Person:
                 name: program_id
                 referencedColumnName: id
                 nullable: false
-    lifeCycleCallbacks: [ setModifiedValue, setCreatedValue ]
+    lifecycleCallbacks: 
+      prePersist: [ setCreatedValue ]
+      preUpdate: [ setModifiedValue ]

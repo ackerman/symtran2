@@ -19,8 +19,9 @@ jQuery(document).ready(function($) {
     yearStart: '2014',
     yearEnd: '2015',
     roundTime: 'round',
-    format: 'Y-m-d H:i:s',
-    scrollInput: false
+    format: 'Y-m-d g:i a',
+    scrollInput: false,
+    lang: 'en'
   });
 });
 

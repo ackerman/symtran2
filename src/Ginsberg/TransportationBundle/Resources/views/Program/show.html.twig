@@ -1,4 +1,4 @@
-{% extends '::base.html.twig' %}
+{% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
     <h1>Program</h1>
@@ -14,12 +14,12 @@
                 <td>{{ entity.name }}</td>
             </tr>
             <tr>
-                <th>Shortcode</th>
+                <th>Shortcode Mask</th>
                 <td>{{ entity.shortcode }}</td>
             </tr>
             <tr>
-                <th>Eligibility_group</th>
-                <td>{{ entity.eligibilitygroup }}</td>
+                <th>Eligibility Group</th>
+                <td>{{ entity.eligibilityGroup }}</td>
             </tr>
         </tbody>
     </table>

@@ -29,7 +29,7 @@ class Program
     /**
      * @var string
      */
-    private $eligibility_group;
+    private $eligibilityGroup;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -138,7 +138,7 @@ class Program
      */
     public function getEligibilityGroup()
     {
-        return $this->eligibility_group;
+        return $this->eligibilityGroup;
     }
 
     /**
@@ -281,4 +281,31 @@ class Program
     public function __toString() {
       return $this->getName();
     }
+    
+    /**
+    * Get Program name based on official name of the program's MCommunity eligibility group.
+    */
+    public static function get_program_name_by_ldap_group($ldap_group) 
+    {
+      $repository = $this->getDoctrine()->getRepository('GinsbergTransportationBundle:Program');
+      $program = $repository->findBy($ldap_group);
+      if ($program) {
+        return $program->getName();
+      } else {
+        return false;
+      }
+    }
+
+  /**
+   * Get Program Id based on official name of the program's MCommunity eligibility group.
+   */
+  public static function get_program_id_by_ldap_group($ldap_group) {
+    $repository = $this->getDoctrine()->getRepository('GinsbergTransportationBundle:Program');
+    $program = $repository->findBy($ldap_group);
+    if ($program) {
+      return $program->getId();
+    } else {
+      return false;
+    }
+  }
 }

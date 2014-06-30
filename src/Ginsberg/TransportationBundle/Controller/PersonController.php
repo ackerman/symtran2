@@ -52,7 +52,7 @@ class PersonController extends Controller
             $em = $this->getDoctrine()->getManager();
             
             // Can't get PrePersist to work, so setting created here
-            $entity->setCreated(new \DateTime());
+            //$entity->setCreated(new \DateTime());
             
             $em->persist($entity);
             $em->flush();
@@ -119,7 +119,7 @@ class PersonController extends Controller
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Person entity.');
         }
-
+        
         $deleteForm = $this->createDeleteForm($id);
 
         return array(

@@ -22,7 +22,7 @@ class PersonType extends AbstractType
             ->add('status')
             ->add('date_approved', 'datetime', array(
                 'widget' => 'single_text',
-                'format' => 'yyyy-MM-dd hh:mm:ss',
+                'format' => 'yyyy-MM-dd hh:mm a',
                 'attr' => array(
                     'class' => 'datetime',
                   )

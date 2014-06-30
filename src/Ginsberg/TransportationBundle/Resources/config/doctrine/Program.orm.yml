@@ -14,9 +14,10 @@ Ginsberg\TransportationBundle\Entity\Program:
             unique: true
             nullable: false
         shortcode:
-            type: integer
+            type: string
+            length: 100
             nullable: false
-        eligibility_group:
+        eligibilityGroup:
             type: string
             length: 255
             nullable: false

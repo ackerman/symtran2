@@ -1,7 +1,7 @@
 parameters:
-#    ginsberg_transportation.example.class: Ginsberg\TransportationBundle\Example
+    ginsberg_transportation.user.class: Ginsberg\TransportationBundle\DependencyInjection\User
 
 services:
-#    ginsberg_transportation.example:
-#        class: %ginsberg_transportation.example.class%
+    user:
+        class: %ginsberg_transportation.user.class%
 #        arguments: [@service_id, "plain_value", %parameter%]
