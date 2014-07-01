@@ -21,6 +21,7 @@ class PersonType extends AbstractType
             ->add('phone')
             ->add('status')
             ->add('dateApproved', 'datetime', array(
+                'required' => FALSE,
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd hh:mm a',
                 'attr' => array(
@@ -31,7 +32,7 @@ class PersonType extends AbstractType
             ->add('hasUnpaidTicket')
             ->add('created', 'datetime', array('widget' => 'text', 'empty_value' => 'Enter a date', 'read_only' => true))
             ->add('modified', 'datetime', array('widget' => 'text', 'empty_value' => 'Enter a date', 'read_only' => true))
-            ->add('program')
+            ->add('program', null, array('empty_value' => 'Select a Program'))
         ;
     }
     

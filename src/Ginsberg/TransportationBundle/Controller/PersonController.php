@@ -19,7 +19,7 @@ class PersonController extends Controller
 {
 
     /**
-     * Lists all Person entities.
+     * Lists all Person entities with status pending. Needs to include a Search form.
      *
      * @Route("/", name="person")
      * @Method("GET")
