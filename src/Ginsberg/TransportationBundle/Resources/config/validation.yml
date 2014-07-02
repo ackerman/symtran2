@@ -1,18 +1,3 @@
-Ginsberg\TransportationBundle\Entity\Program:
-  properites:
-    name:
-      - NotBlank: ~
-      - Length:
-          min: 4
-          max: 255
-    shortcode:
-      - Length:
-          min: 4
-          max: 100
-    eligibility_group:
-      - Length:
-          min: 4
-          max: 255
 Ginsberg\TransportationBundle\Entity\Destination:
   properties:
     name:
@@ -20,7 +5,5 @@ Ginsberg\TransportationBundle\Entity\Destination:
       - Length:
           min: 4
           max: 255
-    program:
-      - NotBlank: ~
     
       

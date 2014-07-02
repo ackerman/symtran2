@@ -47,6 +47,9 @@ class ProgramController extends Controller
         $entity = new Program();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
+        
+        $logger = $this->get('logger');
+        $logger->info(var_dump($request));
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();

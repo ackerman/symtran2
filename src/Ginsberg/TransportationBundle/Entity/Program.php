@@ -119,20 +119,20 @@ class Program
     }
 
     /**
-     * Set eligibility_group
+     * Set eligibilityGroup
      *
      * @param string $eligibilityGroup
      * @return Program
      */
     public function setEligibilityGroup($eligibilityGroup)
     {
-        $this->eligibility_group = $eligibilityGroup;
+        $this->eligibilityGroup = $eligibilityGroup;
 
         return $this;
     }
 
     /**
-     * Get eligibility_group
+     * Get eligibilityGroup
      *
      * @return string 
      */

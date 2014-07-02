@@ -29,13 +29,93 @@ class PersonController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         
-        $entities = $em->getRepository('GinsbergTransportationBundle:Person')->findByPendingSortedByCreated('pending');
-        //$entities = $em->getRepository('GinsbergTransportationBundle:Person')->findAll();
+        //$entities = $em->getRepository('GinsbergTransportationBundle:Person')->findByPendingSortedByCreated('pending');
+        $entities = $em->getRepository('GinsbergTransportationBundle:Person')->findAll();
 
         return array(
             'entities' => $entities,
         );
     }
+    
+    /**
+     * Searches the Person table.
+     *
+     * @Route("/", name="person_search")
+     * @Method("POST")
+     * @Template("GinsbergTransportationBundle:Person:search.html.twig")
+     */
+    public function searchAction(Request $request)
+    {
+        $entity = new Person();
+        $form = $this->createCreateForm($entity);
+        $form->handleRequest($request);
+        
+        
+        
+        if ($form->isValid()) {
+          $firstName = $form->get('firstName')->getData();
+          $lastName = $form->get('lastName')->getData();
+          $uniqname = $form->get('uniqname')->getData();
+          $program = $form->get('program')->getData();
+            $em = $this->getDoctrine()->getManager();
+            
+            $entities = $em->getRepository('GinsbergTransportationBundle:Person')->findBySearchCriteria($firstName, $lastName, $uniqname, $program);
+        
+            // Can't get PrePersist to work, so setting created here
+            //$entity->setCreated(new \DateTime());
+            
+            //$em->persist($entity);
+            //$em->flush();
+            
+            return array(
+              'entities' => $entities,
+            );
+            //return $this->redirect($this->generateUrl('person_search'));
+        }
+
+        return array(
+            'entity' => $entity,
+            'form'   => $form->createView(),
+        );
+    }
+
+    /**
+    * Creates a form to search the Person table.
+    *
+    * @param Person $entity The entity
+    *
+    * @return \Symfony\Component\Form\Form The form
+    */
+    private function createSearchForm(Person $entity)
+    {
+        $form = $this->createForm(new PersonType(), $entity, array(
+            'action' => $this->generateUrl('person_search'),
+            'method' => 'POST',
+        ));
+
+        $form->add('submit', 'submit', array('label' => 'Search'));
+
+        return $form;
+    }
+
+    /**
+     * Displays a form to search the Person table.
+     *
+     * @Route("/search", name="person_search_criteria")
+     * @Method("GET")
+     * @Template()
+     */
+    public function searchCriteriaAction()
+    {
+        $entity = new Person();
+        $form   = $this->createSearchForm($entity);
+
+        return array(
+            'entity' => $entity,
+            'form'   => $form->createView(),
+        );
+    }
+    
     /**
      * Creates a new Person entity.
      *
@@ -251,8 +331,5 @@ class PersonController extends Controller
             ->getForm()
         ;
     }
-    
-    public function searchAction() {
-      
-    }
+
 }

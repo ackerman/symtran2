@@ -11,15 +11,27 @@ use Doctrine\ORM\EntityRepository;
  * repository methods below.
  */
 class PersonRepository extends EntityRepository
-{
-  public function findMe() {
-    print_r("Here");
-  }
-  
+{  
   public function findByPendingSortedByCreated($status) 
   {
     $dql = "SELECT p FROM GinsbergTransportationBundle:Person p WHERE p.status = :status ORDER BY p.created ASC";
     $query = $this->getEntityManager()->createQuery($dql)->setParameter('status', $status);
+
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
+  }
+  
+  public function findBySearchCriteria($firstName = NULL, $lastName = NULL, $uniqname = NULL, $program = NULL) 
+  {
+    $programDQL = ($program) ? ' AND IDENTITY(p.program) LIKE :program ' : '';
+    $params = ($program) ? array('firstName' => "%$firstName%", 'lastName' => "%$lastName%", 'uniqname' => "%$uniqname%", 'program' => $program) :
+      array('firstName' => "%$firstName%", 'lastName' => "%$lastName%", 'uniqname' => "%$uniqname%");
+    
+    $dql = "SELECT p FROM GinsbergTransportationBundle:Person p WHERE p.firstName LIKE :firstName AND p.lastName LIKE :lastName AND p.uniqname LIKE :uniqname $programDQL ORDER BY p.lastName ASC, p.firstName ASC, p.uniqname ASC";
+    $query = $this->getEntityManager()->createQuery($dql)->setParameters($params);
 
     try {
       return $query->getResult();

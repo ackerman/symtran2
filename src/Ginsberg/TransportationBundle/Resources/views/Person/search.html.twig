@@ -1,0 +1,61 @@
+{% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
+
+{% block body -%}
+    <h1>People</h1>
+    <ul>
+        <li class="button">
+            <a href="{{ path('person_new') }}">
+                Create a new entry
+            </a>
+        </li>
+    </ul>
+    <table class="records_list">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>First_name</th>
+                <th>Last_name</th>
+                <th>Uniqname</th>
+                <th>Program</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th>Date Approved</th>
+                <th>Terms Agreed</th>
+                <th>Tickets</th>
+                <th>Created</th>
+                <th>Modified</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td><a href="{{ path('person_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td>{{ entity.firstName }}</td>
+                <td>{{ entity.lastName }}</td>
+                <td>{{ entity.uniqname }}</td>
+                <td>{{ entity.program }}</td>
+                <td>{{ entity.phone }}</td>
+                <td>{{ entity.status }}</td>
+                <td>{% if entity.dateApproved %}{{ entity.dateApproved|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ entity.isTermsAgreed }}</td>
+                <td>{{ entity.hasUnpaidTicket }}</td>
+                <td>{% if entity.created %}{{ entity.created|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.modified %}{{ entity.modified|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>
+                <ul>
+                    <li>
+                        <a href="{{ path('person_show', { 'id': entity.id }) }}">show</a>
+                    </li>
+                    <li>
+                        <a href="{{ path('person_edit', { 'id': entity.id }) }}">edit</a>
+                    </li>
+                </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    
+    {% endblock %}
