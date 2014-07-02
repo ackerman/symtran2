@@ -1,7 +1,5 @@
-{% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
-
-{% block body -%}
-    <h1>Search</h1>
+<div id="person_search">
+    <h2>Search</h2>
     {{ form_start(form, {'attr': {'novalidate': 'novalidate' }}) }}
       {{ form_errors(form) }}
       {{ form_row(form.firstName) }}
@@ -14,4 +12,4 @@
       
     {{ form_end(form, {'render_rest': false}) }}
 
-{% endblock %}
+</div>

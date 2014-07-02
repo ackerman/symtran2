@@ -8,6 +8,8 @@
                 Create a new entry
             </a>
         </li>
+        
+        {{ render(controller('GinsbergTransportationBundle:Person:searchCriteria')) }}
     </ul>
     <table class="records_list">
         <thead>
@@ -34,7 +36,7 @@
                 <td>{{ entity.firstName }}</td>
                 <td>{{ entity.lastName }}</td>
                 <td>{{ entity.uniqname }}</td>
-                <td>{{ entity.program }}</td>
+                <td><a href="{{ path('program_show', { 'id': entity.program.id }) }}">{{ entity.program }}</a></td>
                 <td>{{ entity.phone }}</td>
                 <td>{{ entity.status }}</td>
                 <td>{% if entity.dateApproved %}{{ entity.dateApproved|date('Y-m-d H:i:s') }}{% endif %}</td>

@@ -1,15 +1,40 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
-    <h1>Reservation creation</h1>
+    <h1>Add a Reservation</h1>
+    <ul class="record_actions">
+      <li>
+          <a href="{{ path('reservation') }}">
+              Back to the list
+          </a>
+      </li>
+    </ul>
+    {{ form_start(form) }}
+      {{ form_errors(form) }}
+      {{ form_row(form.start) }}
+      {{ form_row(form.endt) }}
+      {{ form_row(form.checkout) }}
+      {{ form_row(form.checkin) }}
+      {{ form_row(form.seatsRequired) }}
+      {{ form_row(form.person) }}
+      {{ form_row(form.program) }}
+      {{ form_row(form.destinationText) }}
+      {{ form_row(form.notes) }}
+      {{ form_row(form.isNoShow) }}
+      {{ form_row(form._token) }}
+      {{ form_row(form.created) }}
+      {{ form_row(form.modified) }}
+      
+      {{ form_row(form.submit, {'label': 'Submit' }) }}
+      
+    {{ form_end(form, {'render_rest': false}) }}
 
-    {{ form(form) }}
-
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('reservation') }}">
-            Back to the list
-        </a>
-    </li>
-</ul>
+        
+{% endblock %}
+{% block javascripts %}
+  {% javascripts 
+    '@GinsbergTransportationBundle/Resources/public/js/reservation_datetimepicker.js' %}
+    {{ parent() }}
+    <script src="{{ asset_url }}"></script>
+  {% endjavascripts %}
 {% endblock %}

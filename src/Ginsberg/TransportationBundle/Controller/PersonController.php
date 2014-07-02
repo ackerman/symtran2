@@ -29,8 +29,8 @@ class PersonController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         
-        //$entities = $em->getRepository('GinsbergTransportationBundle:Person')->findByPendingSortedByCreated('pending');
-        $entities = $em->getRepository('GinsbergTransportationBundle:Person')->findAll();
+        $entities = $em->getRepository('GinsbergTransportationBundle:Person')->findByPendingSortedByCreated('pending');
+        //$entities = $em->getRepository('GinsbergTransportationBundle:Person')->findAll();
 
         return array(
             'entities' => $entities,
@@ -42,7 +42,7 @@ class PersonController extends Controller
      *
      * @Route("/", name="person_search")
      * @Method("POST")
-     * @Template("GinsbergTransportationBundle:Person:search.html.twig")
+     * @Template("GinsbergTransportationBundle:Person:index.html.twig")
      */
     public function searchAction(Request $request)
     {
@@ -57,20 +57,20 @@ class PersonController extends Controller
           $lastName = $form->get('lastName')->getData();
           $uniqname = $form->get('uniqname')->getData();
           $program = $form->get('program')->getData();
-            $em = $this->getDoctrine()->getManager();
-            
-            $entities = $em->getRepository('GinsbergTransportationBundle:Person')->findBySearchCriteria($firstName, $lastName, $uniqname, $program);
-        
-            // Can't get PrePersist to work, so setting created here
-            //$entity->setCreated(new \DateTime());
-            
-            //$em->persist($entity);
-            //$em->flush();
-            
-            return array(
-              'entities' => $entities,
-            );
-            //return $this->redirect($this->generateUrl('person_search'));
+          $em = $this->getDoctrine()->getManager();
+
+          $entities = $em->getRepository('GinsbergTransportationBundle:Person')->findBySearchCriteria($firstName, $lastName, $uniqname, $program);
+
+          // Can't get PrePersist to work, so setting created here
+          //$entity->setCreated(new \DateTime());
+
+          //$em->persist($entity);
+          //$em->flush();
+
+          return array(
+            'entities' => $entities,
+          );
+          //return $this->redirect($this->generateUrl('person_search'));
         }
 
         return array(
@@ -201,8 +201,6 @@ class PersonController extends Controller
             throw $this->createNotFoundException('Unable to find Person entity.');
         }
         
-        $em->getRepository('GinsbergTransportationBundle:Person')->findMe();
-        //$entity->testMe();
         $deleteForm = $this->createDeleteForm($id);
 
         return array(

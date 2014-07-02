@@ -412,4 +412,8 @@ class Person
           return null;
         }
     }
+    
+    public function __toString() {
+      return $this->firstName . ' ' . $this->lastName;
+    }
 }

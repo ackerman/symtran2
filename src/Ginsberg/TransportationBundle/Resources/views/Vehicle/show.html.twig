@@ -22,6 +22,10 @@
                 <td>{{ entity.capacity }}</td>
             </tr>
             <tr>
+            <th>Program</th>
+              <td><a href="{{ path('program_show', { 'id': entity.program.id }) }}">{{ entity.program }}</a></td>
+            </tr>
+            <tr>
                 <th>Notes</th>
                 <td>{{ entity.notes }}</td>
             </tr>

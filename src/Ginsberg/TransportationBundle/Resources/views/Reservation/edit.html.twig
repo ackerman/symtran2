@@ -14,3 +14,10 @@
     <li>{{ form(delete_form) }}</li>
 </ul>
 {% endblock %}
+{% block javascripts %}
+  {% javascripts 
+    '@GinsbergTransportationBundle/Resources/public/js/reservation_datetimepicker.js' %}
+    {{ parent() }}
+    <script src="{{ asset_url }}"></script>
+  {% endjavascripts %}
+{% endblock %}

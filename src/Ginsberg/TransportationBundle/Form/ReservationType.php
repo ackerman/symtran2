@@ -15,17 +15,46 @@ class ReservationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('start')
-            ->add('end')
-            ->add('out')
-            ->add('in')
+            ->add('start', 'datetime', array(
+                'required' => TRUE,
+                'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd hh:mm a',
+                'attr' => array(
+                    'class' => 'datetime',
+                  )
+                ))
+            ->add('end', 'datetime', array(
+                'required' => TRUE,
+                'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd hh:mm a',
+                'attr' => array(
+                    'class' => 'datetime',
+                  )
+                ))
+            ->add('checkout', 'datetime', array(
+                'required' => FALSE,
+                'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd hh:mm a',
+                'attr' => array(
+                    'class' => 'datetime',
+                  )
+                ))
+            ->add('checkin', 'datetime', array(
+                'required' => FALSE,
+                'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd hh:mm a',
+                'attr' => array(
+                    'class' => 'datetime',
+                  )
+                ))
+            ->add('person')
+            ->add('program')
+            ->add('seatsRequired')
+            ->add('destinationText')
+            ->add('notes')
+            ->add('isNoShow')
             ->add('created')
             ->add('modified')
-            ->add('seats_required')
-            ->add('destination_text')
-            ->add('notes')
-            ->add('is_noshow')
-            ->add('person')
         ;
     }
     

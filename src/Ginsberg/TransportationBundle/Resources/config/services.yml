@@ -4,4 +4,7 @@ parameters:
 services:
     user:
         class: %ginsberg_transportation.user.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
+    ginsberg_transportation.form.type.person:
+      class: Ginsberg\TransportationBundle\Form\Type\PersonType
+      tags:
+        - { name: form.type, alias: person }

@@ -2,7 +2,19 @@
 
 {% block body -%}
     <h1>Reservation</h1>
-
+<ul class="record_actions">
+    <li>
+        <a href="{{ path('reservation') }}">
+            Back to the list
+        </a>
+    </li>
+    <li>
+        <a href="{{ path('reservation_edit', { 'id': entity.id }) }}">
+            Edit
+        </a>
+    </li>
+    <li>{{ form(delete_form) }}</li>
+</ul>
     <table class="record_properties">
         <tbody>
             <tr>
@@ -18,12 +30,36 @@
                 <td>{{ entity.end|date('Y-m-d H:i:s') }}</td>
             </tr>
             <tr>
-                <th>Out_datetime</th>
-                <td>{{ entity.outdatetime|date('Y-m-d H:i:s') }}</td>
+                <th>Checkout</th>
+                <td>{{ entity.checkout is empty ? '' : entity.checkout|date('Y-m-d H:i:s') }}</td>
             </tr>
             <tr>
-                <th>In_datetime</th>
-                <td>{{ entity.indatetime|date('Y-m-d H:i:s') }}</td>
+                <th>Checkin</th>
+                <td>{{ entity.checkin|date('Y-m-d H:i:s') }}</td>
+            </tr>
+            <tr>
+                <th>Seats Required</th>
+                <td>{{ entity.seatsRequired }}</td>
+            </tr>
+            <tr>
+                <th>Person</th>
+                <td>{{ entity.person }}</td>
+            </tr>
+            <tr>
+                <th>Program</th>
+                <td>{{ entity.program }}</td>
+            </tr>
+            <tr>
+                <th>Destination Text</th>
+                <td>{{ entity.destinationText }}</td>
+            </tr>
+            <tr>
+                <th>Notes</th>
+                <td>{{ entity.notes }}</td>
+            </tr>
+            <tr>
+                <th>No Show</th>
+                <td>{{ entity.isNoShow }}</td>
             </tr>
             <tr>
                 <th>Created</th>
@@ -33,36 +69,7 @@
                 <th>Modified</th>
                 <td>{{ entity.modified|date('Y-m-d H:i:s') }}</td>
             </tr>
-            <tr>
-                <th>Seats_required</th>
-                <td>{{ entity.seatsrequired }}</td>
-            </tr>
-            <tr>
-                <th>Destination_text</th>
-                <td>{{ entity.destinationtext }}</td>
-            </tr>
-            <tr>
-                <th>Notes</th>
-                <td>{{ entity.notes }}</td>
-            </tr>
-            <tr>
-                <th>Is_noshow</th>
-                <td>{{ entity.isnoshow }}</td>
-            </tr>
         </tbody>
     </table>
 
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('reservation') }}">
-            Back to the list
-        </a>
-    </li>
-    <li>
-        <a href="{{ path('reservation_edit', { 'id': entity.id }) }}">
-            Edit
-        </a>
-    </li>
-    <li>{{ form(delete_form) }}</li>
-</ul>
 {% endblock %}

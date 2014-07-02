@@ -2,6 +2,19 @@
 
 {% block body -%}
     <h1>Person</h1>
+    <ul class="record_actions">
+      <li>
+          <a href="{{ path('person') }}">
+              Back to the list
+          </a>
+      </li>
+      <li>
+          <a href="{{ path('person_edit', { 'id': entity.id }) }}">
+              Edit
+          </a>
+      </li>
+      <li>{{ form(delete_form) }}</li>
+    </ul>
 
     <table class="record_properties">
         <tbody>
@@ -10,16 +23,20 @@
                 <td>{{ entity.id }}</td>
             </tr>
             <tr>
-                <th>First_name</th>
+                <th>First Name</th>
                 <td>{{ entity.firstName }}</td>
             </tr>
             <tr>
-                <th>Last_name</th>
+                <th>Last Name</th>
                 <td>{{ entity.lastName }}</td>
             </tr>
             <tr>
                 <th>Uniqname</th>
                 <td>{{ entity.uniqname }}</td>
+            </tr>
+            <tr>
+                <th>Program</th>
+                <td><a href="{{ path('program_show', { 'id': entity.program.id }) }}">{{ entity.program }}</a></td>
             </tr>
             <tr>
                 <th>Phone</th>
@@ -30,15 +47,15 @@
                 <td>{{ entity.status }}</td>
             </tr>
             <tr>
-                <th>Date_approved</th>
+                <th>Date approved</th>
                 <td>{{ entity.dateApproved is empty ? "" : entity.dateApproved|date('Y-m-d H:i:s') }}</td>
             </tr>
             <tr>
-                <th>Is_terms_agreed</th>
+                <th>Terms agreed</th>
                 <td>{{ entity.isTermsAgreed }}</td>
             </tr>
             <tr>
-                <th>Has ticket/th>
+                <th>Has ticket</th>
                 <td>{{ entity.hasUnpaidTicket }}</td>
             </tr>
             <tr>
@@ -51,18 +68,4 @@
             </tr>
         </tbody>
     </table>
-
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('person') }}">
-            Back to the list
-        </a>
-    </li>
-    <li>
-        <a href="{{ path('person_edit', { 'id': entity.id }) }}">
-            Edit
-        </a>
-    </li>
-    <li>{{ form(delete_form) }}</li>
-</ul>
 {% endblock %}

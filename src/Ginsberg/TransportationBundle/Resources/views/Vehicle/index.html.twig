@@ -1,8 +1,14 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
-    <h1>Vehicle list</h1>
-
+    <h1>Vehicles</h1>
+    <ul>
+      <li>
+        <a href="{{ path('vehicle_new') }}">
+            Create a new entry
+        </a>
+      </li>
+    </ul>
     <table class="records_list">
         <thead>
             <tr>
@@ -10,6 +16,7 @@
                 <th>Name</th>
                 <th>Type</th>
                 <th>Capacity</th>
+                <th>Program</th>
                 <th>Notes</th>
                 <th>Is_active</th>
                 <th>Actions</th>
@@ -22,6 +29,7 @@
                 <td>{{ entity.name }}</td>
                 <td>{{ entity.type }}</td>
                 <td>{{ entity.capacity }}</td>
+                <td><a href="{{ path('program_show', { 'id': entity.program.id }) }}">{{ entity.program }}</a></td>
                 <td>{{ entity.notes }}</td>
                 <td>{{ entity.isactive }}</td>
                 <td>
@@ -38,12 +46,4 @@
         {% endfor %}
         </tbody>
     </table>
-
-        <ul>
-        <li>
-            <a href="{{ path('vehicle_new') }}">
-                Create a new entry
-            </a>
-        </li>
-    </ul>
     {% endblock %}
