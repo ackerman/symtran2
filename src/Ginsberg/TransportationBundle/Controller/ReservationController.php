@@ -27,13 +27,30 @@ class ReservationController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+      // Set local variables needed for fetching different
+      // kinds of trips (upcoming trips, ongoing trips, and checkins today)
+      $now = date("Y-m-d H:i:s");
+      $date =  strtotime(date("Y-m-d"));
+      $date_end = mktime(0,0,0, date("m", $date), date("d", $date)+1, date("Y", $date));
+      $date_end = date('Y-m-d H:i:s', $date_end);
+      $date = date('Y-m-d H:i:s', $date);
+      $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->findAll();
+      // Find today's upcoming trips.
+      // Looks for trips where the reservation has an assigned vehicle
+      // and the vehicle has not been checked out yet.
+      $upcoming = $em->getRepository('GinsbergTransportationBundle:Reservation')->findUpcomingTrips($date, $date_end);
+      $ongoing = $em->getRepository('GinsbergTransportationBundle:Reservation')->findOngoingTrips($now);
+      $checkinsToday = $em->getRepository('GinsbergTransportationBundle:Reservation')->findCheckinsToday($now);
+      
+$entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->findAll();
 
-        return array(
-            'entities' => $entities,
-        );
+      return array(
+          'upcoming' => $upcoming,
+          'ongoing' => $ongoing,
+          'checkinsToday' => $checkinsToday,
+          'entities' => $entities,
+      );
     }
     /**
      * Creates a new Reservation entity.

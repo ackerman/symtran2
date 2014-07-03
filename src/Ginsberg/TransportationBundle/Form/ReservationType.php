@@ -47,6 +47,7 @@ class ReservationType extends AbstractType
                     'class' => 'datetime',
                   )
                 ))
+            ->add('vehicle', NULL, array('empty_value' => 'Manually Select a Vehicle'))
             ->add('person')
             ->add('program')
             ->add('seatsRequired')

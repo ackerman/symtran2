@@ -239,4 +239,13 @@ class Vehicle
     {
         return $this->program;
     }
+    
+    /**
+     * To String
+     * 
+     * @return string The type concatenated with the name
+     */
+    public function __toString() {
+      return $this->getType() . ' ' . $this->getName();
+    }
 }

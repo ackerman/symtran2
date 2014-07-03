@@ -83,6 +83,22 @@ class Reservation
      * @ORM\JoinColumn(name="program_id", referencedColumnName="id", nullable=false)
      */
     private $program;
+    
+    /**
+     * @var \Ginsberg\TransportationBundle\Entity\Series
+     */
+    private $series;
+
+    /**
+     * @var \Ginsberg\TransportationBundle\Entity\Destination
+     */
+    private $destination;
+
+    /**
+     * @var \Ginsberg\TransportationBundle\Entity\Vehicle
+     */
+    private $vehicle;
+
 
     /**
      * Constructor
@@ -411,12 +427,7 @@ class Reservation
     {
         return $this->program;
     }
-    /**
-     * @var \Ginsberg\TransportationBundle\Entity\Vehicle
-     */
-    private $vehicle;
-
-
+    
     /**
      * Set vehicle
      *
@@ -439,16 +450,7 @@ class Reservation
     {
         return $this->vehicle;
     }
-    /**
-     * @var \Ginsberg\TransportationBundle\Entity\Series
-     */
-    private $series;
-
-    /**
-     * @var \Ginsberg\TransportationBundle\Entity\Destination
-     */
-    private $destination;
-
+    
 
     /**
      * Set series

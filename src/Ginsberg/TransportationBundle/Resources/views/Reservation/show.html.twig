@@ -35,7 +35,11 @@
             </tr>
             <tr>
                 <th>Checkin</th>
-                <td>{{ entity.checkin|date('Y-m-d H:i:s') }}</td>
+                <td>{{ entity.checkin is empty ? '' : entity.checkin|date('Y-m-d H:i:s') }}</td>
+            </tr>
+            <tr>
+                <th>Vehicle</th>
+                <td>{{ entity.vehicle }}</td>
             </tr>
             <tr>
                 <th>Seats Required</th>
@@ -54,6 +58,10 @@
                 <td>{{ entity.destinationText }}</td>
             </tr>
             <tr>
+                <th>Series</th>
+                <td>{{ entity.series }}</td>
+            </tr>
+            <tr>
                 <th>Notes</th>
                 <td>{{ entity.notes }}</td>
             </tr>
@@ -67,7 +75,7 @@
             </tr>
             <tr>
                 <th>Modified</th>
-                <td>{{ entity.modified|date('Y-m-d H:i:s') }}</td>
+                <td>{{ entity.modified is empty ? '' : entity.modified|date('Y-m-d H:i:s') }}</td>
             </tr>
         </tbody>
     </table>

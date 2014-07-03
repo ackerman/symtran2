@@ -3,6 +3,7 @@
 namespace Ginsberg\TransportationBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\ResultSetMapping as RSMAP;
 
 /**
  * ReservationRepository
@@ -12,4 +13,94 @@ use Doctrine\ORM\EntityRepository;
  */
 class ReservationRepository extends EntityRepository
 {
+  /**
+  * Return all reservations for today that have not yet been checked out or declared No Shows.
+  * I.e., find all reservations where the given start time is between start and end.
+  *    today        8am -------------- 8pm today (Today's times)
+  *  yesterday, 5pm ------------------------- 6pm tomorrow (reservation spans today, will be found)
+  *  yesterday, 5pm -------------- today 6pm (reservation started yesterday and ends today, will be found)
+  *    today,            5pm -- today 6pm (reservation started today and ends today, will be found)
+  *    today,            5pm ---------------- 6pm tomorrow (reservation started today and ends tomorrow, will be found)
+  * 
+  * @param date $date The date we are finding reservations for (could be sometime today or a date selected)
+  * @param date $date_end The beginning of the day following $date (could be tomorrow, could be based on a date selected)
+  */
+  public function findUpcomingTrips($date, $date_end)
+  {
+    $params = array('date' => $date, 'date_end' => $date_end);
+    $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE 
+            ((r.start <= :date AND r.end >= :date_end) 
+            OR (r.start <= :date AND r.end >= :date AND r.end <= :date_end) 
+            OR (r.start >= :date AND r.start < :date_end AND r.end < :date_end) 
+            OR (r.start >= :date AND r.start < :date_end AND r.end >= :date_end))
+            AND r.isNoShow = 0
+            AND r.checkout is NULL
+            AND r.vehicle != 0';
+    $query = $this->getEntityManager()->createQuery($dql)->setParameters($params);
+
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
+  }
+  
+  /**
+  * Return all reservations that under way (checked out but not checked in yet).
+  * 
+  * @param date $now Not actually used
+  */ 
+  public function findOngoingTrips($now)
+  {
+    $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE 
+            ((r.checkout is not NULL AND r.checkin is NULL)) AND r.vehicle != 0';
+    $query = $this->getEntityManager()->createQuery($dql);
+
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
+  }
+  
+  /**
+   * Return all reservations that were checked in today
+   * 
+   * @param date $now Not actually used
+   */
+  public function findCheckinsToday($now) 
+  {
+    $em = $this->getEntityManager();
+    
+    // The SQL DATE() function is not supported in Doctrine due to portability issues,
+    // so we have to use Doctrine's createNativeQuery(). That involves
+    // creating a Result Set Mapping from the SQL results to the class.
+    // We do that using the ResultSetMappingBuilder().
+    $rsm = new \Doctrine\ORM\Query\ResultSetMappingBuilder($em, 2);
+    
+    $rsm->addRootEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Reservation', 'r', array('created' => 'recreated', 'modified' => 'rmodified', 'r.program_id' => 'rprogram_id', 'p.program_id' => 'person_program'), 2);
+    /*$rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Program', 'prog', 'r', 'program', array('id' => 'program_id'));
+    $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Person', 'p', 'r', 'person', array('id' => 'person_id'), array('program_id' => 'person_program'));
+    $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Program', 'person_prog', 'p', 'program', array('id' => 'program_id'), array('program_id' => 'wtf_program'));
+    $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Destination', 'd', 'r', 'destination', array('id' => 'destination_id'));
+    $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Program', 'dest_prog', 'd', 'program', array('id' => 'program_id'), array('program_id' => 'goodgod_program'));
+    
+    $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Series', 's', 'r', 'series', array('id' => 'series_id'));
+    $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Ticket', 't', 'r', 'ticket', array('id' => 'ticket_id'));
+    //$rsm->addJoinedEntityFromClassMetadata($class, $alias, $parentAlias, $relation, $renamedColumns)
+    */
+
+    $nativeSQL = 'SELECT r.id, r.start, r.end, r.checkout, r.checkin, r.created, r.modified from reservation r WHERE 
+            CURRENT_DATE() LIKE DATE(r.checkin) 
+            AND r.checkout is not NULL
+            AND r.checkin is not NULL
+            AND r.vehicle_id != 0';
+    $nativeQuery = $em->createNativeQuery($nativeSQL, $rsm);
+
+    try {
+      return $nativeQuery->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
+  }
 }
