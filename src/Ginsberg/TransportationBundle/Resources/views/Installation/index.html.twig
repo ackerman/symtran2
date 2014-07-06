@@ -1,0 +1,75 @@
+{% extends '::base.html.twig' %}
+
+{% block body -%}
+    <h1>Installation list</h1>
+
+    <table class="records_list">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Isopen</th>
+                <th>Reservationsopen</th>
+                <th>Carsavailable</th>
+                <th>Fallstart</th>
+                <th>Thanksgivingstart</th>
+                <th>Thanksgivingend</th>
+                <th>Fallend</th>
+                <th>Winterstart</th>
+                <th>Mlkstart</th>
+                <th>Mlkend</th>
+                <th>Springbreakstart</th>
+                <th>Springbreakend</th>
+                <th>Winterend</th>
+                <th>Fallback</th>
+                <th>Springforward</th>
+                <th>Dailyopen</th>
+                <th>Dailyclose</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td><a href="{{ path('installation_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td>{{ entity.name }}</td>
+                <td>{{ entity.isOpen }}</td>
+                <td>{{ entity.reservationsOpen }}</td>
+                <td>{{ entity.carsAvailable }}</td>
+                <td>{% if entity.fallStart %}{{ entity.fallStart|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.thanksgivingStart %}{{ entity.thanksgivingStart|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.thanksgivingEnd %}{{ entity.thanksgivingEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.fallEnd %}{{ entity.fallEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.winterStart %}{{ entity.winterStart|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.mlkStart %}{{ entity.mlkStart|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.mlkEnd %}{{ entity.mlkEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.springbreakStart %}{{ entity.springbreakStart|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.springbreakEnd %}{{ entity.springbreakEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.winterEnd %}{{ entity.winterEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.fallBack %}{{ entity.fallBack|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.springForward %}{{ entity.springForward|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ entity.dailyOpen }}</td>
+                <td>{{ entity.dailyClose }}</td>
+                <td>
+                <ul>
+                    <li>
+                        <a href="{{ path('installation_show', { 'id': entity.id }) }}">show</a>
+                    </li>
+                    <li>
+                        <a href="{{ path('installation_edit', { 'id': entity.id }) }}">edit</a>
+                    </li>
+                </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+        <ul>
+        <li>
+            <a href="{{ path('installation_new') }}">
+                Create a new entry
+            </a>
+        </li>
+    </ul>
+    {% endblock %}

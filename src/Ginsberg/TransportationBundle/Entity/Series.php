@@ -71,4 +71,13 @@ class Series
     {
         return $this->reservations;
     }
+    
+    /**
+     * To String
+     * 
+     * @return string The Id as a string
+     */
+    public function __toString() {
+      return (string) $this->getId();
+    }
 }

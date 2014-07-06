@@ -8,7 +8,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Ginsberg\TransportationBundle\Entity\Reservation;
+use Ginsberg\TransportationBundle\Entity\Series;
 use Ginsberg\TransportationBundle\Form\ReservationType;
+use \DateTime;
 
 /**
  * Reservation controller.
@@ -114,7 +116,77 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
 
           $em->flush();
           
-          if ($entity->getVehicle()) {
+         
+          
+          // The "isRepeating" field in the Reservation form is not mapped 
+          // to the database or the entity, so we get it from the $form
+          if ($form->get('isRepeating')->getData() == TRUE)
+          {
+            $logger->info('This is a repeating reservation');
+            $repeatingReservationsCreated = 0; // counter
+            $noVehicleAvailable = array(); // keep track of failed reservations
+          
+            // The "Repeats Until" field in the Reservation form is not mapped 
+            // to the database or the entity, so we get it from the $form
+            $repeatsUntil = $form->get('repeatsUntil')->getData();
+            list($repeatHour, $repeatMinute) = explode(':', $em->getRepository('GinsbergTransportationBundle:Installation')->find(1)->getDailyClose());
+            $repeatsUntil->setTime($repeatHour, $repeatMinute);
+            
+            // Get the datetime one week from the base reservation (the
+            // reservation that we are calculating the repetitions from).
+            // DO NOT USE PHP DateTime CALCULATIONS. THEY ADJUST RESERVATION 
+            // TIMES FOR DAYLIGHT SAVINGS TIME, WHICH IS _NOT_ WHAT WE WANT.
+            // E.g., a reservation for 4pm can become a reservation for 3pm or
+            // 5pm if you use PHP calculations. 
+            $formatter = $this->get('res_utils');
+            $repetitionStart = $formatter->getRepeatInterval($entity->getStart());
+            $repetitionEnd = $formatter->getRepeatInterval($entity->getEnd());
+            
+            while ($repetitionStart < $repeatsUntil)
+            {
+              // Create reservation for new date
+              $reservation = new Reservation();
+              $reservation->setSeatsRequired($entity->getSeatsRequired());
+              $reservation->setSeries($entity->getSeries());
+              $reservation->setPerson($entity->getPerson());
+              $reservation->setProgram($entity->getProgram());
+              $reservation->setVehicle(NULL);
+              $reservation->setDestination($entity->getDestination());
+              $reservation->setDestinationText($entity->getDestinationText());
+              $reservation->setNotes($entity->getNotes());
+              $reservation->setCheckout(NULL);
+              $reservation->setCheckin(NULL);
+              $reservation->setCreated(new DateTime());
+              
+              $reservation->setStart($repetitionStart);
+              $reservation->setEnd($repetitionEnd);
+              
+              $em->persist($reservation);
+              $em->flush();
+              
+              if (!$this->_assignReservationToVehicle($reservation))
+              {
+                array_push($noVehicleAvailable, $reservation);
+              }
+              
+              $em->flush();
+              $repeatingReservationsCreated++;
+              
+              // Set up the dates for the next repetition of the reservation
+              $repetitionStart = $formatter->getRepeatInterval($repetitionStart);
+              $repetitionEnd = $formatter->getRepeatInterval($repetitionEnd);
+              
+            }
+          }
+          if ($repeatingReservation)
+          {
+            $this->get('session')->getFlashBag()->add(
+                'repeating',
+                'Created ' . $repeatingReservationsCreated . ' reservations.'
+            );
+            return $this->redirect($this->generateUrl('reservation_show', array('id' => $entity->getId())));
+          } 
+           if ($entity->getVehicle()) {
             $this->get('session')->getFlashBag()->add(
                 'sucess',
                 'Success! Reservation '. $entity->getId() . ' with vehicle ' . $entity-getVehicle()->getName() . ' has been created.'
@@ -128,13 +200,6 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
                 'Sorry! No vehicle is available at the requested time.'
             );
             return $this->redirect($this->generateUrl('reservation_show', array('id' => $entity->getId())));
-          }
-          
-          if ($entity->isRepeating())
-          {
-            $logger->info('This is a repeating reservation');
-            $repeating_reservations_created = 0; // counter
-            $no_vehicle_available = array(); // keep track of failed reservations
           }
         }
 

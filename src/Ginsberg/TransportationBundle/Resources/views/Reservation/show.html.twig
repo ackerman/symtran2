@@ -25,7 +25,11 @@
         {{ flashMessage }}
       </div>
     {% endfor %}
-    
+    {% for flashMessage in app.session.flashbag.get('repeating') %}
+      <div class="flash-notice reservation-repeating">
+        {{ flashMessage }}
+      </div>
+    {% endfor %}
     <table class="record_properties">
         <tbody>
             <tr>

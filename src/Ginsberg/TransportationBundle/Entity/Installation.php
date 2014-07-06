@@ -96,6 +96,15 @@ class Installation
      */
     private $springForward;
 
+    /**
+     * @var string
+     */
+    private $dailyOpen;
+
+    /**
+     * @var string
+     */
+    private $dailyClose;
 
     /**
      * Get id
@@ -473,5 +482,51 @@ class Installation
     public function getSpringForward()
     {
         return $this->springForward;
+    }
+    
+    /**
+     * Set dailyOpen
+     *
+     * @param string $dailyOpen
+     * @return Installation
+     */
+    public function setDailyOpen($dailyOpen)
+    {
+        $this->dailyOpen = $dailyOpen;
+
+        return $this;
+    }
+
+    /**
+     * Get dailyOpen
+     *
+     * @return string 
+     */
+    public function getDailyOpen()
+    {
+        return $this->dailyOpen;
+    }
+
+    /**
+     * Set dailyClose
+     *
+     * @param string $dailyClose
+     * @return Installation
+     */
+    public function setDailyClose($dailyClose)
+    {
+        $this->dailyClose = $dailyClose;
+
+        return $this;
+    }
+
+    /**
+     * Get dailyClose
+     *
+     * @return string 
+     */
+    public function getDailyClose()
+    {
+        return $this->dailyClose;
     }
 }
