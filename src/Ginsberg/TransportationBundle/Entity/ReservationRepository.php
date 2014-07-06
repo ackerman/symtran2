@@ -35,7 +35,7 @@ class ReservationRepository extends EntityRepository
             OR (r.start >= :date AND r.start < :date_end AND r.end >= :date_end))
             AND r.isNoShow = 0
             AND r.checkout is NULL
-            AND r.vehicle != 0';
+            AND r.vehicle is not NULL';
     $query = $this->getEntityManager()->createQuery($dql)->setParameters($params);
 
     try {
@@ -53,7 +53,7 @@ class ReservationRepository extends EntityRepository
   public function findOngoingTrips($now)
   {
     $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE 
-            ((r.checkout is not NULL AND r.checkin is NULL)) AND r.vehicle != 0';
+            ((r.checkout is not NULL AND r.checkin is NULL)) AND r.vehicle is not NULL';
     $query = $this->getEntityManager()->createQuery($dql);
 
     try {
@@ -94,7 +94,7 @@ class ReservationRepository extends EntityRepository
             CURRENT_DATE() LIKE DATE(r.checkin) 
             AND r.checkout is not NULL
             AND r.checkin is not NULL
-            AND r.vehicle_id != 0 
+            AND r.vehicle_id is not NULL 
             AND r.person_id = p.id AND r.program_id = prog.id AND r.vehicle_id = v.id';
     $nativeQuery = $em->createNativeQuery($nativeSQL, $rsm);
 
@@ -104,7 +104,4 @@ class ReservationRepository extends EntityRepository
       return null;
     }
   }
-
-  
-
 }

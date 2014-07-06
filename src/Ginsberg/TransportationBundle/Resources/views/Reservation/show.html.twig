@@ -15,6 +15,17 @@
     </li>
     <li>{{ form(delete_form) }}</li>
 </ul>
+    {% for flashMessage in app.session.flashbag.get('success') %}
+      <div class="flash-notice save-success">
+        {{ flashMessage }}
+      </div>
+    {% endfor %}
+    {% for flashMessage in app.session.flashbag.get('failure') %}
+      <div class="flash-notice save-failure">
+        {{ flashMessage }}
+      </div>
+    {% endfor %}
+    
     <table class="record_properties">
         <tbody>
             <tr>
@@ -39,7 +50,13 @@
             </tr>
             <tr>
                 <th>Vehicle</th>
-                <td>{{ entity.vehicle }}</td>
+                <td>
+                  {% if entity.vehicle %}
+                    {{ entity.vehicle }}
+                  {% else %}
+                    <span style="color: red; font-weight: bold;">No Vehicle Available!</span>
+                  {% endif %}
+                  </td>
             </tr>
             <tr>
                 <th>Seats Required</th>

@@ -81,8 +81,6 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           $logger->info("vehicleRequested = $vehicleRequested");
           $logger->info("vehicleRequested is of type " . gettype($vehicleRequested));
           
-          $originalDateEdited = '';
-          
           // TODO: figure out how to handle special PC requirements for Destination
           
           // Even if the admin requested a particular vehicle, we don't want 
@@ -109,24 +107,35 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           $logger->info('Just persisted reservation entity prior to assigning vehicle');
           $em->flush(); 
          
-            $logger->info('vehicleRequested is of type ' . gettype($vehicleRequested));
-            //$vehicle = $em->getRepository('Vehicle')->find($);
-            
-            
-            $vehiclesArray = $this->_assignReservationToVehicle($entity->getStart(), $entity->getEnd(), $vehicleRequested);
-            $logger->info("vehclesArray = ");
-            //$logger->info(var_dump($vehiclesArray));
-            if (sizeof($vehiclesArray) == 1) 
-            {
-              $entity->setVehicle($vehiclesArray[0]);
-            }
-           
-            $em->flush();
-            return $this->redirect($this->generateUrl('reservation_show', array('id' => $entity->getId())));
-           
+          $logger->info('vehicleRequested is of type ' . gettype($vehicleRequested));
+          //$vehicle = $em->getRepository('Vehicle')->find($);
+
+          $entity = $this->_assignReservationToVehicle($entity, $vehicleRequested);
+
+          $em->flush();
           
-          $logger->info('Flush was false? Redirecting to index page');
-           // return $this->redirect($this->generateUrl('reservation'));
+          if ($entity->getVehicle()) {
+            $this->get('session')->getFlashBag()->add(
+                'sucess',
+                'Success! Reservation '. $entity->getId() . ' with vehicle ' . $entity-getVehicle()->getName() . ' has been created.'
+            );
+            return $this->redirect($this->generateUrl('reservation_show', array('id' => $entity->getId())));
+          }
+          else
+          {
+            $this->get('session')->getFlashBag()->add(
+                'failure',
+                'Sorry! No vehicle is available at the requested time.'
+            );
+            return $this->redirect($this->generateUrl('reservation_show', array('id' => $entity->getId())));
+          }
+          
+          if ($entity->isRepeating())
+          {
+            $logger->info('This is a repeating reservation');
+            $repeating_reservations_created = 0; // counter
+            $no_vehicle_available = array(); // keep track of failed reservations
+          }
         }
 
         return array(
@@ -447,31 +456,67 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
   * @param Vehicle $requestedVehicle Vehicle if admin selected one
 	* @return array $reservationsToSave Array (possibly empty) of reservations with vehicles assigned
 	*/
-	private function _assignReservationToVehicle($start, $end, $requestedVehicle = FALSE)
+	private function _assignReservationToVehicle($entity, $requestedVehicle = FALSE)
   {
+    $em = $this->getDoctrine()->getManager();
     $logger = $this->get('logger');
-    $vehicles = array();
 		// If a particular car has been requested from the admin Reservation screen,
 		// see if that particular vehicle is available
     if ($requestedVehicle) 
     {
       $logger->info('requestedVehicle must exist');
       // Is the vehicle active and big enough?
-      if ($requestedVehicle->getIsActive() && $requestedVehicle->getCapacity() >= $requestedVehicle->getCapacity())
+      if ($requestedVehicle->getIsActive() && $requestedVehicle->getCapacity() >= $entity->getCapacity())
       {
         $logger->info('requestedVehicle active and big enough');
-        if ($this->_timeSlotAvailable($start, $end, $requestedVehicle)){
-					$vehicles[] = $requestedVehicle;
-          return $vehicles;
+        if ($this->_timeSlotAvailable($entity->getStart(), $entity->getEnd(), $requestedVehicle)){
+					$entity->setVehicle($requestedVehicle);
+          return $entity;
 				} else 
         {
-          return; NULL;
+          $entity->setVehicle(NULL);
+          return $entity;
         }
       }
     } else
-    {
-      // No particular vehicle was requested
-      ;
+    { // No particular vehicle was requested
+      
+      // Find vehicles that are active, in the right program, and have the 
+      // required capacity.
+			// If reservation is for AR, only let them use AR vehicles
+			// If reservation is for PC, only let them use PC vehicles
+			// If contract or staff, they can use any vehicle
+      $vehicles = array();
+      $prog = $entity->getProgram();
+      if ($prog->getName() == 'Project Community' || $prog->getName() == 'America Reads')
+      {
+        $logger->info('prog = ' . $prog->getName());
+        
+        $vehicles = $em->getRepository('GinsbergTransportationBundle:Vehicle')->findActiveVehiclesByProgram($entity);
+      } else
+      {
+        $logger->info('Thinks not PC or AR. prog name = ' . $prog->getName());
+        $vehicles = $em->getRepository('GinsbergTransportationBundle:Vehicle')->findActiveVehiclesByCapacity($entity);
+        //$vehicles = \Ginsberg\TransportationBundle\Entity\Vehicle::findActiveVehiclesByCapacity($entity);
+      }
+      
+      // For each vehicle, check if the timeslot is free.
+			// (this works fine for 10 cars but might not scale to 100 due to the number
+			// of queries required.)
+			foreach ($vehicles as $vehicle) {
+				//$logger->info("Calling time_slot_available for start: " . $entity->getStart() . ", end: " . $entity->getEnd() . ", vehicle: " . $entity->getVehicle()->getName());
+				if($this->_timeSlotAvailable($entity->getStart(), $entity->getEnd(), $vehicle)){
+					$entity->setVehicle($vehicle);
+					return $entity;
+				} else {
+
+				}
+			}
+      
+      // No vehicle available; mark the problem.
+			$entity->setVehicle(NULL);
+			$logger->info('In _assignReservationToVehcle. Assignment failed, no vehicle available.');
+			return $entity;
     }
 		/*if ($requestedVehicle) {
 			// Is the vehicle active and big enough?
