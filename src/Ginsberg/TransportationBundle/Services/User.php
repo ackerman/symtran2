@@ -1,6 +1,6 @@
 <?php
 
-namespace Ginsberg\TransportationBundle\DependencyInjection;
+namespace Ginsberg\TransportationBundle\Services;
 
 /**
  * This file provides methods for managing user identity info for the logged-in user, 

@@ -78,23 +78,24 @@ class ReservationRepository extends EntityRepository
     // We do that using the ResultSetMappingBuilder().
     $rsm = new \Doctrine\ORM\Query\ResultSetMappingBuilder($em, 2);
     
-    $rsm->addRootEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Reservation', 'r', array('created' => 'recreated', 'modified' => 'rmodified', 'r.program_id' => 'rprogram_id', 'p.program_id' => 'person_program'), 2);
+    $rsm->addRootEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Reservation', 'r', array('created' => 'rcreated'));
     /*$rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Program', 'prog', 'r', 'program', array('id' => 'program_id'));
-    $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Person', 'p', 'r', 'person', array('id' => 'person_id'), array('program_id' => 'person_program'));
-    $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Program', 'person_prog', 'p', 'program', array('id' => 'program_id'), array('program_id' => 'wtf_program'));
+    $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Person', 'p', 'r', 'person', array('id' => 'person_id'));
+    //$rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Program', 'person_prog', 'p', 'program', array('program_id' => 'program_id'), array('id' => 'wtf_program'));
     $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Destination', 'd', 'r', 'destination', array('id' => 'destination_id'));
-    $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Program', 'dest_prog', 'd', 'program', array('id' => 'program_id'), array('program_id' => 'goodgod_program'));
+    /*$rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Program', 'dest_prog', 'd', 'program', array('id' => 'program_id'), array('program_id' => 'goodgod_program'));
     
     $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Series', 's', 'r', 'series', array('id' => 'series_id'));
     $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Ticket', 't', 'r', 'ticket', array('id' => 'ticket_id'));
     //$rsm->addJoinedEntityFromClassMetadata($class, $alias, $parentAlias, $relation, $renamedColumns)
     */
 
-    $nativeSQL = 'SELECT r.id, r.start, r.end, r.checkout, r.checkin, r.created, r.modified from reservation r WHERE 
+    $nativeSQL = 'SELECT r.id, r.start, r.end, r.checkout, r.checkin, r.program_id from reservation r, vehicle v, person p, program prog WHERE 
             CURRENT_DATE() LIKE DATE(r.checkin) 
             AND r.checkout is not NULL
             AND r.checkin is not NULL
-            AND r.vehicle_id != 0';
+            AND r.vehicle_id != 0 
+            AND r.person_id = p.id AND r.program_id = prog.id AND r.vehicle_id = v.id';
     $nativeQuery = $em->createNativeQuery($nativeSQL, $rsm);
 
     try {
@@ -103,4 +104,7 @@ class ReservationRepository extends EntityRepository
       return null;
     }
   }
+
+  
+
 }

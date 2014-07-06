@@ -69,6 +69,15 @@ swiftmailer:
     password:  "%mailer_password%"
     spool:     { type: memory }
 
+# Monolog configuration for rotating log (from
+# http://stackoverflow.com/questions/20126530/log-rotating-with-monolog-in-symfony2
+monolog:
+    handlers:
+        main:
+            type:  rotating_file
+            path:  %kernel.logs_dir%/%kernel.environment%.log
+            level: debug
+            
 # Stof Doctrine Extension Bundle (provides Timestampable)
 #stof_doctrine_extensions:
 #  default_locale: en_US

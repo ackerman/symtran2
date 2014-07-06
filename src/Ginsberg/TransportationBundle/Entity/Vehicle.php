@@ -39,7 +39,7 @@ class Vehicle
     /**
      * @var boolean
      */
-    private $is_active;
+    private $isActive;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -169,7 +169,7 @@ class Vehicle
      */
     public function setIsActive($isActive)
     {
-        $this->is_active = $isActive;
+        $this->isActive = $isActive;
 
         return $this;
     }
@@ -181,7 +181,7 @@ class Vehicle
      */
     public function getIsActive()
     {
-        return $this->is_active;
+        return $this->isActive;
     }
 
     /**

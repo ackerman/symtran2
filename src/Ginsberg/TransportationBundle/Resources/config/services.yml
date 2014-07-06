@@ -1,9 +1,13 @@
 parameters:
-    ginsberg_transportation.user.class: Ginsberg\TransportationBundle\DependencyInjection\User
+    ginsberg_transportation.user.class: Ginsberg\TransportationBundle\Services\User
+    ginsberg_transportation.res_utils.class: Ginsberg\TransportationBundle\Services\ReservationUtils
 
 services:
     user:
         class: %ginsberg_transportation.user.class%
+    res_utils: 
+      class: %ginsberg_transportation.res_utils.class%
+      arguments: ["@request_stack"]
     ginsberg_transportation.form.type.person:
       class: Ginsberg\TransportationBundle\Form\Type\PersonType
       tags:

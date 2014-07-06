@@ -46,10 +46,11 @@ class ReservationController extends Controller
 $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->findAll();
 
       return array(
-          'upcoming' => $upcoming,
-          'ongoing' => $ongoing,
-          'checkinsToday' => $checkinsToday,
-          'entities' => $entities,
+        'upcoming' => $upcoming,
+        'ongoing' => $ongoing,
+        'checkinsToday' => $checkinsToday,
+        'entities' => $entities,
+        'date' => $date,
       );
     }
     /**
@@ -66,11 +67,66 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($entity);
+          // We'll use the Entity Manager in severall places, so get it now
+          $em = $this->getDoctrine()->getManager();
+          
+          $logger = $this->get('logger');
+            
+          // Is this a repeating reservation?
+          $repeatingReservation = ($form->get('isRepeating')->getData()) ? TRUE : FALSE;
+          $logger->info("repeatingReservation = $repeatingReservation"); 
+          
+          // Did the admin select a particular vehicle in the Create form?
+          $vehicleRequested = $entity->getVehicle();
+          $logger->info("vehicleRequested = $vehicleRequested");
+          $logger->info("vehicleRequested is of type " . gettype($vehicleRequested));
+          
+          $originalDateEdited = '';
+          
+          // TODO: figure out how to handle special PC requirements for Destination
+          
+          // Even if the admin requested a particular vehicle, we don't want 
+          // $entity->vehicle set yet, because we haven't checked it for 
+          // availablity yet. The vehcle_id of the requested vehicle is 
+          // stored in $vehicleRequested.
+          if ($vehicleRequested) {
+            $entity->setVehicle(NULL);
+          }
+          
+          // If this is a repeating reservation, create the Series and get the
+          // series id to set in the Reservation entity.
+          if ($repeatingReservation)
+          {
+            $seriesEntity = new Series();
+            $em->persist($seriesEntity);
             $em->flush();
-
+            $entity->setSeries($seriesEntity);
+          }
+          
+          // If the reservation can be successfully saved, attempt to assign 
+          // it to a vehicle.
+          $em->persist($entity);
+          $logger->info('Just persisted reservation entity prior to assigning vehicle');
+          $em->flush(); 
+         
+            $logger->info('vehicleRequested is of type ' . gettype($vehicleRequested));
+            //$vehicle = $em->getRepository('Vehicle')->find($);
+            
+            
+            $vehiclesArray = $this->_assignReservationToVehicle($entity->getStart(), $entity->getEnd(), $vehicleRequested);
+            $logger->info("vehclesArray = ");
+            //$logger->info(var_dump($vehiclesArray));
+            if (sizeof($vehiclesArray) == 1) 
+            {
+              $entity->setVehicle($vehiclesArray[0]);
+            }
+           
+            $em->flush();
             return $this->redirect($this->generateUrl('reservation_show', array('id' => $entity->getId())));
+           
+          
+          $logger->info('Flush was false? Redirecting to index page');
+           // return $this->redirect($this->generateUrl('reservation'));
         }
 
         return array(
@@ -262,4 +318,229 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
             ->getForm()
         ;
     }
+    
+  /**
+	 * Given a start and end time and a vehicle id, returns true if the vehicle
+	 * is free in the given timeframe.
+   * 
+	 * @param string $start the start of the time period formatted as 'Y-m-d H:i:s'
+	 * @param string $end the end of the time period formatted as 'Y-m-d H:i:s'
+	 * @param Vehicle $vehicle The vehicle we are testing for availability
+	 * @return boolean True if the time slot is free, False if there is a reservation.
+	*/
+	private function _timeSlotAvailable($start, $end, $vehicle) 
+  {
+    $logger = $this->get('logger');
+    $logger->info('in _timeSlotAvailable(). Type of vehicle is ' . gettype($vehicle));
+    //$request = $this->requestStack->getCurrentRequest();
+    
+		// find all reservations where the given start time is exactly the same as start
+    $em = $this->getDoctrine()->getManager();
+    $query = $em->createQuery(
+        'SELECT COUNT(r.vehicle)
+          FROM GinsbergTransportationBundle:Reservation r
+          WHERE r.start = :start AND r.vehicle = :vehicle')
+        ->setParameters(array(':start' => $start, ':vehicle' => $vehicle));
+    
+    $startEqualOverlap = $query->getSingleScalarResult();
+
+		// find all reservations where the given end time is exactly the same as end
+    //$repository = $this->getDoctrine()->getRepository('GinsbergTransportationBundle:Reservation');
+		
+    $query = $em->createQuery(
+      'SELECT COUNT(r.vehicle)
+        FROM GinsbergTransportationBundle:Reservation r
+        WHERE r.end = :end AND r.vehicle = :vehicle')
+      ->setParameters(array(':end' => $end, ':vehicle' => $vehicle));
+    
+    $endEqualOverlap = $query->getSingleScalarResult();
+/*
+    $end_equal_overlap = Reservation::model()->count(
+			'end = :end AND vehicle_id = :vehicle_id',
+			array(
+						':end' => $end,
+						':vehicle_id' => $vehicle_id,)
+		);
+*/
+	  // find all reservations where the given start time is between start and end.
+    //         3pm ------------ 5pm (given $start and $end)
+    // 2pm ------------ 4pm (existing reservation, will be found)
+    // also catches situations like this:
+    //         3pm ------------ 5pm (given $start and $end)
+    // 2pm ---------------------------- 6pm (existing reservation, will be found)
+    $query = $em->createQuery(
+      'SELECT COUNT(r.vehicle)
+        FROM GinsbergTransportationBundle:Reservation r
+        WHERE r.start < :start AND r.end > :start AND r.vehicle = :vehicle')
+      ->setParameters(array(':start' => $start, ':vehicle' => $vehicle));
+    
+    $startOverlap = $query->getSingleScalarResult();
+/*
+    $start_overlap = Reservation::model()->count(
+      'start < :start AND end > :start AND vehicle_id = :vehicle_id',
+      array(
+        ':start' => $start,
+        ':vehicle_id' => $vehicle_id,
+      )
+    );
+ */
+
+    // find all reservations where the given end time is between start and end.
+    // 2pm ----------- 4pm (given $start and end)
+    //        3pm ------------- 5pm (existing reservation, will be found)
+    $query = $em->createQuery(
+      'SELECT COUNT(r.vehicle)
+        FROM GinsbergTransportationBundle:Reservation r
+        WHERE r.start < :end AND r.end > :end AND r.vehicle = :vehicle')
+      ->setParameters(array(':end' => $end, ':vehicle' => $vehicle));
+    
+    $endOverlap = $query->getSingleScalarResult();
+/*
+    $end_overlap = Reservation::model()->count(
+      'start < :end AND end > :end AND vehicle_id = :vehicle_id',
+      array(
+        ':end' => $end,
+        ':vehicle_id' => $vehicle_id,
+      )
+    );
+*/
+
+    // find all reservations where the given start and end time completely
+    // cover a reservation, like so:
+    //    2pm --------------------------- 5pm (given $start and $end)
+    //            3pm ----------- 4pm (existing reservation, will be found)
+    $query = $em->createQuery(
+      'SELECT COUNT(r.vehicle)
+        FROM GinsbergTransportationBundle:Reservation r
+        WHERE r.start > :start AND r.end < :end AND r.vehicle = :vehicle')
+      ->setParameters(array(':start' => $start, ':end' => $end, ':vehicle' => $vehicle));
+    
+    $fullOverlap = $query->getSingleScalarResult();
+/*
+    $full_overlap = Reservation::model()->count(
+      'start > :start AND end < :end AND vehicle_id = :vehicle_id',
+      array(
+        ':start' => $start,
+        ':end' => $end,
+        ':vehicle_id' => $vehicle_id,
+      )
+    );
+*/
+    // var_dump("vehicle " . $vehicle_id);   // debug
+    // var_dump($start_overlap);   // debug
+    // var_dump($end_overlap);     // debug
+    // var_dump($full_overlap);    // debug
+		$logger->info("In Reservation::time_slot_available, start_equal_overlap = $startEqualOverlap, start_overlap = $startOverlap, end_equal_overlap = $endEqualOverlap, end_overlap = $endOverlap, full_overlap = $fullOverlap, vehicle_id =  " . $vehicle->getId());
+    if ( (bool) $startEqualOverlap or (bool) $startOverlap or (bool) $endEqualOverlap or (bool) $endOverlap or (bool) $fullOverlap )
+    {
+      return False;
+    } 
+    return True;
+	}
+  
+  /**
+	* Attempts to find an available vehicle belonging to the model's program that
+	* and assign it to the current reservation.
+  * 
+  * @param datetime $start The start time of the reservation
+  * @param datetime $end The end time of the reservation
+  * @param Vehicle $requestedVehicle Vehicle if admin selected one
+	* @return array $reservationsToSave Array (possibly empty) of reservations with vehicles assigned
+	*/
+	private function _assignReservationToVehicle($start, $end, $requestedVehicle = FALSE)
+  {
+    $logger = $this->get('logger');
+    $vehicles = array();
+		// If a particular car has been requested from the admin Reservation screen,
+		// see if that particular vehicle is available
+    if ($requestedVehicle) 
+    {
+      $logger->info('requestedVehicle must exist');
+      // Is the vehicle active and big enough?
+      if ($requestedVehicle->getIsActive() && $requestedVehicle->getCapacity() >= $requestedVehicle->getCapacity())
+      {
+        $logger->info('requestedVehicle active and big enough');
+        if ($this->_timeSlotAvailable($start, $end, $requestedVehicle)){
+					$vehicles[] = $requestedVehicle;
+          return $vehicles;
+				} else 
+        {
+          return; NULL;
+        }
+      }
+    } else
+    {
+      // No particular vehicle was requested
+      ;
+    }
+		/*if ($requestedVehicle) {
+			// Is the vehicle active and big enough?
+			$vehicle = Vehicle::model()->findByPk($requestedVehicle);
+			Yii::log('this->id = ' . $this->id, 'info', 'system.debug');
+			Yii::log('vehicle->name = ' . $vehicle->name, 'info', 'system.debug');
+			if ($vehicle->active && $vehicle->capacity >= $this->seats_required) {
+				if(Reservation::time_slot_available($this->start, $this->end, $vehicle->id)){
+					$this->vehicle_id = $vehicle->id;
+					$this->save();
+					return True;
+				}
+			}
+     */
+
+			// The requested vehicle was not available; mark the problem.
+			
+
+
+			// Find vehicles that are active, in the right program, and have the required capacity
+			// If reservation is for AR, only let them use AR vehicles
+			// If reservation is for PC, only let them use PC vehicles
+			// If contract or staff, they can use any vehicle
+     /* 
+			$prog = Program::model()->findByPk($this->program_id);
+			if($prog->name == "Project Community" || $prog->name == "America Reads") {
+				Yii::log('prog name = ' . $prog->name, "info", "System.debug");
+				$vehicles = Vehicle::find_active_vehicles_by_program($this->program_id, $this->seats_required);
+			} else {
+				Yii::log('Thinks not PC or AR. prog name = ' . $prog->name, "info", "System.debug");
+				$vehicles = Vehicle::find_active_vehicles($this->seats_required);
+			}
+      
+			$vehicles = '';
+			$prog = Program::model()->findByPk($this->program_id);
+			if($prog->name == "Project Community" || $prog->name == "America Reads") {
+				Yii::log('prog name = ' . $prog->name, "info", "System.debug");
+				$vehicles = Vehicle::find_active_vehicles_by_program($this->program_id, $this->seats_required);
+			} else {
+				Yii::log('Thinks not PC or AR. prog name = ' . $prog->name, "info", "System.debug");
+				$vehicles = Vehicle::find_active_vehicles($this->seats_required);
+			}
+       
+
+
+			// For each vehicle, check if the timeslot is free.
+			// (this works fine for 10 cars but might not scale to 100 due to the number
+			// of queries required.)
+			foreach ($vehicles as $vehicle) {
+				Yii::log("Calling time_slot_available for start: " . $this->start . ", end: " . $this->end . ", vehicle: " . $vehicle->id, "info", "System.debug");
+				if(Reservation::time_slot_available($this->start, $this->end, $vehicle->id)){
+					$this->vehicle_id = $vehicle->id;
+					$this->save();
+					return True;
+				} else {
+
+				}
+			}
+			// No vehicle available; mark the problem.
+			$this->vehicle_id = Null;
+			//$this->program = Null;
+			if(!$this->save()) {
+				Yii::log('In assign_reservation_to_vehicle. Assignment and save failed. Res id = ' . $this->id . ' Vehicle_id = ' . $this->vehicle_id, 'info', 'system.debug');
+			} else {
+				Yii::log('In assign_reservation_to_vehicle. Assignment failed, but save succeeded. Res id = ' . $this->id . ' Vehicle_id = ' . $this->vehicle_id, 'info', 'system.debug');
+			}
+			return False;
+		}
+      */
+  }
+
 }

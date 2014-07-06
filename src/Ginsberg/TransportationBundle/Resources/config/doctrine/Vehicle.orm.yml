@@ -20,7 +20,7 @@ Ginsberg\TransportationBundle\Entity\Vehicle:
           type: string
           length: 255
           nullable: true
-        is_active:
+        isActive:
           type: boolean
           nullable: true
     oneToMany:

@@ -12,6 +12,12 @@ use Doctrine\ORM\EntityRepository;
  */
 class PersonRepository extends EntityRepository
 {  
+  /**
+   * Find all Persons with status "pending" and sort by "created".
+   * 
+   * @param type $status
+   * @return queryResult|null
+   */
   public function findByPendingSortedByCreated($status) 
   {
     $dql = "SELECT p FROM GinsbergTransportationBundle:Person p WHERE p.status = :status ORDER BY p.created ASC";
@@ -24,8 +30,20 @@ class PersonRepository extends EntityRepository
     }
   }
   
+  /**
+   * Search by optional provided values ($firstName, $lastName, $uniqname, 
+   * $program). Search is loose and not case-sensitive.
+   * 
+   * @param type $firstName
+   * @param type $lastName
+   * @param type $uniqname
+   * @param type $program
+   * @return queryResult|null
+   */
   public function findBySearchCriteria($firstName = NULL, $lastName = NULL, $uniqname = NULL, $program = NULL) 
   {
+    // Only include $program criteria if user is searching on Program
+    // To find associated entity (Person's Program), use IDENTITY() SQL method
     $programDQL = ($program) ? ' AND IDENTITY(p.program) LIKE :program ' : '';
     $params = ($program) ? array('firstName' => "%$firstName%", 'lastName' => "%$lastName%", 'uniqname' => "%$uniqname%", 'program' => $program) :
       array('firstName' => "%$firstName%", 'lastName' => "%$lastName%", 'uniqname' => "%$uniqname%");
@@ -39,4 +57,55 @@ class PersonRepository extends EntityRepository
       return null;
     }
   }
+  
+  /**
+   * Convert PTS status (e.g., "Submitted", "Waiting for Documentation", or 
+   * "Approved" to a Ginsberg Transportation System status, such as "pending" 
+   * or "approved".
+   * 
+   * @param type $ptsStatus
+   * @return string
+   */
+  public static function convertPtsStatusToGcStatus($ptsStatus) {
+		if ($ptsStatus == "Submitted" || $ptsStatus == "Waiting for Documentation") {
+			$gcStatus = 'pending';
+		} elseif ($ptsStatus == "Approved") {
+			$gcStatus = 'approved';
+		} elseif ($ptsStatus == 'Not Approved') {
+			$gcStatus = 'rejected';
+		}
+		return $gcStatus;
+	}
+  
+  /**
+   * Return the users email address
+   * 
+   * @return string The user's email address (uniqname@umich.edu)
+   */
+  public static function getEmail()
+	{
+	  return $this->uniqname . '@umich.edu';
+	}
+  
+  /**
+   * Return the full name of the Person by provided uniqname.
+   * 
+   * Since the Person __toString() method returns the Person's full name, the  
+   * same effect can probably be accomplished with:
+   * (string) $person->findByUniqname($uniqname)
+   * 
+   * @param type $uniqname
+   * @return string|boolean 
+   */
+  public static function getFullNameByUniqname($uniqname)
+	{
+    $person = Person::findByUniqname($uniqname);
+    if ($person)
+    {
+      return $person->first_name . ' ' . $person->last_name;
+    } else 
+    {
+      return False;
+    }
+	}
 }

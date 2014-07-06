@@ -15,6 +15,19 @@ class ReservationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('isRepeating', 'checkbox', array(
+              'mapped' => FALSE,
+              'required' => FALSE,
+            ))
+            ->add('repeatsUntil', 'datetime', array(
+              'mapped' => FALSE,
+              'required' => FALSE,
+              'widget' => 'single_text',
+              'format' => 'yyy-MM-dd hh:mm a',
+              'attr' => array(
+                'class' => 'datetime',
+              )
+            ))
             ->add('start', 'datetime', array(
                 'required' => TRUE,
                 'widget' => 'single_text',
@@ -49,8 +62,9 @@ class ReservationType extends AbstractType
                 ))
             ->add('vehicle', NULL, array('empty_value' => 'Manually Select a Vehicle'))
             ->add('person')
-            ->add('program')
+            ->add('program', NULL, array('empty_value' => 'Select a Program'))
             ->add('seatsRequired')
+            ->add('destination', NULL, array('empty_value' => 'Select a Destination'))
             ->add('destinationText')
             ->add('notes')
             ->add('isNoShow')

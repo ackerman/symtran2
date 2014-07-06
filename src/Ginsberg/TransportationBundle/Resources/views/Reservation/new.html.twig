@@ -11,6 +11,8 @@
     </ul>
     {{ form_start(form) }}
       {{ form_errors(form) }}
+      {{ form_row(form.isRepeating) }}
+      {{ form_row(form.repeatsUntil) }}
       {{ form_row(form.start) }}
       {{ form_row(form.end) }}
       {{ form_row(form.checkout) }}
