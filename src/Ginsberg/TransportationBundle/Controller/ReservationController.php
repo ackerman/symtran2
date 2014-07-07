@@ -73,16 +73,23 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           $em = $this->getDoctrine()->getManager();
           
           $logger = $this->get('logger');
-            
+          
+          // Create arrays to hold successful and unsuccessful vehicle 
+          // assignments
+          $successfulReservations = array();
+          $failedReservations = array();
+          
           // Is this a repeating reservation?
-          $repeatingReservation = ($form->get('isRepeating')->getData()) ? TRUE : FALSE;
-          $logger->info("repeatingReservation = $repeatingReservation"); 
+          $isRepeatingReservation = ($form->get('isRepeating')->getData()) ? TRUE : FALSE;
+          if ($isRepeatingReservation) 
+          {
+            
+          }
+          $logger->info("repeatingReservation = $isRepeatingReservation"); 
           
           // Did the admin select a particular vehicle in the Create form?
           $vehicleRequested = $entity->getVehicle();
-          $logger->info("vehicleRequested = $vehicleRequested");
-          $logger->info("vehicleRequested is of type " . gettype($vehicleRequested));
-          
+
           // TODO: figure out how to handle special PC requirements for Destination
           
           // Even if the admin requested a particular vehicle, we don't want 
@@ -95,7 +102,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           
           // If this is a repeating reservation, create the Series and get the
           // series id to set in the Reservation entity.
-          if ($repeatingReservation)
+          if ($isRepeatingReservation)
           {
             $seriesEntity = new Series();
             $em->persist($seriesEntity);
@@ -116,16 +123,26 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
 
           $em->flush();
           
-         
+          if ($isRepeatingReservation) 
+          {
+            $entity->getSeries()->addReservation($entity);
+            $logger->info('First reservation. entity->getVehicle = ' . $entity->getVehicle());
+            if ($entity->getVehicle())
+            {
+              $successfulReservations[] = $entity;
+            } 
+            else 
+            {
+              $failedReservations[] = $entity;
+            }
+          }
           
           // The "isRepeating" field in the Reservation form is not mapped 
           // to the database or the entity, so we get it from the $form
           if ($form->get('isRepeating')->getData() == TRUE)
           {
             $logger->info('This is a repeating reservation');
-            $repeatingReservationsCreated = 0; // counter
-            $noVehicleAvailable = array(); // keep track of failed reservations
-          
+            
             // The "Repeats Until" field in the Reservation form is not mapped 
             // to the database or the entity, so we get it from the $form
             $repeatsUntil = $form->get('repeatsUntil')->getData();
@@ -161,16 +178,21 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
               $reservation->setStart($repetitionStart);
               $reservation->setEnd($repetitionEnd);
               
-              $em->persist($reservation);
-              $em->flush();
+              $em->persist($reservation);              
               
-              if (!$this->_assignReservationToVehicle($reservation))
+              $reservation->getSeries()->addReservation($reservation);
+              $reservation = $this->_assignReservationToVehicle($reservation, $vehicleRequested);
+              if (!$reservation->getVehicle())
               {
-                array_push($noVehicleAvailable, $reservation);
+                $failedReservations[] = $reservation;
+              }
+              else
+              {
+                $successfulReservations[] = $reservation;
               }
               
+              // Save the reservation with Vehicle assigned (or failed)
               $em->flush();
-              $repeatingReservationsCreated++;
               
               // Set up the dates for the next repetition of the reservation
               $repetitionStart = $formatter->getRepeatInterval($repetitionStart);
@@ -178,28 +200,32 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
               
             }
           }
-          if ($repeatingReservation)
+          if ($isRepeatingReservation)
           {
-            $this->get('session')->getFlashBag()->add(
-                'repeating',
-                'Created ' . $repeatingReservationsCreated . ' reservations.'
-            );
-            return $this->redirect($this->generateUrl('reservation_show', array('id' => $entity->getId())));
+            return $this->render('GinsbergTransportationBundle:Reservation:list_created_repeating.html.twig', array(
+                'successes' => count($successfulReservations), 
+                'failures' => count($failedReservations),
+                'entities' => $reservation->getSeries()->getReservations()));
           } 
-           if ($entity->getVehicle()) {
-            $this->get('session')->getFlashBag()->add(
-                'sucess',
-                'Success! Reservation '. $entity->getId() . ' with vehicle ' . $entity-getVehicle()->getName() . ' has been created.'
-            );
-            return $this->redirect($this->generateUrl('reservation_show', array('id' => $entity->getId())));
-          }
-          else
+          else 
           {
-            $this->get('session')->getFlashBag()->add(
-                'failure',
-                'Sorry! No vehicle is available at the requested time.'
-            );
-            return $this->redirect($this->generateUrl('reservation_show', array('id' => $entity->getId())));
+            // It's just a single reservation. Redirect to the Show template  
+            // with a success or failure Flash message
+            if ($entity->getVehicle()) {
+              $this->get('session')->getFlashBag()->add(
+                  'sucess',
+                  'Success! Reservation '. $entity->getId() . ' with vehicle ' . $entity-getVehicle()->getName() . ' has been created.'
+              );
+              return $this->redirect($this->generateUrl('reservation_show', array('id' => $entity->getId())));
+            }
+            else
+            {
+              $this->get('session')->getFlashBag()->add(
+                  'failure',
+                  'Sorry! No vehicle is available at the requested time.'
+              );
+              return $this->redirect($this->generateUrl('reservation_show', array('id' => $entity->getId())));
+            }
           }
         }
 
@@ -531,7 +557,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
     {
       $logger->info('requestedVehicle must exist');
       // Is the vehicle active and big enough?
-      if ($requestedVehicle->getIsActive() && $requestedVehicle->getCapacity() >= $entity->getCapacity())
+      if ($requestedVehicle->getIsActive() && $requestedVehicle->getCapacity() >= $entity->getSeatsRequired())
       {
         $logger->info('requestedVehicle active and big enough');
         if ($this->_timeSlotAvailable($entity->getStart(), $entity->getEnd(), $requestedVehicle)){

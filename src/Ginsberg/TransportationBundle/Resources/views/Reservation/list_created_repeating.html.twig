@@ -1,0 +1,81 @@
+{% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
+
+{% block body -%}
+  {% set vehicle_requested_text %}
+    <span class="error">REQUESTED VEHICLE NOT AVAILABLE</span>
+  {% endset %}
+  {% set no_vehicle_text %}
+    <span class="error">NO VEHICLE AVAILABLE</span>
+  {% endset %}
+  <h1>Reservations Created</h1> 
+  <h2>(Successful: {{ successes }} , Failed: {{ failures }})</h2>
+    <ul>
+      <li>
+        <a href="{{ path('reservation') }}">
+            Return to Reservations
+        </a>
+      </li>
+    </ul> 
+    <table class="records_list">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Checkout</th>
+                <th>Checkin</th>
+                <th>Vehicle</th>
+                <th>Seats required</th>
+                <th>Person</th>
+                <th>Program</th>
+                <th>Destination</th>
+                <th>Destination text</th>
+                <th>Series</th>
+                <th>Notes</th>
+                <th>No Show</th>
+                <th>Created</th>
+                <th>Modified</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td><a href="{{ path('reservation_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td>{% if entity.start %}{{ entity.start|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.end %}{{ entity.end|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.checkout %}{{ entity.checkout|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.checkin %}{{ entity.checkin|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>
+                  {% if entity.vehicle == false %}
+                    {{ no_vehicle_text }}
+                  {% else %}
+                    {{ entity.vehicle }}
+                  {% endif %}
+                </td>
+                <td>{{ entity.seatsRequired }}</td>
+                <td>{{ entity.person }}</td>
+                <td>{{ entity.program }}</td>
+                <td>{{ entity.destination }}</td>
+                <td>{{ entity.destinationText }}</td>
+                <td>{{ entity.series }}</td>
+                <td>{{ entity.notes }}</td>
+                <td>{{ entity.isNoShow }}</td>
+                <td>{% if entity.created %}{{ entity.created|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.modified %}{{ entity.modified|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>
+                <ul>
+                    <li>
+                        <a href="{{ path('reservation_show', { 'id': entity.id }) }}">show</a>
+                    </li>
+                    <li>
+                        <a href="{{ path('reservation_edit', { 'id': entity.id }) }}">edit</a>
+                    </li>
+                </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
