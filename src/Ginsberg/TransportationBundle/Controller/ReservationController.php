@@ -33,15 +33,15 @@ class ReservationController extends Controller
       // kinds of trips (upcoming trips, ongoing trips, and checkins today)
       $now = date("Y-m-d H:i:s");
       $date =  strtotime(date("Y-m-d"));
-      $date_end = mktime(0,0,0, date("m", $date), date("d", $date)+1, date("Y", $date));
-      $date_end = date('Y-m-d H:i:s', $date_end);
+      $dateEnd = mktime(0,0,0, date("m", $date), date("d", $date)+1, date("Y", $date));
+      $dateEnd = date('Y-m-d H:i:s', $dateEnd);
       $date = date('Y-m-d H:i:s', $date);
       $em = $this->getDoctrine()->getManager();
 
       // Find today's upcoming trips.
       // Looks for trips where the reservation has an assigned vehicle
       // and the vehicle has not been checked out yet.
-      $upcoming = $em->getRepository('GinsbergTransportationBundle:Reservation')->findUpcomingTrips($date, $date_end);
+      $upcoming = $em->getRepository('GinsbergTransportationBundle:Reservation')->findUpcomingTrips($date, $dateEnd);
       $ongoing = $em->getRepository('GinsbergTransportationBundle:Reservation')->findOngoingTrips($now);
       $checkinsToday = $em->getRepository('GinsbergTransportationBundle:Reservation')->findCheckinsToday($now);
       
@@ -126,7 +126,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           if ($isRepeatingReservation) 
           {
             $entity->getSeries()->addReservation($entity);
-            $logger->info('First reservation. entity->getVehicle = ' . $entity->getVehicle());
+            $logger->info('Just saved first reservation in series. entity->getVehicle = ' . $entity->getVehicle());
             if ($entity->getVehicle())
             {
               $successfulReservations[] = $entity;
@@ -139,8 +139,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           
           // The "isRepeating" field in the Reservation form is not mapped 
           // to the database or the entity, so we get it from the $form
-          if ($form->get('isRepeating')->getData() == TRUE)
-          {
+          if ($isRepeatingReservation) {
             $logger->info('This is a repeating reservation');
             
             // The "Repeats Until" field in the Reservation form is not mapped 
@@ -159,8 +158,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
             $repetitionStart = $formatter->getRepeatInterval($entity->getStart());
             $repetitionEnd = $formatter->getRepeatInterval($entity->getEnd());
             
-            while ($repetitionStart < $repeatsUntil)
-            {
+            while ($repetitionStart < $repeatsUntil) {
               // Create reservation for new date
               $reservation = new Reservation();
               $reservation->setSeatsRequired($entity->getSeatsRequired());
@@ -211,10 +209,13 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           {
             // It's just a single reservation. Redirect to the Show template  
             // with a success or failure Flash message
+            $logger->info('This is a single reservation with Id ' . $entity->getId());
             if ($entity->getVehicle()) {
+              $id = $entity->getId();
+              $vehicleName = $entity->getVehicle()->getName();
               $this->get('session')->getFlashBag()->add(
                   'sucess',
-                  'Success! Reservation '. $entity->getId() . ' with vehicle ' . $entity-getVehicle()->getName() . ' has been created.'
+                  "Success! Reservation $id with vehicle $vehicleName has been created."
               );
               return $this->redirect($this->generateUrl('reservation_show', array('id' => $entity->getId())));
             }
@@ -398,7 +399,9 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
         }
         // Set the unmapped fields
         $form->get('isRepeating')->setData($isRepeating);
-        $form->get('repeatsUntil')->setData($originalUntilDate);
+        if ($isRepeating) {
+         $form->get('repeatsUntil')->setData($originalUntilDate); 
+        }
         
         $form->add('submit', 'submit', array('label' => 'Update'));
 
@@ -414,7 +417,9 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
     public function updateAction(Request $request, $id)
     {
       $em = $this->getDoctrine()->getManager();
-
+      
+      $logger = $this->get('logger');
+      
       $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
 
       if (!$entity) {
@@ -424,7 +429,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
       // Calculations that need to be made before the Edit form is displayed.
       $now = new \DateTime();
       $isReservationPast = ($entity->getEnd() < $now) ? TRUE : FALSE;
-
+      
       // Hold on to the original start and end dates and seatsRequired to 
       // find out if they have changed.
       $originalStartDate = $entity->getStart();
@@ -459,11 +464,22 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
       $editForm->handleRequest($request);
 
       if ($editForm->isValid()) {
+        ///////////////////////////////////////////////////////////////////////
+        //////////// BEGIN ACTUAL UPDATE //////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////
+         
         // TODO Handle Project Community Destination requirements
+        
+        $successfulReservations = array();
+        $failedReservations = array();
+        
         if ($entity->getVehicle() != $originalVehicle) {
           $vehicleRequested = $entity->getVehicle();
         }
-
+        
+        $newStartTime = date('H:i:s', $entity->getStart()->getTimestamp());
+        $newEndTime = date('H:i:s', $entity->getEnd()->getTimestamp());
+			
         // If reservation is in the past, don't let them change start, end, 
         // seats required, or vehicle_id. This would trigger reassigning 
         // the vehicle, which doesn't make sense for a past reservation.
@@ -478,7 +494,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
         // on the POST data. Irrelevant here? Or not?
 
 
-
+        $entity->setModified(new \DateTime);
         $em->flush();
 
         $startOrEndChanged = FALSE;
@@ -522,24 +538,30 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           
           $em->flush();
           
-          $this->_assignReservationToVehicle($vehicleRequested);
+          $this->_assignReservationToVehicle($entity, $vehicleRequested);
           
+          $entity->setModified(new \DateTime);
           $em->flush();
+          
+          if ($entity->getVehicle()) {
+            $successfulReservations[] = $entity;
+          } else {
+            $failedReservations[] = $entity;
+          }
         }
 
-        $editSeries = ($form->get('editSeries')->getData()) ? TRUE : FALSE;
-        if ($repeating && $editSeries && !$isReservationPast) {
+        $editSeries = ($editForm->get('editSeries')->getData()) ? TRUE : FALSE;
+        if ($isRepeating && $editSeries && !$isReservationPast) {
           // Initialize some variables
           $reservationsToDelete = array();
           $deletedReservations = 0;
 
           // calculate final repeat date, making it end at 10:00 pm of the "until" date.
-          $repeatUntil = $form->get('repeatsUntil')->getData();
-          $logger->info('repeat_until = ' . date('Y-m-d H:i:s', $repeatUntil->getTimestamp()) . ', original_until_date = ' . date('Y-m-d H:i:s', $originalUntilDate->getTimestamp()));
-          if ($repeatUntil < $originalUntilDate) {
-            $logger->info('Going to delete some records. repeat_until = ' . date('Y-m-d H:i:s', $repeatUntil->getTimestamp()) . ' original_until_date = ' . date('Y-m-d H:i:s', $originalUntilDate->getTimestamp()));
-            $reservationsToDelete = $this->_getFutureReservationsInSeries($series, $repeatUntil);
-            $reservationsToDelete = $reservationsToDelete->getData();
+          $repeatsUntil = $editForm->get('repeatsUntil')->getData();
+          $logger->info('repeatsUntil = ' . date('Y-m-d H:i:s', $repeatsUntil->getTimestamp()) . ', original_until_date = ' . date('Y-m-d H:i:s', $originalUntilDate->getTimestamp()));
+          if ($repeatsUntil < $originalUntilDate) {
+            $logger->info('Going to delete some records. repeat_until = ' . date('Y-m-d H:i:s', $repeatsUntil->getTimestamp()) . ' original_until_date = ' . date('Y-m-d H:i:s', $originalUntilDate->getTimestamp()));
+            $reservationsToDelete = $this->_getFutureReservationsInSeries($entity, $repeatsUntil);
           }
 
           /*// Get the number of days expressed as seconds between the original start time
@@ -548,73 +570,114 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           $startInterval = Format::get_repeat_interval(strtotime($originalStartDate), strtotime($entity->start));
           $endInterval = Format::get_repeat_interval(strtotime($originalEndDate), strtotime($entity->end));
           */
-          $futureReservations = $this->_getFutureReservationsInSeries($series, $entity->getStart());
+          $futureReservations = $this->_getFutureReservationsInSeries($entity, $entity->getStart());
 
           foreach($futureReservations as $reservation) {
-            $logger->info('starting out in foreach, id = ' . $reservation->getId() . '  orig reservation->start: ' . $reservation->getStart() );
-            $logger->info('starting out in foreach, id = ' . $reservation->getId() . '  orig reservation->end: ' . $reservation->getEnd() );
-            $orig_start = strtotime($reservation->getStart());
-            $orig_end = strtotime($reservation->getEnd());
-            $reservation->attributes=$_POST['Reservation'];
-            $reservation->date_edited = date('Y-m-d H:i:s');
-            $new_start_day = strtotime(date('Y-m-d', $orig_start)) + $startInterval;
-            $new_end_day =  strtotime(date('Y-m-d', $orig_end)) + $endInterval;
-            $new_start_day_and_time = date('Y-m-d', $new_start_day) . ' ' . $new_start_time;
-            $new_end_day_and_time = date('Y-m-d', $new_end_day) . ' ' . $new_end_time;
-            $reservation->setStart($new_start_day_and_time);
-            $reservation->setEnd($new_end_day_and_time);
-            $logger->info('in foreach future_reservations, calculated reservation->start = ' . $reservation->getStart());
-            $logger->info('in foreach future_reservations, calculated reservation->end = ' . $reservation->getEnd());
+            $logger->info('starting out in foreach, id = ' . $reservation->getId());
+            $logger->info('starting out in foreach, id = ' . $reservation->getId());
+            $origStart = $reservation->getStart()->getTimestamp();
+            $origEnd = $reservation->getEnd()->getTimestamp();
+            
+            // TODO: What if someone edits all future reservations starting from
+            // a date in the middle of the series? Should we test here for
+            // if ($origStart != $entity->getStart())???
+            $reservation->setSeatsRequired($entity->getSeatsRequired());
+            $reservation->setPerson($entity->getPerson());
+            $reservation->setProgram($entity->getProgram());
+            $reservation->setDestination($entity->getDestination());
+            $reservation->setDestinationText($entity->getDestinationText());
+            $reservation->setNotes($entity->getNotes());
+            
+            
+            
+            $newStartDay = strtotime(date('Y-m-d', $origStart)) + $startInterval;
+            $newEndDay =  strtotime(date('Y-m-d', $origEnd)) + $endInterval;
+            $newStartDayAndTime = date('Y-m-d', $newStartDay) . ' ' . $newStartTime;
+            $newEndDayAndTime = date('Y-m-d', $newEndDay) . ' ' . $newEndTime;
+            $reservation->setStart(new \DateTime($newStartDayAndTime));
+            $reservation->setEnd(new \DateTime($newEndDayAndTime));
+            $logger->info('in foreach future_reservations, calculated reservation->start = ' . date('Y-m-d H:i:s', $reservation->getStart()->getTimestamp()));
+            $logger->info('in foreach future_reservations, calculated reservation->end = ' . date('Y-m-d H:i:s', $reservation->getEnd()->getTimestamp()));
             if ($needNewVehicle) {
               $reservation->setVehicle(NULL);
             }
             $reservation->setCheckout(NULL);
             $reservation->setCheckin(NULL);
-            if ($reservation->save()) {
-              $logger->info('Repeating reservation saved');
-            }
+            
+            $reservation->setModified(new \DateTime());
+            
+            $em->persist($reservation);
+            $em->flush();
+            
+            $logger->info('Repeating reservation saved: ' );
+            
             if ($needNewVehicle) {
-              $reservation->assign_reservation_to_vehicle($vehicleRequested);
+              $reservation = $this->_assignReservationToVehicle($reservation, $vehicleRequested);
+              $em->flush();
+              if ($reservation->getVehicle()) {
+                $successfulReservations[] = $reservation;
+                //$logger->info("Needed new vehicle. success count = " . count($successfulReservations));
+              } else {
+                $failedReservations[] = $reservation;
+                //$logger->info("Needed new vehicle. failed count = " . count($failedReservations));
+              }
             }
             //$logger->info('in foreach future_reservation, start_datetime now = ' . $start_datetime);
           }
-          if ($reservationsToDelete != '') {
+          if ($reservationsToDelete) {
+            $deletedReservations = 0;
             foreach($reservationsToDelete as $deleteMe) {
-              $logger->info('delete_me->id = ' . $deleteMe->getId() . ' delete_me->start = ' . $deleteMe->getStart());
-              $deleteMe->delete();
+              $logger->info('delete_me->id = ' . $deleteMe->getId() . ' delete_me->start = ' . date('Y-m-d H:i:s', $deleteMe->getStart()->getTimestamp()));
+              $em->remove($deleteMe);
               $deletedReservations++;
             }
           }
-          $seriesData = Reservation::get_changed_reservations_in_series($series_id, $entity->date_edited);
-          $this->render('view_repeating',array(
-            'action'=>'Updated',
-            'modified'=>$entity->getModified(),
-            'isReservationPast'=>$isReservationPast,
-            'vehicleRequested' => $vehicleRequested,
-            'series'=>$entity->getSeries(),
-            'seriesData'=>$seriesData,
-            'deletedReservationCount' => $deletedReservations,
-          ));
+          
+          // Prepare data for rendering the results page summarizing the 
+          // changes made.
+          $logger->info("Calling _getChangedReservationsInSeries().");
+          $seriesData = $this->_getChangedReservationsInSeries($entity);
+          return $this->render('GinsbergTransportationBundle:Reservation:list_updated_repeating.html.twig', array(
+              'deleted' => $deletedReservations, 
+              'successes' => count($successfulReservations),
+              'failures' => count($failedReservations),
+              'vehicleRequested' => $vehicleRequested,
+              'entities' => $seriesData,
+            )
+          );
         } else {
-          //$this->redirect(array('reservation/view/' . $entity->id));
-          // It would be better if this were a redirect(), but I need to pass in the $vehicleRequested variable
-          $this->render('view', array(
-                                      'model'=>$entity,
-                                      'vehicle_requested'=>$vehicleRequested,
-                                      ));
-          // Prevent the rest of this controller from being evaluated and displaying the update view.
-          return TRUE;
+          // It's just a single reservation. Redirect to the Show template  
+          // with a success or failure Flash message
+          if ($entity->getVehicle()) {
+            $id = $entity->getId();
+            $vehicleName = $entity->getVehicle()->getName();
+            $this->get('session')->getFlashBag()->add(
+                'sucess',
+                "Success! Reservation $id with vehicle $vehicleName has been updated."
+            );
+            return $this->redirect($this->generateUrl('reservation_show', array('id' => $entity->getId())));
+          }
+          else
+          {
+            $this->get('session')->getFlashBag()->add(
+                'failure',
+                'Sorry! No vehicle is available at the requested time.'
+            );
+            return $this->redirect($this->generateUrl('reservation_show', array('id' => $entity->getId())));
+          }
         }
 
 
-            return $this->redirect($this->generateUrl('reservation_edit', array('id' => $id)));
-        }
+            //return $this->redirect($this->generateUrl('reservation_edit', array('id' => $id)));
+      }
+      
+      // Display Edit form because no data submitted yet
 
-        return array(
-            'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        );
+      return array(
+          'entity'      => $entity,
+          'edit_form'   => $editForm->createView(),
+          'delete_form' => $deleteForm->createView(),
+      );
     }
     
     /**
@@ -774,9 +837,10 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
 		$logger->info("In Reservation::time_slot_available, start_equal_overlap = $startEqualOverlap, start_overlap = $startOverlap, end_equal_overlap = $endEqualOverlap, end_overlap = $endOverlap, full_overlap = $fullOverlap, vehicle_id =  " . $vehicle->getId());
     if ( (bool) $startEqualOverlap or (bool) $startOverlap or (bool) $endEqualOverlap or (bool) $endOverlap or (bool) $fullOverlap )
     {
-      return False;
-    } 
-    return True;
+      return FALSE;
+    } else {
+      return TRUE;
+    }
 	}
   
   /**
@@ -836,11 +900,13 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
 			// (this works fine for 10 cars but might not scale to 100 due to the number
 			// of queries required.)
 			foreach ($vehicles as $vehicle) {
-				//$logger->info("Calling time_slot_available for start: " . $entity->getStart() . ", end: " . $entity->getEnd() . ", vehicle: " . $entity->getVehicle()->getName());
+				$logger->info("Calling time_slot_available for vehicle: " . $vehicle->getName());
 				if($this->_timeSlotAvailable($entity->getStart(), $entity->getEnd(), $vehicle)){
 					$entity->setVehicle($vehicle);
 					return $entity;
-				} 
+				} else {
+          continue;
+        }
 			}
       
       // No vehicle available; mark the problem.
@@ -947,13 +1013,16 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
 	 *
 	 * Allows a reservation model to reset its date when the reservation is edited.
 	 *
+   * @param datetime $oldDate The original date of the Reservation
+   * @param datetime $newDate The newly requested date from the Reservation form
+   * @return int The interval in seconds between the old and the new dates
 	 */
 	private function _getIntervalInDays($oldDate, $newDate) {
 		// Number of seconds in a day
     $oneday = 24*60*60;
 		// Get the date with no time for each date
-		$oldDate = strtotime(date('Y-m-d', strtotime($oldDate)));
-		$newDate = strtotime(date('Y-m-d', strtotime($newDate)));
+		$oldDate = strtotime(date('Y-m-d', $oldDate->getTimestamp()));
+		$newDate = strtotime(date('Y-m-d', $newDate->getTimestamp()));
 		// get the interval in seconds
 		$interval = $newDate - $oldDate;
 		// Divide $interval by 86400 seconds to get the number of days for rounding.
@@ -973,10 +1042,10 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
    * @param datetime $date The date after which we want the reservations
    * @return array An array of future reservations in this series
    */
-	private function _getFutureReservationsInSeries($series, $date) 
+	private function _getFutureReservationsInSeries($entity, $date) 
   {
     $logger = $this->get('logger');
-    $logger->info('in _getFutureReservationsInSeries. Series id is ' . $series->getId());
+    //$logger->info('in _getFutureReservationsInSeries. Series id is ' . $series->getId());
     //$request = $this->requestStack->getCurrentRequest();
     
 		// find all reservations where the given start time is exactly the same as start
@@ -984,8 +1053,33 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
     $query = $em->createQuery(
         'SELECT r
           FROM GinsbergTransportationBundle:Reservation r
-          WHERE series = :series AND start > :date')
-        ->setParameters(array(':series' => $series, ':date' => $date));
+          WHERE r.series = :series AND r.start > :date')
+        ->setParameters(array(':series' => $entity->getSeries(), ':date' => $date));
+    
+    $futureReservationsInSeries = $query->getResult();
+    return $futureReservationsInSeries;
+	}
+  
+  /**
+   * Returns an array containing all Reservations in the series 
+   * that changed at a certain time. 
+   * 
+   * The save process for the series may extend over a few milliseconds, so 
+   * select for a time period. 
+   */
+	private function _getChangedReservationsInSeries($entity) {
+		$logger = $this->get('logger');
+    $logger->info('in _getChangedReservationsInSeries. Series id is ' . $entity->getSeries()->getId());
+    
+    $endRange = $entity->getEnd()->getTimestamp() + 1;
+		$endRange = date('Y-m-d H:i:s', $endRange);
+    
+    $em = $this->getDoctrine()->getManager();
+    $query = $em->createQuery(
+        'SELECT r
+          FROM GinsbergTransportationBundle:Reservation r
+          WHERE r.series = :series AND r.modified BETWEEN :date AND :endRange')
+        ->setParameters(array(':series' => $entity->getSeries(), ':date' => $entity->getModified(), ':endRange' => $endRange));
     
     $futureReservationsInSeries = $query->getResult();
     return $futureReservationsInSeries;
