@@ -1,9 +1,24 @@
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Enable the jQuery plugin datetimepicker on various fields in the
+ * Reservation Add and Edit forms.
+ * 
+ * For details on using the plugin, see:
+ * http://xdsoft.net/jqplugins/datetimepicker/. The version used here is
+ * slightly modified from the original to provide AM/PM formatting in the
+ * Timepicker.
  */
 jQuery(document).ready(function($) {
+  var allowTimesArray = [];
+  for (var i = 8, j = 0; i < 20; i++) {
+    for (j = 0; j < 60; j += 15) {
+      h = (i < 10 ? '0' : '') + i;
+      m = (j < 10 ? '0' : '') + j;
+      var myTime = h + ':' + m;
+      allowTimesArray.push(myTime);
+    }
+  }
+  allowTimesArray.push('20:00');
+  
   $('#ginsberg_transportationbundle_reservation_start').datetimepicker({
     onGenerate:function( ct ){
       $(this).find('.xdsoft_date.xdsoft_weekend')
@@ -13,9 +28,7 @@ jQuery(document).ready(function($) {
     inline: false,
     mindate: 0,
     weekends: ['06.01.2014', '07.01.2014','08.01.2014','09.01.2014','10.01.2014','11.01.2014','12.01.2014','01.01.2015','02.01.2015','03.01.2015','04.01.2015','05.01.2015','06.01.2015'],
-    step: 15,
-    minTime: '08:00',
-    maxTime: '20:00',
+    allowTimes: allowTimesArray,
     yearStart: '2014',
     yearEnd: '2016',
     roundTime: 'round',
@@ -32,9 +45,7 @@ jQuery(document).ready(function($) {
     inline: false,
     mindate: 0,
     weekends: ['06.01.2014', '07.01.2014','08.01.2014','09.01.2014','10.01.2014','11.01.2014','12.01.2014','01.01.2015','02.01.2015','03.01.2015','04.01.2015','05.01.2015','06.01.2015'],
-    step: 15,
-    minTime: '08:00',
-    maxTime: '20:00',
+    allowTimes: allowTimesArray,
     yearStart: '2014',
     yearEnd: '2016',
     roundTime: 'round',
@@ -51,9 +62,7 @@ jQuery(document).ready(function($) {
     inline: false,
     mindate: 0,
     weekends: ['06.01.2014', '07.01.2014','08.01.2014','09.01.2014','10.01.2014','11.01.2014','12.01.2014','01.01.2015','02.01.2015','03.01.2015','04.01.2015','05.01.2015','06.01.2015'],
-    step: 15,
-    minTime: '08:00',
-    maxTime: '20:00',
+    allowTimes: allowTimesArray,
     yearStart: '2014',
     yearEnd: '2016',
     roundTime: 'round',
@@ -70,9 +79,7 @@ jQuery(document).ready(function($) {
     inline: false,
     mindate: 0,
     weekends: ['06.01.2014', '07.01.2014','08.01.2014','09.01.2014','10.01.2014','11.01.2014','12.01.2014','01.01.2015','02.01.2015','03.01.2015','04.01.2015','05.01.2015','06.01.2015'],
-    step: 15,
-    minTime: '08:00',
-    maxTime: '20:00',
+    allowTimes: allowTimesArray,
     yearStart: '2014',
     yearEnd: '2016',
     roundTime: 'round',
@@ -85,17 +92,14 @@ jQuery(document).ready(function($) {
       $(this).find('.xdsoft_date.xdsoft_weekend')
         .addClass('xdsoft_disabled');
     },
-    timepicker: true,
+    timepicker: false,
     inline: false,
     mindate: 0,
     weekends: ['06.01.2014', '07.01.2014','08.01.2014','09.01.2014','10.01.2014','11.01.2014','12.01.2014','01.01.2015','02.01.2015','03.01.2015','04.01.2015','05.01.2015','06.01.2015'],
-    step: 15,
-    minTime: '08:00',
-    maxTime: '20:00',
     yearStart: '2014',
     yearEnd: '2016',
     roundTime: 'round',
-    format: 'Y-m-d g:i a',
+    format: 'Y-m-d',
     scrollInput: false,
     lang: 'en'
   });

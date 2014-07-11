@@ -28,6 +28,10 @@ class ReservationType extends AbstractType
                 'class' => 'datetime',
               )
             ))
+            ->add('editSeries', 'checkbox', array(
+              'mapped' => FALSE,
+              'required' => FALSE,
+            ))
             ->add('start', 'datetime', array(
                 'required' => TRUE,
                 'widget' => 'single_text',

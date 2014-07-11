@@ -2,8 +2,48 @@
 
 {% block body -%}
     <h1>Reservation edit</h1>
+    
+    {% if isReservationPast == true %}
+      <p><span style="font-weight: bold; color: #FF0000;">Warning: This reservation occurred in the past. Do you really want to edit it?</span><br />
+      <span style="color: #ff0000;">You will not be able to change the start or end dates or the seats required field.</span></p>
+    {% endif %}
 
-    {{ form(edit_form) }}
+    {{ form_start(edit_form) }}
+      {# If this is one reservation in a series, see whether they want to edit
+      all future items or just this one #}
+      {% if edit_form.isRepeating.vars.value == true %}
+        {% if isReservationPast == false %}
+          <div class="row">
+            <span style="font-weight: bold;">Edit all future reservations in this series?</span><br />
+            {{ form_label(edit_form.editSeries) }}
+            {{ form_errors(edit_form.editSeries) }}
+            {{ form_widget(edit_form.editSeries) }}
+          </div>
+        {% endif %}
+      {% endif %}
+
+    
+      {{ form_errors(edit_form) }}
+      {{ form_row(edit_form.isRepeating) }}
+      {{ form_row(edit_form.repeatsUntil) }}
+      {{ form_row(edit_form.start) }}
+      {{ form_row(edit_form.end) }}
+      {{ form_row(edit_form.checkout) }}
+      {{ form_row(edit_form.checkin) }}
+      {{ form_row(edit_form.vehicle) }}
+      {{ form_row(edit_form.seatsRequired) }}
+      {{ form_row(edit_form.person) }}
+      {{ form_row(edit_form.program) }}
+      {{ form_row(edit_form.destinationText) }}
+      {{ form_row(edit_form.notes) }}
+      {{ form_row(edit_form.isNoShow) }}
+      {{ form_row(edit_form._token) }}
+      {{ form_row(edit_form.created) }}
+      {{ form_row(edit_form.modified) }}
+      
+      {{ form_row(edit_form.submit, {'label': 'Update' }) }}
+      
+    {{ form_end(edit_form, {'render_rest': false}) }}
 
         <ul class="record_actions">
     <li>
