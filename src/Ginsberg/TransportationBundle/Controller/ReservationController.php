@@ -80,7 +80,8 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           $failedReservations = array();
           
           // Is this a repeating reservation?
-          $isRepeatingReservation = ($form->get('isRepeating')->getData()) ? TRUE : FALSE;
+          $isRepeatingReservation = $form->get('isRepeating')->getData();
+          $logger->info("isRepeatingReservation = $isRepeatingReservation");
           if ($isRepeatingReservation) 
           {
             
@@ -145,8 +146,11 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
             // The "Repeats Until" field in the Reservation form is not mapped 
             // to the database or the entity, so we get it from the $form
             $repeatsUntil = $form->get('repeatsUntil')->getData();
+            $logger->info('repeatsUntil starts out as ' . date('Y-m-d H:i:s', $repeatsUntil->getTimestamp()));
             list($repeatHour, $repeatMinute) = explode(':', $em->getRepository('GinsbergTransportationBundle:Installation')->find(1)->getDailyClose());
+            $logger->info('repeatHour = ' . $repeatHour . ', repeatMinute = ' . $repeatMinute);
             $repeatsUntil->setTime($repeatHour, $repeatMinute);
+            $logger->info('After setting time, repeatsUntil is ' . date('Y-m-d H:i:s', $repeatsUntil->getTimestamp()));
             
             // Get the datetime one week from the base reservation (the
             // reservation that we are calculating the repetitions from).
@@ -178,7 +182,6 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
               
               $em->persist($reservation);              
               
-              $reservation->getSeries()->addReservation($reservation);
               $reservation = $this->_assignReservationToVehicle($reservation, $vehicleRequested);
               if (!$reservation->getVehicle())
               {
@@ -192,6 +195,8 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
               // Save the reservation with Vehicle assigned (or failed)
               $em->flush();
               
+              $reservation->getSeries()->addReservation($reservation);
+              
               // Set up the dates for the next repetition of the reservation
               $repetitionStart = $formatter->getRepeatInterval($repetitionStart);
               $repetitionEnd = $formatter->getRepeatInterval($repetitionEnd);
@@ -203,7 +208,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
             return $this->render('GinsbergTransportationBundle:Reservation:list_created_repeating.html.twig', array(
                 'successes' => count($successfulReservations), 
                 'failures' => count($failedReservations),
-                'entities' => $reservation->getSeries()->getReservations()));
+                'entities' => $entity->getSeries()->getReservations()));
           } 
           else 
           {
@@ -435,7 +440,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
       $originalStartDate = $entity->getStart();
       $originalEndDate = $entity->getEnd();
       $originalSeatsRequired = $entity->getSeatsRequired();
-      $originalUntilDate = '';
+      $originalUntilDate = NULL;
 
       // Get the entity's vehicle to see if the admin is trying to change 
       // it. If so, we will later save the new id in $requestedVehicle
@@ -455,8 +460,11 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
         // Calculate the "original" until date based on the date of last 
         // reservation in the series at Installation's dailyClose time.
         $originalUntilDate = $lastReservationInSeries->getEnd();
+        $logger->info('originalUntilDate starts out as ' . date('Y-m-d H:i:s', $originalUntilDate->getTimestamp()));
         list($repeatHour, $repeatMinute) = explode(':', $em->getRepository('GinsbergTransportationBundle:Installation')->find(1)->getDailyClose());
+        $logger->info('repeatHour = ' . $repeatHour . ', repeatMinute = ' . $repeatMinute);
         $originalUntilDate->setTime($repeatHour, $repeatMinute);
+        $logger->info('After setting time, originalUntilDate is ' . date('Y-m-d H:i:s', $originalUntilDate->getTimestamp())); 
       }
 
       $deleteForm = $this->createDeleteForm($id);
@@ -559,11 +567,24 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           // calculate final repeat date, making it end at 10:00 pm of the "until" date.
           $repeatsUntil = $editForm->get('repeatsUntil')->getData();
           $logger->info('repeatsUntil = ' . date('Y-m-d H:i:s', $repeatsUntil->getTimestamp()) . ', original_until_date = ' . date('Y-m-d H:i:s', $originalUntilDate->getTimestamp()));
+          list($repeatHour, $repeatMinute) = explode(':', $em->getRepository('GinsbergTransportationBundle:Installation')->find(1)->getDailyClose());
+          $logger->info('repeatHour = ' . $repeatHour . ', repeatMinute = ' . $repeatMinute);
+          $repeatsUntil->setTime($repeatHour, $repeatMinute);
+          $logger->info('After setting time, repeatsUntil is ' . date('Y-m-d H:i:s', $repeatsUntil->getTimestamp())); 
+          
           if ($repeatsUntil < $originalUntilDate) {
-            $logger->info('Going to delete some records. repeat_until = ' . date('Y-m-d H:i:s', $repeatsUntil->getTimestamp()) . ' original_until_date = ' . date('Y-m-d H:i:s', $originalUntilDate->getTimestamp()));
+            $logger->info('Going to delete some records. start = ' . date('Y-m-d H:i:s', $entity->getStart()->getTimestamp()) . ', repeat_until = ' . date('Y-m-d H:i:s', $repeatsUntil->getTimestamp()) . ' original_until_date = ' . date('Y-m-d H:i:s', $originalUntilDate->getTimestamp()));
             $reservationsToDelete = $this->_getFutureReservationsInSeries($entity, $repeatsUntil);
+            
+            $deletedReservations = 0;
+            foreach($reservationsToDelete as $deleteMe) {
+              $logger->info('delete_me->id = ' . $deleteMe->getId() . ' delete_me->start = ' . date('Y-m-d H:i:s', $deleteMe->getStart()->getTimestamp()));
+              $em->remove($deleteMe);
+              $em->flush();
+              $deletedReservations++;
+            } 
           }
-
+          
           /*// Get the number of days expressed as seconds between the original start time
           // and the new start time. Same for end times. We concatenate the day and the time
           // (calculated separately) in order to avoid having PHP adjust for day lights savings.
@@ -573,8 +594,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           $futureReservations = $this->_getFutureReservationsInSeries($entity, $entity->getStart());
 
           foreach($futureReservations as $reservation) {
-            $logger->info('starting out in foreach, id = ' . $reservation->getId());
-            $logger->info('starting out in foreach, id = ' . $reservation->getId());
+            $logger->info('starting out in foreach to modify each future reservation, id = ' . $reservation->getId());
             $origStart = $reservation->getStart()->getTimestamp();
             $origEnd = $reservation->getEnd()->getTimestamp();
             
@@ -624,14 +644,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
             }
             //$logger->info('in foreach future_reservation, start_datetime now = ' . $start_datetime);
           }
-          if ($reservationsToDelete) {
-            $deletedReservations = 0;
-            foreach($reservationsToDelete as $deleteMe) {
-              $logger->info('delete_me->id = ' . $deleteMe->getId() . ' delete_me->start = ' . date('Y-m-d H:i:s', $deleteMe->getStart()->getTimestamp()));
-              $em->remove($deleteMe);
-              $deletedReservations++;
-            }
-          }
+          
           
           // Prepare data for rendering the results page summarizing the 
           // changes made.
@@ -1045,7 +1058,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
 	private function _getFutureReservationsInSeries($entity, $date) 
   {
     $logger = $this->get('logger');
-    //$logger->info('in _getFutureReservationsInSeries. Series id is ' . $series->getId());
+    $logger->info('in _getFutureReservationsInSeries. Series id is ' . $entity->getSeries()->getId()) . ' date ($repeatsUntil)= ' . date('Y-m-d H:i:s', $date->getTimestamp()) . ' start = ' . date('Y-m-d H:i:s', $entity->getStart()->getTimestamp());
     //$request = $this->requestStack->getCurrentRequest();
     
 		// find all reservations where the given start time is exactly the same as start
@@ -1057,6 +1070,9 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
         ->setParameters(array(':series' => $entity->getSeries(), ':date' => $date));
     
     $futureReservationsInSeries = $query->getResult();
+    foreach ($futureReservationsInSeries as $res) {
+      $logger->info('Id = ' . $res->getId() . ' start = ' . date('Y-m-d H:i:s', $res->getStart()->getTimestamp()) . ' repeatsUntil = ' . ' date ($repeatsUntil)= ' . date('Y-m-d H:i:s', $date->getTimestamp()));
+    }
     return $futureReservationsInSeries;
 	}
   

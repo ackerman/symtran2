@@ -99,7 +99,7 @@ jQuery(document).ready(function($) {
     yearStart: '2014',
     yearEnd: '2016',
     roundTime: 'round',
-    format: 'Y-m-d',
+    format: 'Y-m-d 20:00',
     scrollInput: false,
     lang: 'en'
   });

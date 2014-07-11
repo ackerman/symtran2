@@ -23,7 +23,7 @@ class ReservationType extends AbstractType
               'mapped' => FALSE,
               'required' => FALSE,
               'widget' => 'single_text',
-              'format' => 'yyy-MM-dd hh:mm a',
+              'format' => 'yyy-MM-dd 20:00',
               'attr' => array(
                 'class' => 'datetime',
               )
