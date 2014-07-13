@@ -16,7 +16,7 @@ use Doctrine\ORM\EntityRepository;
  */
 class UserProvider implements UserProviderInterface
 {
-  private $personRepository;
+  public $personRepository;
   
    protected static $_host = 'ldap.itd.umich.edu';
     // The umbrella group that lists the subgroups of eligible drivers
@@ -37,7 +37,7 @@ class UserProvider implements UserProviderInterface
           $roles[] = 'ROLE_SUPER_ADMIN';
         } elseif (self::is_admin()) {
           $roles[] = 'ROLE_ADMIN';
-        } elseif (self::is_eligible()) {
+        } elseif (self::is_eligible() && self::is_approved()) {
           $roles[] = 'ROLE_USER';
         }
         
@@ -217,9 +217,8 @@ class UserProvider implements UserProviderInterface
     public static function is_approved()
     {
       $uniqname = self::get_uniqname();
-      $personRepository = $this->get('ginsberg_person');
       $status = $personRepository->findStatusByUniqname($uniqname);
-        
+       
       return($status == 'approved') ? TRUE : FALSE;
         
     }

@@ -4,8 +4,12 @@ parameters:
     user_provider.class: Ginsberg\TransportationBundle\Security\User\UserProvider
     
 services:
+  ginsberg_user:
+    class: "%ginsberg_transportation.user.class%"
   user_provider:
     class: "%user_provider.class%"
+    properties:
+      personRepository: "@ginsberg_person.person_repository"
   res_utils: 
     class: %ginsberg_transportation.res_utils.class%
     arguments: ["@request_stack"]
