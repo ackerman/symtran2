@@ -1,14 +1,21 @@
 parameters:
     ginsberg_transportation.user.class: Ginsberg\TransportationBundle\Services\User
     ginsberg_transportation.res_utils.class: Ginsberg\TransportationBundle\Services\ReservationUtils
-
+    user_provider.class: Ginsberg\TransportationBundle\Security\User\UserProvider
+    
 services:
-    user:
-        class: %ginsberg_transportation.user.class%
-    res_utils: 
-      class: %ginsberg_transportation.res_utils.class%
-      arguments: ["@request_stack"]
-    ginsberg_transportation.form.type.person:
-      class: Ginsberg\TransportationBundle\Form\Type\PersonType
-      tags:
-        - { name: form.type, alias: person }
+  user_provider:
+    class: "%user_provider.class%"
+  res_utils: 
+    class: %ginsberg_transportation.res_utils.class%
+    arguments: ["@request_stack"]
+  ginsberg_transportation.form.type.person:
+    class: Ginsberg\TransportationBundle\Form\Type\PersonType
+    tags:
+      - { name: form.type, alias: person }
+  ginsberg_person.person_repository:
+    class: Doctrine\ORM\EntityRepository
+    factory_service: doctrine.orm.default_entity_manager
+    factory_method: getRepository
+    arguments:
+      - Ginsberg\TransportationBundle\Entity\Person

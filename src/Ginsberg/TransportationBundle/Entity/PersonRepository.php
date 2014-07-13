@@ -108,4 +108,10 @@ class PersonRepository extends EntityRepository
       return False;
     }
 	}
+  
+  public function findStatusByUniqname($uniqname) 
+  {
+    $person = $this->findByUniqname($uniqname);
+    return $person->getStatus();
+  }
 }

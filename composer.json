@@ -18,7 +18,8 @@
         "sensio/distribution-bundle": "~3.0",
         "sensio/framework-extra-bundle": "~3.0",
         "incenteev/composer-parameter-handler": "~2.0",
-        "gedmo/doctrine-extensions": "dev-master"
+        "gedmo/doctrine-extensions": "dev-master",
+        "svt/cosign-bundle": "@dev"
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3"
@@ -56,5 +57,11 @@
         "branch-alias": {
             "dev-master": "2.5-dev"
         }
-    }
+    },
+    "repositories": [
+      {
+        "type": "git",
+        "url": "https://github.com/fmfi-svt/cosign-bundle.git"
+      }
+    ]
 }
