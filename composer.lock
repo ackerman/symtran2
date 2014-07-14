@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c31f9b721a4b88b50d071d8dbeb4d2b1",
+    "hash": "fb86809c8612f144b1db44a06c390c15",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -1105,29 +1105,6 @@
             "time": "2014-05-22 23:27:44"
         },
         {
-            "name": "svt/cosign-bundle",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/fmfi-svt/cosign-bundle.git",
-                "reference": "6d4315d079d59b9ec460ba3a05253bd39f716f34"
-            },
-            "require": {
-                "symfony/symfony": ">=2.1"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "SVT\\CosignBundle": "src/"
-                }
-            },
-            "license": [
-                "BSD"
-            ],
-            "description": "Support for login via CoSign",
-            "time": "2013-07-22 07:39:05"
-        },
-        {
             "name": "swiftmailer/swiftmailer",
             "version": "v5.2.1",
             "source": {
@@ -1615,7 +1592,7 @@
                     "role": "Lead Developer"
                 },
                 {
-                    "name": "Armin Ronacher",
+                    "name": "Armin Ronacher2",
                     "email": "armin.ronacher@active-4.com",
                     "role": "Project Founder"
                 },
@@ -1690,8 +1667,7 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "gedmo/doctrine-extensions": 20,
-        "svt/cosign-bundle": 20
+        "gedmo/doctrine-extensions": 20
     },
     "platform": {
         "php": ">=5.3.3"
