@@ -15,6 +15,15 @@ class ReservationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('dateToShow', 'datetime', array(
+              'mapped' => FALSE,  
+              'required' => FALSE,
+              'widget' => 'single_text',
+              'format' => 'yyyy-MM-dd',
+              'attr' => array(
+                  'class' => 'datetime',
+                )
+              ))
             ->add('isRepeating', 'checkbox', array(
               'mapped' => FALSE,
               'required' => FALSE,
@@ -23,7 +32,7 @@ class ReservationType extends AbstractType
               'mapped' => FALSE,
               'required' => FALSE,
               'widget' => 'single_text',
-              'format' => 'yyy-MM-dd 20:00',
+              'format' => 'yyyy-MM-dd 20:00',
               'attr' => array(
                 'class' => 'datetime',
               )
@@ -83,7 +92,8 @@ class ReservationType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Ginsberg\TransportationBundle\Entity\Reservation'
+            'data_class' => 'Ginsberg\TransportationBundle\Entity\Reservation',
+          'validation_groups' => FALSE,
         ));
     }
 

@@ -26,7 +26,6 @@ security:
     default:
           anonymous: ~
   access_control:
-    - { path: ^/reservation, roles: ROLE_ADMIN }
     - { path: ^/installation, roles: ROLE_SUPER_ADMIN }
     
   encoders:

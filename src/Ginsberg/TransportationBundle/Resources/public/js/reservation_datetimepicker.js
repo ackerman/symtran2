@@ -19,6 +19,22 @@ jQuery(document).ready(function($) {
   }
   allowTimesArray.push('20:00');
   
+  $('#ginsberg_transportationbundle_reservation_dateToShow').datetimepicker({
+    onGenerate:function( ct ){
+      $(this).find('.xdsoft_date.xdsoft_weekend')
+        .addClass('xdsoft_disabled');
+    },
+    timepicker: false,
+    inline: false,
+    mindate: 0,
+    weekends: ['06.01.2014', '07.01.2014','08.01.2014','09.01.2014','10.01.2014','11.01.2014','12.01.2014','01.01.2015','02.01.2015','03.01.2015','04.01.2015','05.01.2015','06.01.2015'],
+    yearStart: '2014',
+    yearEnd: '2016',
+    roundTime: 'round',
+    format: 'Y-m-d',
+    scrollInput: false,
+    lang: 'en'
+  });
   $('#ginsberg_transportationbundle_reservation_start').datetimepicker({
     onGenerate:function( ct ){
       $(this).find('.xdsoft_date.xdsoft_weekend')

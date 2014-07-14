@@ -1,6 +1,11 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
+  {% if dateToShow == date %}
+    {% set day = dateToShow %}
+  {% else %}
+    {% set day = dateToShow %}
+  {% endif %}
     <h1>Reservations</h1>
     <ul>
       <li>
@@ -9,13 +14,9 @@
         </a>
       </li>
     </ul>
-        {{ dump(checkinsToday) }}    
-    <form action="" method="get" accept-charset="utf-8">
-      <input type="text" name="date" value="<?php echo $date; ?>" id="date" class="datetime">
-      <input type="submit" value="Go to date &rarr;">
-    </form>
-
-            <h2>Today's Reservations</h2>
+    {{ render(controller('GinsbergTransportationBundle:Reservation:searchCriteria')) }}
+    
+            <h2>Reservations for {{ day|date('Y-m-d') }}</h2>
     <table class="records_list">
         <thead>
             <tr>
@@ -72,6 +73,7 @@
         </tbody>
     </table>
 
+    {% if ongoing %}
         <h2>Trips in Progress</h2>
         <table class="records_list">
           <thead>
@@ -128,7 +130,9 @@
         {% endfor %}
         </tbody>
     </table>
+        {% endif %}
         
+        {% if checkinsToday %}
         <h2>Today's Checkins</h2>
         <table class="records_list">
           <thead>
@@ -185,6 +189,7 @@
         {% endfor %}
         </tbody>
     </table>
+        {% endif %}
         <h2>All Reservations</h2>
         <table class="records_list">
           <thead>
@@ -241,4 +246,11 @@
         {% endfor %}
         </tbody>
     </table>
+{% endblock %}
+{% block javascripts %}
+  {% javascripts 
+    '@GinsbergTransportationBundle/Resources/public/js/reservation_datetimepicker.js' %}
+    {{ parent() }}
+    <script src="{{ asset_url }}"></script>
+  {% endjavascripts %}
 {% endblock %}

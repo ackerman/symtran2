@@ -10,7 +10,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Ginsberg\TransportationBundle\Entity\Reservation;
 use Ginsberg\TransportationBundle\Entity\Series;
 use Ginsberg\TransportationBundle\Form\ReservationType;
-use \DateTime;
 
 /**
  * Reservation controller.
@@ -35,9 +34,9 @@ class ReservationController extends Controller
       $date =  strtotime(date("Y-m-d"));
       $dateEnd = mktime(0,0,0, date("m", $date), date("d", $date)+1, date("Y", $date));
       $dateEnd = date('Y-m-d H:i:s', $dateEnd);
-      $date = date('Y-m-d H:i:s', $date);
+      $date = date('Y-m-d', $date);
       $em = $this->getDoctrine()->getManager();
-
+      
       // Find today's upcoming trips.
       // Looks for trips where the reservation has an assigned vehicle
       // and the vehicle has not been checked out yet.
@@ -53,8 +52,96 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
         'checkinsToday' => $checkinsToday,
         'entities' => $entities,
         'date' => $date,
+        'dateToShow' => $date,
       );
     }
+    
+    /**
+     * Returns reservations for the date selected.
+     *
+     * @Route("/", name="reservation_search")
+     * @Method("POST")
+     * @Template("GinsbergTransportationBundle:Reservation:index.html.twig")
+     */
+    public function searchAction(Request $request)
+    {
+      $logger = $this->get('logger');
+        $logger->info('in searchAction');
+        $entity = new Reservation();
+        $form = $this->createCreateForm($entity);
+        $form->handleRequest($request);
+        $logger->info('After handleRequest, dateToShow = ' . date('Y-m-d H:i:s', $form->get('dateToShow')->getData()->getTimestamp()));
+        
+        
+        if ($form->isValid()) {
+          $dateToShow = $form->get('dateToShow')->getData();
+          $logger->info('In searchAction, form is valid, dateToShow = ' . date('Y-m-d', $dateToShow->getTimestamp()));
+          $date = $dateToShow->getTimestamp();
+          $dateEnd = mktime(0,0,0, date("m", $date), date("d", $date)+1, date("Y", $date));
+      
+          $endDate = new \DateTime($dateEnd);
+          $ongoing = array();
+          $checkinsToday = array();
+          $today = date('Y-m-d');
+          
+          $em = $this->getDoctrine()->getManager();
+          $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->findTripsForDate($dateToShow, $dateEnd);
+          
+          $logger->info('count of entities = ' . count($entities));
+          return array(
+            'upcoming' => $entities,
+            'ongoing' => $ongoing,
+            'checkinsToday' => $checkinsToday,
+            'dateToShow' => $dateToShow,
+            'date' => $today,
+            'entities' => array(),
+          );
+          //return $this->redirect($this->generateUrl('person_search'));
+        }
+
+        return array(
+            'entity' => $entity,
+            'form'   => $form->createView(),
+        );
+    }
+ 
+    /**
+    * Creates a form to select the date to go to.
+    *
+    * @param Reservation $entity The entity
+    *
+    * @return \Symfony\Component\Form\Form The form
+    */
+    private function createSearchForm(Reservation $entity)
+    {
+        $form = $this->createForm(new ReservationType(), $entity, array(
+            'action' => $this->generateUrl('reservation_search'),
+            'method' => 'POST',
+        ));
+
+        $form->add('submit', 'submit', array('label' => 'Go to date'));
+
+        return $form;
+    }
+    /**
+     * Allows user to display reservations for a different date.
+     *
+     * @Route("/search", name="reservation_search_criteria")
+     * @Method("GET")
+     * @Template("GinsbergTransportationBundle:Reservation:reservation_date_to_show.html.twig")
+     */
+    public function searchCriteriaAction()
+    {
+        $entity = new Reservation();
+        $form   = $this->createSearchForm($entity);
+
+        return array(
+            'entity' => $entity,
+            'form'   => $form->createView(),
+        );
+    }
+    
+    
     /**
      * Creates a new Reservation entity.
      *

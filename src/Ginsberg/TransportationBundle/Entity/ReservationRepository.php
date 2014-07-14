@@ -104,4 +104,22 @@ class ReservationRepository extends EntityRepository
       return null;
     }
   }
+  
+  public function findTripsForDate($date, $date_end)
+  {
+    $params = array('date' => $date, 'date_end' => $date_end);
+    $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE 
+            ((r.start <= :date AND r.end >= :date_end) 
+            OR (r.start <= :date AND r.end >= :date AND r.end <= :date_end) 
+            OR (r.start >= :date AND r.start < :date_end AND r.end < :date_end) 
+            OR (r.start >= :date AND r.start < :date_end AND r.end >= :date_end))
+            AND r.vehicle is not NULL';
+    $query = $this->getEntityManager()->createQuery($dql)->setParameters($params);
+
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
+  }
 }
