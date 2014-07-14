@@ -28,6 +28,7 @@ class ReservationController extends Controller
      */
     public function indexAction()
     {
+      $logger = $this->get('logger');
       // Set local variables needed for fetching different
       // kinds of trips (upcoming trips, ongoing trips, and checkins today)
       $now = date("Y-m-d H:i:s");
@@ -35,6 +36,8 @@ class ReservationController extends Controller
       $dateEnd = mktime(0,0,0, date("m", $date), date("d", $date)+1, date("Y", $date));
       $dateEnd = date('Y-m-d H:i:s', $dateEnd);
       $date = date('Y-m-d', $date);
+      $logger->info("now  = $now, dateEnd = $dateEnd, date = $date");
+      
       $em = $this->getDoctrine()->getManager();
       
       // Find today's upcoming trips.
@@ -70,19 +73,29 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
         $entity = new Reservation();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
-        $logger->info('After handleRequest, dateToShow = ' . date('Y-m-d H:i:s', $form->get('dateToShow')->getData()->getTimestamp()));
+        //$logger->info('After handleRequest, dateToShow = ' . date('Y-m-d H:i:s', $form->get('dateToShow')->getData()->getTimestamp()));
         
         
         if ($form->isValid()) {
-          $dateToShow = $form->get('dateToShow')->getData();
-          $logger->info('In searchAction, form is valid, dateToShow = ' . date('Y-m-d', $dateToShow->getTimestamp()));
-          $date = $dateToShow->getTimestamp();
-          $dateEnd = mktime(0,0,0, date("m", $date), date("d", $date)+1, date("Y", $date));
-      
-          $endDate = new \DateTime($dateEnd);
+          // If they clicked the "Today" button, show the index page from the 
+          // indexAction with ongoing trips, etc.
+          if ($form->get('today')->isClicked()) {
+            return $this->redirect($this->generateUrl('reservation'));
+          } else {
+            $dateToShow = $form->get('dateToShow')->getData();
+          }
+          //$logger->info('In searchAction, form is valid, dateToShow = ' . $dateToShow->format('c'));
+          
+          // We have to clone $dateToShow so $dateEnd and $dateToShow aren't 
+          // pointing at the same value. We probably don't have to worry about
+          // PHP adjusting for daylight savings here, so using $dateEnd->add()
+          // should be okay.
+          $dateEnd = clone($dateToShow);
+          $dateEnd->add(new \DateInterval('P1D'));
+          //$logger->info('After changint $dateEnd, dateToShow = ' . $dateToShow->format('c'));
           $ongoing = array();
           $checkinsToday = array();
-          $today = date('Y-m-d');
+          $today = new \DateTime(date('Y-m-d'));
           
           $em = $this->getDoctrine()->getManager();
           $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->findTripsForDate($dateToShow, $dateEnd);
@@ -119,7 +132,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
             'method' => 'POST',
         ));
 
-        $form->add('submit', 'submit', array('label' => 'Go to date'));
+        $form->add('submit', 'submit', array('label' => "Go to date"));
 
         return $form;
     }
