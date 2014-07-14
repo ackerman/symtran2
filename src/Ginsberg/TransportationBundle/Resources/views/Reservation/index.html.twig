@@ -2,7 +2,7 @@
 
 {% block body -%}
   {% if dateToShow == date %}
-    {% set day = dateToShow %}
+    {% set day = "Today" %}
   {% else %}
     {% set day = dateToShow %}
   {% endif %}
@@ -16,7 +16,7 @@
     </ul>
     {{ render(controller('GinsbergTransportationBundle:Reservation:searchCriteria')) }}
     
-            <h2>Reservations for {{ day|date('Y-m-d') }}</h2>
+    <h2>Reservations for {% if day == "Today" %} {{ day }}{%else %}{{ day|date('Y-m-d') }}{% endif %}</h2>
     <table class="records_list">
         <thead>
             <tr>
@@ -248,6 +248,12 @@
     </table>
 {% endblock %}
 {% block javascripts %}
+  {% javascripts 
+    '@GinsbergTransportationBundle/Resources/public/js/moment.js' %}
+    {{ parent() }}
+    <script src="{{ asset_url }}"></script>
+    <script>moment().format();</script>
+  {% endjavascripts %}
   {% javascripts 
     '@GinsbergTransportationBundle/Resources/public/js/reservation_datetimepicker.js' %}
     {{ parent() }}

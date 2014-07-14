@@ -1,10 +1,13 @@
 <div id="reservation_date_to_show">
     {{ form_start(form, {'attr': {'novalidate': 'novalidate' }}) }}
-      {{ form_row(form.dateToShow) }}
+      {{ form_widget(form.dateToShow) }}
       {{ form_row(form._token) }}
       
-      {{ form_row(form.submit, {'label': 'Go to date &rarr;' }) }}
+      {{ form_widget(form.submit) }}
       
+        <span class='button next'>
+          {{ form_widget(form.today) }}
+        </span>
     {{ form_end(form, {'render_rest': false}) }}
 
 </div>

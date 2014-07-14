@@ -19,6 +19,8 @@ jQuery(document).ready(function($) {
   }
   allowTimesArray.push('20:00');
   
+  //var today = moment().format("YYYY-MM-DD");
+  //$('#ginsberg_transportationbundle_reservation_dateToShow').val(today);
   $('#ginsberg_transportationbundle_reservation_dateToShow').datetimepicker({
     onGenerate:function( ct ){
       $(this).find('.xdsoft_date.xdsoft_weekend')
