@@ -13,17 +13,11 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 /**
  * Default controller.
  *
- * @Route("/")
+
  */
 class DefaultController extends Controller
 {
-  /**
-  * Lists all Program entities.
-  *
-  * @Route("/", name="site")
-  * @Method("GET")
-  * @Template()
-  */
+  
  public function indexAction()
  {
    return $this->redirect($this->generateUrl('program_index'));

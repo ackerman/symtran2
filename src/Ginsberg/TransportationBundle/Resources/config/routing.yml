@@ -3,8 +3,8 @@ ginsberg_transportation:
   type: annotation
   prefix: /
 ginsberg_transportation_homepage:
-    pattern:  /hello/{name}
-    defaults: { _controller: GinsbergTransportationBundle:Default:index }
+  path: / 
+  defaults: { _controller: GinsbergTransportationBundle:Site:index }
 site:
   pattern: /site
   defaults: { _controller: "GinsbergTransportationBundle:Default:index" }
