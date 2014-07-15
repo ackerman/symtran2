@@ -9,8 +9,8 @@ services:
     class: "%ginsberg_transportation.user.class%"
   user_provider:
     class: "%user_provider.class%"
-    properties:
-      personRepository: "@ginsberg_person.person_repository"
+    arguments:
+      ["@ginsberg_person.person_repository", "@logger"]
   res_utils: 
     class: %ginsberg_transportation.res_utils.class%
     arguments: ["@request_stack"]

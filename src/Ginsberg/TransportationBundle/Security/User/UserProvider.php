@@ -16,7 +16,13 @@ use Doctrine\ORM\EntityRepository;
  */
 class UserProvider implements UserProviderInterface
 {
-  public $personRepository;
+  private $personRepository;
+  private $logger;
+  
+  public function __construct(\Ginsberg\TransportationBundle\Entity\PersonRepository $personRepository, \Monolog\Logger $logger) {
+    $this->personRepository = $personRepository;
+    $this->logger = $logger;
+  }
   
    protected static $_host = 'ldap.itd.umich.edu';
     // The umbrella group that lists the subgroups of eligible drivers
@@ -32,7 +38,7 @@ class UserProvider implements UserProviderInterface
       $salt = "";
       $roles = array();
     
-      if (self::is_authenticated()) {
+      if (self::is_authenticated() && self::is_approved()) {
         if (self::is_superuser()) {
           $roles[] = 'ROLE_SUPER_ADMIN';
         } elseif (self::is_admin()) {
