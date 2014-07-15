@@ -27,10 +27,12 @@ class PersonController extends Controller
      */
     public function indexAction()
     {
+      $logger = $this->get('logger');
+      $logger->info('In PersonController::indexAction()');
         $em = $this->getDoctrine()->getManager();
         
-        $entities = $em->getRepository('GinsbergTransportationBundle:Person')->findByPendingSortedByCreated('pending');
-        //$entities = $em->getRepository('GinsbergTransportationBundle:Person')->findAll();
+        //$entities = $em->getRepository('GinsbergTransportationBundle:Person')->findByPendingSortedByCreated('pending');
+        $entities = $em->getRepository('GinsbergTransportationBundle:Person')->findAll();
 
         return array(
             'entities' => $entities,
@@ -47,7 +49,7 @@ class PersonController extends Controller
     public function searchAction(Request $request)
     {
         $entity = new Person();
-        $form = $this->createCreateForm($entity);
+        $form = $this->createSearchForm($entity);
         $form->handleRequest($request);
         
         
@@ -125,15 +127,18 @@ class PersonController extends Controller
      */
     public function createAction(Request $request)
     {
+      $logger = $this->get('logger');
+      $logger->info('Just entered PersonController::createAction');
+        
         $entity = new Person();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
+        $logger->info('in PersonController::createAction after handleRequest. isValid = ' . $form->isValid());
+          
 
         if ($form->isValid()) {
+          $logger->info('in PersonController::createAction, form is valid');
             $em = $this->getDoctrine()->getManager();
-            
-            // Can't get PrePersist to work, so setting created here
-            //$entity->setCreated(new \DateTime());
             
             $em->persist($entity);
             $em->flush();
@@ -156,13 +161,17 @@ class PersonController extends Controller
     */
     private function createCreateForm(Person $entity)
     {
+      $logger = $this->get('logger');
+      $logger->info('Just entered PersonController::createCreateForm()');
+       
         $form = $this->createForm(new PersonType(), $entity, array(
             'action' => $this->generateUrl('person_create'),
             'method' => 'POST',
         ));
 
         $form->add('submit', 'submit', array('label' => 'Create'));
-
+        $logger->info('Just created the form in PersonController::createCreateForm()');
+      
         return $form;
     }
 
@@ -175,6 +184,8 @@ class PersonController extends Controller
      */
     public function newAction()
     {
+      $logger = $this->get('logger');
+      $logger->info('In PersonController::newAction()');
         $entity = new Person();
         $form   = $this->createCreateForm($entity);
 

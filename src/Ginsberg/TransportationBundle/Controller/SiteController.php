@@ -99,7 +99,7 @@ class SiteController extends Controller
 	public function indexAction()
 	{
     $logger = $this->get('logger');
-		$logger->info('In actionIndex');
+		$logger->info('In SiteController::actionIndex');
     
     $em = $this->getDoctrine()->getManager();
     

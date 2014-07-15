@@ -7,6 +7,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Ginsberg\TransportationBundle\Entity\Person;
+use Ginsberg\TransportationBundle\Services\PersonService;
 use Doctrine\ORM\EntityRepository;
 
 /* 
@@ -17,10 +18,12 @@ use Doctrine\ORM\EntityRepository;
 class UserProvider implements UserProviderInterface
 {
   private $personRepository;
+  private $personService;
   private $logger;
   
-  public function __construct(\Ginsberg\TransportationBundle\Entity\PersonRepository $personRepository, \Monolog\Logger $logger) {
+  public function __construct(\Ginsberg\TransportationBundle\Entity\PersonRepository $personRepository, \Ginsberg\TransportationBundle\Services\PersonService $personService, \Monolog\Logger $logger) {
     $this->personRepository = $personRepository;
+    $this->personService = $personService;
     $this->logger = $logger;
   }
   
@@ -38,12 +41,12 @@ class UserProvider implements UserProviderInterface
       $salt = "";
       $roles = array();
     
-      if (self::is_authenticated() && self::is_approved()) {
+      if (self::is_authenticated()) {
         if (self::is_superuser()) {
           $roles[] = 'ROLE_SUPER_ADMIN';
         } elseif (self::is_admin()) {
           $roles[] = 'ROLE_ADMIN';
-        } elseif (self::is_eligible() && self::is_approved()) {
+        } elseif (self::is_eligible()) {
           $roles[] = 'ROLE_USER';
         }
         
@@ -220,10 +223,10 @@ class UserProvider implements UserProviderInterface
      *
      * @return boolean Whether user is approved
      */
-    public static function is_approved()
+    public function is_approved()
     {
       $uniqname = self::get_uniqname();
-      $status = $personRepository->findStatusByUniqname($uniqname);
+      $status = $this->personService->getStatusByUniqname($uniqname);
        
       return($status == 'approved') ? TRUE : FALSE;
         

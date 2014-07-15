@@ -27,9 +27,9 @@ class ProgramService
   public function get_program_name_by_ldap_group($ldap_group) 
   {
     $program = $this->programRepository->findByEligibilityGroup($ldap_group);
-    $this->logger->info('in get_program_name_by_ldap_group. $program = ' . var_dump($program[0]));
+    $this->logger->info('in get_program_name_by_ldap_group. $program = ' . var_dump($program));
     if ($program) {
-      return $program[0]->getProgram()->getName();
+      return true;
     } else {
       return false;
     }

@@ -28,11 +28,11 @@ class PersonType extends AbstractType
                     'class' => 'datetime',
                   )
                 ))
-            ->add('isTermsAgreed')
-            ->add('hasUnpaidTicket')
+            ->add('isTermsAgreed', 'checkbox', array('required' => FALSE))
+            ->add('hasUnpaidTicket', 'checkbox', array('required' => FALSE))
             ->add('created', 'datetime', array('widget' => 'text', 'empty_value' => 'Enter a date', 'read_only' => true))
             ->add('modified', 'datetime', array('widget' => 'text', 'empty_value' => 'Enter a date', 'read_only' => true))
-            ->add('program', null, array('empty_value' => 'Select a Program'))
+            ->add('program', null, array('empty_value' => 'Select a Program', 'required' => FALSE))
         ;
     }
     
