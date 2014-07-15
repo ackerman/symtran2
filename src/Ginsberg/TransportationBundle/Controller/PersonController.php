@@ -25,31 +25,33 @@ class PersonController extends Controller
      * @Method("GET")
      * @Template()
      */
-    public function indexAction()
+    public function indexAction($entities = NULL)
     {
       $logger = $this->get('logger');
       $logger->info('In PersonController::indexAction()');
+      if ($entities == NULL) {
         $em = $this->getDoctrine()->getManager();
         
         //$entities = $em->getRepository('GinsbergTransportationBundle:Person')->findByPendingSortedByCreated('pending');
         $entities = $em->getRepository('GinsbergTransportationBundle:Person')->findAll();
-
-        return array(
-            'entities' => $entities,
-        );
+      }
+        
+      return array(
+          'entities' => $entities,
+      );
     }
     
     /**
      * Searches the Person table.
      *
-     * @Route("/", name="person_search")
+     * @Route("/search", name="person_search")
      * @Method("POST")
      * @Template("GinsbergTransportationBundle:Person:index.html.twig")
      */
     public function searchAction(Request $request)
     {
         $entity = new Person();
-        $form = $this->createSearchForm($entity);
+        $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         
         
@@ -68,7 +70,12 @@ class PersonController extends Controller
 
           //$em->persist($entity);
           //$em->flush();
-
+          
+          $response = $this->forward('GinsbergTransportationBundle:Person:index', array(
+              'entities' => $entities,
+          ));
+          
+          return $response;
           return array(
             'entities' => $entities,
           );

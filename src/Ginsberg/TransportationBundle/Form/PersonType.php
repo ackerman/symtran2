@@ -19,7 +19,7 @@ class PersonType extends AbstractType
             ->add('lastName')
             ->add('uniqname')
             ->add('phone')
-            ->add('status')
+            ->add('status', NULL, array('required' => FALSE))
             ->add('dateApproved', 'datetime', array(
                 'required' => FALSE,
                 'widget' => 'single_text',
@@ -30,8 +30,8 @@ class PersonType extends AbstractType
                 ))
             ->add('isTermsAgreed', 'checkbox', array('required' => FALSE))
             ->add('hasUnpaidTicket', 'checkbox', array('required' => FALSE))
-            ->add('created', 'datetime', array('widget' => 'text', 'empty_value' => 'Enter a date', 'read_only' => true))
-            ->add('modified', 'datetime', array('widget' => 'text', 'empty_value' => 'Enter a date', 'read_only' => true))
+            ->add('created', 'datetime', array('widget' => 'text', 'empty_value' => 'Enter a date', 'read_only' => true, 'required' => FALSE))
+            ->add('modified', 'datetime', array('widget' => 'text', 'empty_value' => 'Enter a date', 'read_only' => true, 'required' => FALSE))
             ->add('program', null, array('empty_value' => 'Select a Program', 'required' => FALSE))
         ;
     }
