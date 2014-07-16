@@ -13,7 +13,9 @@ use Ginsberg\TransportationBundle\Entity\Series;
 use Ginsberg\TransportationBundle\Entity\Program;
 use Ginsberg\TransportationBundle\Security\User\UserProvider;
 use Ginsberg\TransportationBundle\Form\ReservationType;
+use Ginsberg\TransportationBundle\Form\PersonType;
 use Ginsberg\TransportationBundle\Services\ProgramService;
+use Ginsberg\TransportationBundle\Services\PersonService;
 
 /**
  * Controller for public-facing area of Transportation website
@@ -113,8 +115,8 @@ class SiteController extends Controller
 
 		// If the user is not eligible, (that is, they are not in a subgroup of the group
 		// 'ginsberg transpo eligible'), send them to the 'ineligible' view.
-		if (!$ldap_group) {
-			$this->render('ineligible', array(
+		if ($ldap_group == FALSE) {
+			return $this->render('GinsbergTransportationBundle:Site:ineligible.html.twig', array(
 				'name' => $provider->get_first_name(),
 			));
 		} else {
@@ -197,7 +199,7 @@ class SiteController extends Controller
 									$person->setProgram($program);
 								}
 								// We need their contact info and terms agreement
-								$this->redirect(array('register'));
+								return $this->redirect($this->generateUrl('site_start_registration'));
 								//$person = Person::find_by_uniqname($uniqname);
 								//$this->render('register', array('name' => User::get_first_name(), 'model' => $person));
 								break;
@@ -205,7 +207,7 @@ class SiteController extends Controller
 						} else {
 							// user approved by PTS but not yet in Ginsberg database
 							$logger->info('actionIndex: user approved by PTS but not yet in Ginsberg database');
-							return $this->render('GinsbergTransportationBundle:Person:register.html.twig');
+							return $this->redirect('GinsbergTransportationBundle:Site:register');
 							break;
 						}
 					case 'Submitted':
@@ -269,102 +271,157 @@ class SiteController extends Controller
 		}
 	}
 
-
-	/**
-	 * View for users who are not yet registered
-	*/
-	public function actionRegister()
-	{
-		$logger->info('In actionRegister');
-		// User::is_eligible will either return the name of the first eligibility group found
+  /**
+   * Displays a form for a User to register.
+   *
+   * @Route("/register", name="site_start_registration")
+   * @Method("GET")
+   * @Template()
+   */
+  public function initiateRegistrationAction()
+  {
+    $logger = $this->get('logger');
+    $logger->info('In registerAction');
+    $em = $this->getDoctrine()->getManager();
+    $provider = $this->get('user_provider');
+    
+// User::is_eligible will either return the name of the first eligibility group found
 		// for the user, or false. Save the name of the $ldap_group for later.
-		$ldap_group = User::is_eligible();
+		$ldap_group = $provider->is_eligible();
 
 		// If the user is not eligible, (that is, they are not in a subgroup of the group
 		// 'ginsberg transpo eligible'), send them to the 'ineligible' view.
-		if (!$ldap_group) {
-			$this->render('ineligible', array(
-				'name' => User::get_first_name(),
+		if ($ldap_group == FALSE) {
+			return $this->render('GinsbergTransportationBundle:Site:ineligible.html.twig', array(
+				'name' => $provider->get_first_name(),
 			));
-		} else {
-			$uniqname = User::get_uniqname();
-
-			$mvr_status = User::get_pts_status_by_uniqname($uniqname);
-			//$mvr_status = 'Approved'; // ***FOR TESTING***
-			$logger->info('mvr_status = ' . $mvr_status);
-
-			$program = Program::get_program_name_by_ldap_group($ldap_group);
-			$logger->info('User\'s program = ' . $program);
-
-			// Check whether user is already in database
-			//$user_status = Person::get_status_by_uniqname(User::get_uniqname());
-			$person = Person::find_by_uniqname($uniqname);
-			if ($person) {
-				$person->set_status(Person::convert_pts_status_to_gc_status($mvr_status));
-				if ($program && !$person->program) {
-					$person->program = $program;
-				}
-				$logger->info('In actionRegister, person->status = ' . $person->status);
-			} else {
-				$logger->info('No person, so creating new');
-				$person = new Person('register');
-				$person->first_name = User::get_first_name();
-				$person->last_name = User::get_last_name();
-				if ($program) {
-					$person->program = $program;
-				}
-				$person->status = Person::convert_pts_status_to_gc_status($mvr_status);
-				if ($mvr_status == 'Not Approved') {
-					$this->redirect(array('site/rejected'));
-				}
-			}
-			// If this is a form submission, process
-			if(isset($_POST['Person']))
-			{
-				$logger->info('POST[Person] is set');
-				$person->attributes=$_POST['Person'];
-				//CVarDumper::dump($_POST['Person']);
-				//$logger->info('POST[person][terms_agreed] = ' . $_POST['Person']['terms_agreed']);
-				$person->uniqname = User::get_uniqname();
-
-				// Save; if successful, send email and redirect.
-				if($person->save()) {
-					$logger->info('Person saved when registration form submitted.');
-					$logger->info('terms_agreed = ' . $person->terms_agreed);
-					// We no longer send an email, since the real registration is with PTS
-					/*
-					// Send confirmation email.
-					$subject = "Ginsberg Transportation Application Received";
-					$message = $this->renderPartial('email_created', array('name'=>$person->first_name), True);
-					Mail::send(User::get_email(), $subject, $message);
-					*/
-
-					// Redirect
-					$person = Person::find_by_uniqname($uniqname);
-					if ($person->status == 'pending') {
-						//$this->redirect(array('site/pending/'));
-						$this->render('waiting_for_pts', array('name' => $person->first_name, 'model' => $person));
-					} elseif ($person->status == 'approved' && $person->terms_agreed == true) {
-						$logger->info('Approved and terms_agreed');
-						//$this->render('index', array('name' => $person->first_name, 'model' => $person));
-						$this->redirect(array('/'));
-					} else {
-						$logger->info('Somehow got here');
-						$this->render('terms', array('name' => $person->first_name, 'model' => $person));
-					}
-				} else {
-					$logger->info('Person not saved');
-					$this->render('register', array('name'=>User::get_first_name(), 'model'=>$person));
-				}
-			} else {
-				$this->render('register', array(
-					'name'=>$person->first_name,
-					'model'=>$person,
-				));
-			}
 		}
-	}
+    
+    // User is eligible, so either find existing Person or create one,
+    // then set values like Program where appropriate.
+    $uniqname = $provider->get_uniqname();
 
+    $mvr_status = $provider->get_pts_status_by_uniqname($uniqname);
+    //$mvr_status = 'Approved'; // ***FOR TESTING***
+    $logger->info('mvr_status = ' . $mvr_status);
+
+    $program = $em->getRepository('GinsbergTransportationBundle:Program')->findByEligibilityGroup($ldap_group);
+    if (is_array($program)) {
+      $program = $program[0];
+    }
+    $logger->info('User\'s program = ' . $program);
+
+    // Check whether user is already in database
+    //$user_status = Person::get_status_by_uniqname(User::get_uniqname());
+    $person = $em->getRepository('GinsbergTransportationBundle:Person')->findByUniqname($uniqname);
+    if (is_array($person)) {
+      $person = $person[0];
+    }
+    if ($person) {
+      $personService = $this->get('person_service');
+      $person->setStatus($personService->convert_pts_status_to_gc_status($mvr_status));
+      if ($program && !$person->getProgram()) {
+        $person->setProgram($program);
+      }
+      $logger->info('In registerAction, person->status = ' . $person->getStatus());
+    } else {
+      $logger->info('No person, so creating new');
+      $person = new Person('register');
+      $person->setFirstName(User::get_first_name());
+      $person->setLastName(User::get_last_name());
+      if ($program) {
+        $person->setProgram($program);
+      }
+      $person->getStatus(Person::convert_pts_status_to_gc_status($mvr_status));
+      if ($mvr_status == 'Not Approved') {
+        $this->redirect(array('site/rejected'));
+      }
+      $em->persist($person);
+      $em->flush();
+    }
+    
+    // Person either fetched or created, so now display register form
+    $registerForm = $this->createRegisterForm($person);
+
+    return array(
+        'entity'      => $person,
+        'register_form'   => $registerForm->createView(),
+    );
+    
+  }
+  
+  
+  /**
+   * Creates a form to register a Person entity.
+   *
+   * @param Person $entity The entity
+   *
+   * @return \Symfony\Component\Form\Form The form
+   */
+  private function createRegisterForm(Person $entity)
+  {
+    $logger = $this->get('logger');
+    $logger->info('In createRegisterForm(). Id of entity = ' . $entity->getId());
+      $form = $this->createForm(new PersonType(), $entity, array(
+          'action' => $this->generateUrl('site_register', array('id' => $entity->getId())),
+          'method' => 'PUT',
+      ));
+
+      $form->add('submit', 'submit', array('label' => 'Register'));
+
+      return $form;
+  }
+
+	/**
+   * Registers users who are not yet in the Ginsberg Transportation System.
+   *
+   * @Route("/register/{id}", name="site_register")
+   * @Method("POST")
+   * @Template("GinsbergTransportationBundle:Site:register.html.twig")
+   */
+	public function registerAction(Request $request, $id)
+	{
+    $logger = $this->get('logger');
+		$logger->info('In registerAction. $id = ' . $id);
+		$em = $this->getDoctrine()->getManager();
+    $entity = $em->getRepository('GinsbergTransportationBundle:Person')->find($id);
+    $logger->info('entity->getName() = ' . $entity->getName());
+    
+    if (!$entity) {
+      throw $this->createNotFoundException('Unable to find Person in database.');
+    }
+    
+    $registerForm = $this->createRegisterForm($entity);
+    $registerForm->handleRequest($request);
+
+    // If this is a form submission, process
+    if ($registerForm->isValid()) {
+      $logger->info('register_form submitted and is valid');
+      
+      $em->flush();
+      
+      // Figure out where to redirect the person, depending on their status
+      if ($entity->getStatus() == 'pending') {
+        //$this->redirect(array('site/pending/'));
+        return $this->render('GinsbergTransportationBundle:Site:waiting_for_pts.html.twig', array('name' => $entity->getFirstName(), 'entity' => $entity));
+      } elseif ($entity->getStatus() == 'approved' && $entity->getIsTermsAgreed() == true) {
+        $logger->info('Approved and terms_agreed');
+        // Yes, this person is approved and has agreed to terms, so send them on
+        return $this->redirect($this->generateUrl('site'));
+    
+      } else {
+        $logger->info('Somehow got here');
+        $this->render('terms', array('name' => $entity->first_name, 'entity' => $entity));
+      }
+      
+    }
+    
+    return array(
+      'entity' => $entity,
+      'register_form' => $registerForm->createView(),
+    );
+  }
+	
 
 	/**
 	 * View for pending users

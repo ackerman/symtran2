@@ -1,7 +1,7 @@
 {% extends '::base.html.twig' %}
 
 {% block body -%}
-<h1>Welcome, {{ firstName }}</h1>
+<h1>Welcome, {{ entity.firstName }}</h1>
 
 <h2>Terms and Conditions for Driving a Ginsberg Vehicle</h2>
 
@@ -21,29 +21,29 @@
 <li>Will not use a Ginsberg Center vehicle for personal use.</li>
 </ol>
 
-    {{ form_start(form) }}
+    {{ form_start(register_form) }}
 <p class="note">Fields with <span class="required">*</span> are required.</p>
-      {{ form_errors(form) }}
-      {{ form_row(form.firstName) }}
-      {{ form_row(form.lastName) }}
-      {{ form_row(form.uniqname) }}
-      {{ form_row(form.phone) }}
-      {{ form_row(form.status) }}
-      {{ form_row(form.dateApproved) }}
-      {{ form_row(form.hasUnpaidTicket) }}
-      {{ form_row(form.program) }}
-      {{ form_row(form._token) }}
-      {{ form_row(form.created) }}
-      {{ form_row(form.modified) }}
-      {{ form_row(form.isTermsAgreed) }}
+      {{ form_errors(register_form) }}
+      {{ form_row(register_form.firstName) }}
+      {{ form_row(register_form.lastName) }}
+      {{ form_row(register_form.uniqname) }}
+      {{ form_row(register_form.phone) }}
+      {{ form_row(register_form.status) }}
+      {{ form_row(register_form.dateApproved) }}
+      {{ form_row(register_form.hasUnpaidTicket) }}
+      {{ form_row(register_form.program) }}
+      {{ form_row(register_form._token) }}
+      {{ form_row(register_form.created) }}
+      {{ form_row(register_form.modified) }}
+      {{ form_row(register_form.isTermsAgreed) }}
       
-      {{ form_row(form.submit, {'label': 'Submit Registration' }) }}
+      {{ form_row(register_form.submit, {'label': 'Submit Registration' }) }}
       
     {{ form_end(form) }}
 
         <ul class="record_actions">
     <li>
-        <a href="{{ path('person') }}">
+        <a href="{{ path('site') }}">
             Back to the list
         </a>
     </li>

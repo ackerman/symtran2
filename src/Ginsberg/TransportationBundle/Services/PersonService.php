@@ -49,5 +49,17 @@ class PersonService
     $this->logger->info('person = ' . var_dump($person));
     return $person->getStatus();
   }
+  
+  public function convert_pts_status_to_gc_status($pts_status) {
+		if ($pts_status == "Submitted" || $pts_status == "Waiting for Documentation") {
+			$gc_status = 'pending';
+		} elseif ($pts_status == "Approved") {
+			$gc_status = 'approved';
+		} elseif ($pts_status == 'Not Approved') {
+			$gc_status = 'rejected';
+		}
+		return $gc_status;
+	}
+
 }
 

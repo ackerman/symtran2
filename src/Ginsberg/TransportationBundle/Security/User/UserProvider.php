@@ -179,12 +179,15 @@ class UserProvider implements UserProviderInterface
      *
      * @return string The first name of the user
      */
-    public static function get_first_name()
+    public function get_first_name()
     {
       // First check if the user is in the database
-      $person = Person::find_by_uniqname(self::get_uniqname());
+      $person = $this->personRepository->findByUniqname(self::get_uniqname());
+      if (is_array($person)) {
+        $person = $person[0];
+      }
       if ($person){
-        return $person->first_name;
+        return $person->getFirstName();
       }
 
       // Then guess the first name from the LDAP entry
