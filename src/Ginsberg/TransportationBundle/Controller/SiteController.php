@@ -109,6 +109,7 @@ class SiteController extends Controller
 		// User::is_eligible will either return the name of the first eligibility group found
 		// for the user, or false. Save the name of the $ldap_group for later.
 		$ldap_group = $provider->is_eligible();
+    $logger->info("ldap group = $ldap_group");
 
 		// If the user is not eligible, (that is, they are not in a subgroup of the group
 		// 'ginsberg transpo eligible'), send them to the 'ineligible' view.
@@ -165,20 +166,26 @@ class SiteController extends Controller
 			// If we got a 200 code, continue processing. Otherwise, we're done.
 			if (!$done) {
         $person = $em->getRepository('GinsbergTransportationBundle:Person')->findByUniqname($uniqname);
-				
+				if (is_array($person)) {
+          $person = $person[0];
+        }
 				// If the person already set their program manually, don't change it.
-				// Otherwise, set it based on the eligibility group they are in
-				$programService = $this->get('program_service');
-        $program = $programService->get_program_name_by_ldap_group($ldap_group);
-				$logger->info('User\'s program = ' . $program->getName());
-				if ($person && $program && !$person->getTermsAgreed()) {
+				// Otherwise, set it based on the eligibility group they are in.
+        // We know the person has a program set if isTermsAgreed is true, since
+        // they had to set a program on the registration form.
+				$program = $em->getRepository('GinsbergTransportationBundle:Program')->findByEligibilityGroup($ldap_group);
+				if (is_array($program)) {
+          $program = $program[0];
+        }
+        $logger->info('User\'s program = ' . $program->getName());
+				if ($person && $program && !$person->getIsTermsAgreed()) {
 					$person->setProgram($program);
 				}
 
 				switch($pts_json->mvr_status) {
 					case "Approved": // user is approved by pts. Check whether person exists and is approved in Ginsberg db
 						if ($person) {
-							if ($person->are_terms_agreed($uniqname)) {
+							if ($person->getIsTermsAgreed()) {
 								// We must already have their contact info, so update status and let them see index
 								$person->setStatus('approved');
 								break;
@@ -198,7 +205,7 @@ class SiteController extends Controller
 						} else {
 							// user approved by PTS but not yet in Ginsberg database
 							$logger->info('actionIndex: user approved by PTS but not yet in Ginsberg database');
-							$this->redirect(array('site/register'));
+							return $this->render('GinsbergTransportationBundle:Person:register.html.twig');
 							break;
 						}
 					case 'Submitted':
