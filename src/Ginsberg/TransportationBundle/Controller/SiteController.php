@@ -236,8 +236,11 @@ class SiteController extends Controller
 				// User is approved both by PTS and in the Ginsberg db, so let them proceed
 
 				// Is the site open? If not, show closed page. If yes, show the index page.
-				$site_open = Installation::is_open(1);
-				if (!$site_open) {
+				$installation = $em->getRepository('GinsbergTransportationBundle:Installation');
+				//$is_open = $installation::is_open();
+        // For testing
+        $is_open = TRUE;
+        if (!$is_open) {
 					$site = Installation::model()->findByPk(1);
 					$open_for_res = $site->reservations_open;
 					$cars_available = $site->cars_available;
@@ -247,25 +250,18 @@ class SiteController extends Controller
 					//$this->redirect(array('site/closed'));
 				} else {
 					$now=date("Y-m-d H:i:s");
-					$ticket = Ticket::has_tickets($uniqname);
+					//$ticket = Ticket::has_tickets($uniqname);
+          // FOR TESTING
+          $ticket = FALSE;
 
 					// Find upcoming trips for current user
-					$criteria=new CDbCriteria;
-					$criteria->condition='start >= :now AND driver_uniqname = "' . $uniqname . '"';
-					$criteria->params=array(':now'=>$now);
-					$criteria->order = 'start ASC';
-					$upcoming_trips = new CActiveDataProvider('Reservation', array(
-						'criteria'=>$criteria,
-						'pagination'=>array(
-								'pageSize'=>100,
-						),
-					));
+					$upcomingTripsForPerson = $em->getRepository('GinsbergTransportationBundle:Reservation')->findUpcomingTripsByPerson($now, $person);
 
-					$this->render('index',array(
-						'name'=>User::get_first_name(),
+					return array(
+						'name'=>$person->getFirstName(),
 						'ticket'=>$ticket,
-						'upcoming_trips'=>$upcoming_trips,
-					));
+						'upcomingTripsForPerson'=>$upcomingTripsForPerson,
+					);
 				}
 			}
 		}
@@ -276,12 +272,12 @@ class SiteController extends Controller
    *
    * @Route("/register", name="site_start_registration")
    * @Method("GET")
-   * @Template()
+   * @Template("GinsbergTransportationBundle:Site:register.html.twig")
    */
   public function initiateRegistrationAction()
   {
     $logger = $this->get('logger');
-    $logger->info('In registerAction');
+    $logger->info('In initiateRegistrationAction()');
     $em = $this->getDoctrine()->getManager();
     $provider = $this->get('user_provider');
     
@@ -291,7 +287,8 @@ class SiteController extends Controller
 
 		// If the user is not eligible, (that is, they are not in a subgroup of the group
 		// 'ginsberg transpo eligible'), send them to the 'ineligible' view.
-		if ($ldap_group == FALSE) {
+		$logger->info('about to check $ldap_group early in  initiateRegistrationAction');
+    if ($ldap_group == FALSE) {
 			return $this->render('GinsbergTransportationBundle:Site:ineligible.html.twig', array(
 				'name' => $provider->get_first_name(),
 			));
@@ -364,7 +361,7 @@ class SiteController extends Controller
     $logger->info('In createRegisterForm(). Id of entity = ' . $entity->getId());
       $form = $this->createForm(new PersonType(), $entity, array(
           'action' => $this->generateUrl('site_register', array('id' => $entity->getId())),
-          'method' => 'PUT',
+          'method' => 'POST',
       ));
 
       $form->add('submit', 'submit', array('label' => 'Register'));
@@ -385,7 +382,7 @@ class SiteController extends Controller
 		$logger->info('In registerAction. $id = ' . $id);
 		$em = $this->getDoctrine()->getManager();
     $entity = $em->getRepository('GinsbergTransportationBundle:Person')->find($id);
-    $logger->info('entity->getName() = ' . $entity->getName());
+    $logger->info('entity->getFirstName() = ' . $entity->getFirstName());
     
     if (!$entity) {
       throw $this->createNotFoundException('Unable to find Person in database.');

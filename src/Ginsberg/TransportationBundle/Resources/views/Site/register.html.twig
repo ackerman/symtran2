@@ -1,4 +1,4 @@
-{% extends '::base.html.twig' %}
+{% extends 'GinsbergTransportationBundle::public_layout.html.twig' %}
 
 {% block body -%}
 <h1>Welcome, {{ entity.firstName }}</h1>
@@ -39,7 +39,7 @@
       
       {{ form_row(register_form.submit, {'label': 'Submit Registration' }) }}
       
-    {{ form_end(form) }}
+    {{ form_end(register_form) }}
 
         <ul class="record_actions">
     <li>

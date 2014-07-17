@@ -1,0 +1,49 @@
+{% extends 'GinsbergTransportationBundle::public_layout.html.twig' %}
+
+{% block stylesheets %}{% endblock %}
+{% block nav %}{% endblock %}
+{% block body %}
+  <h1>Welcome, {{ name }}</h1>
+  {% if ticket == true %}
+    <p style='color: red; font-weight: bold;'>You have an outstanding ticket. You will not be allowed to check out a vehicle until the ticket has been paid.
+    Tickets can be paid at the Ginsberg Center front desk. For more information, contact the Ginsberg Center, 763-3548.</p>
+  {% endif %}
+    
+  <h2>Your Upcoming Reservations</h2>
+    <table class="records_list">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Checkout</th>
+                <th>Checkin</th>
+                <th>Vehicle</th>
+                <th>Seats required</th>
+                <th>Person</th>
+                <th>Program</th>
+                <th>Destination</th>
+                <th>Destination text</th>
+                <th>Series</th>
+            </tr>
+        </thead>
+        
+    {% for upcoming_trip in upcomingTripsForPerson %}
+      <tr>
+        <td><a href="{{ path('reservation_show', { 'id': upcoming_trip.id }) }}">{{ upcoming_trip.id }}</a></td>
+          <td>{% if upcoming_trip.start %}{{ upcoming_trip.start|date('Y-m-d H:i:s') }}{% endif %}</td>
+          <td>{% if upcoming_trip.end %}{{ upcoming_trip.end|date('Y-m-d H:i:s') }}{% endif %}</td>
+          <td>{% if upcoming_trip.checkout %}{{ upcoming_trip.checkout|date('Y-m-d H:i:s') }}{% endif %}</td>
+          <td>{% if upcoming_trip.checkin %}{{ upcoming_trip.checkin|date('Y-m-d H:i:s') }}{% endif %}</td>
+          <td>{{ upcoming_trip.vehicle }}</td>
+          <td>{{ upcoming_trip.seatsRequired }}</td>
+          <td>{{ upcoming_trip.person }}</td>
+          <td>{{ upcoming_trip.program }}</td>
+          <td>{{ upcoming_trip.destination }}</td>
+          <td>{{ upcoming_trip.destinationText }}</td>
+          <td>{{ upcoming_trip.series }}</td>
+      </tr>
+    {% endfor %}
+    </table>
+{% endblock %}
+{% block privacy %}{% endblock %}

@@ -124,4 +124,17 @@ class ReservationRepository extends EntityRepository
       return null;
     }
   }
+  
+  public function findUpcomingTripsByPerson($now, $person) {
+    $params = array('now' => $now, ':person' => $person);
+    $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE
+        r.start >= :now AND r.person = :person ORDER BY r.start ASC';
+    $query = $this->getEntityManager()->createQuery($dql)->setParameters($params);
+    
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return NULL;
+    }			
+  }
 }
