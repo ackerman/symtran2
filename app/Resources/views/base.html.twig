@@ -6,14 +6,14 @@
       {% block stylesheets %}{% endblock %}
       <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
   </head>
-  <body>
+  <body class="ui-mobile-viewport">
     <header class="group">
       {% block banner %}
           <h1>Ginsberg Transportation System</h1>
       {% endblock %}
       <h2 id="greeting">
         {% block greeting %}
-          Hi, logged in user. <a href="https://weblogin.umich.edu/cgi-bin/logut">Log out.</a>
+          Hi, logged in user. <a href="{{ asset('logout') }}">Log out.</a>
         {% endblock %}
       </h2>
     </header>

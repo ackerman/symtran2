@@ -1,18 +1,13 @@
 {% extends '::base.html.twig' %}
 {% block stylesheets %}
-  {% stylesheets 'bundles/ginsbergtransportation/css/public/*' filter='cssrewrite' %}
+  {% stylesheets 'bundles/ginsbergtransportation/css/user/*' filter='cssrewrite' %}
     <link rel="stylesheet" href="{{ asset_url }}" />
   {% endstylesheets %}
-  <style type="text/css">
-		.ui-select { width: 10em; }
-		.row:nth-child(8) div.ui-select { width: 60%; }
-		.row .ui-checkbox input, .row .ui-radio input { z-index: 200; }
-		.row .ui-select { vertical-align: middle; }
-	</style>
+  {% stylesheets 'bundles/ginsbergtransportation/css/user/smoothness/*' filter='cssrewrite' %}
+    <link rel="stylesheet" href="{{ asset_url }}" />
+  {% endstylesheets %}
 {% endblock %}
 {% block nav %}
-  <li><a href="{{ path('person') }}">Nav 1</a></li>
-  <li><a href="{{ path('reservation') }}">Nav 2</a></li>
+  <li>Nav 1</li>
+  <li>Nav 2</li>
 {% endblock %}
-{% block body %}{% endblock %}
-{% block privacy %}{% endblock %}

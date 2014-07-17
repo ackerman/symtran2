@@ -1,8 +1,13 @@
 {% extends 'GinsbergTransportationBundle::public_layout.html.twig' %}
 
-{% block stylesheets %}{% endblock %}
-{% block nav %}{% endblock %}
 {% block body %}
+  <div data-role="controlgroup" data-type="horizontal">
+  <a href="{{ path('site') }}" data-role="button" data-theme="b">Home</a>
+
+  <a href="" data-role="button">Make a reservation</a>
+
+  <a href="" data-role="button">Past reservations</a>
+</div>
   <h1>Welcome, {{ name }}</h1>
   {% if ticket == true %}
     <p style='color: red; font-weight: bold;'>You have an outstanding ticket. You will not be allowed to check out a vehicle until the ticket has been paid.
