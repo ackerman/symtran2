@@ -6,30 +6,31 @@
       {% block stylesheets %}{% endblock %}
       <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
   </head>
-  <body>
-    <header class="group">
-      {% block banner %}
-          <h1>Ginsberg Transportation System</h1>
-      {% endblock %}
-      <h2 id="greeting">
-        {% block greeting %}
-          Hi, logged in user. <a href="https://weblogin.umich.edu/cgi-bin/logut">Log out.</a>
+  {% block htmlbody %}
+    <body>
+      <header class="group">
+        {% block banner %}
+            <h1>Ginsberg Transportation System</h1>
         {% endblock %}
-      </h2>
-    </header>
-    <nav>
-      <ul>
-        {% block nav %}
+        <h2 id="greeting">
+          {% block greeting %}
+            Hi, logged in user. <a href="{{ asset('logout') }}">Log out.</a>
+          {% endblock %}
+        </h2>
+      </header>
+      <nav>
+        <ul>
+          {% block nav %}
+          {% endblock %}
+        </ul>
+      </nav>
+      <main>
+        {% block body %}{% endblock %}
+      </main>
+      <footer>
+        {% block privacy %}
         {% endblock %}
-      </ul>
-    </nav>
-    <main>
-      {% block body %}{% endblock %}
-    </main>
-    <footer>
-      {% block privacy %}
-      {% endblock %}
-    </footer>
+      </footer>
       {% block javascripts %}
         {% javascripts 
           '@GinsbergTransportationBundle/Resources/public/js/datetimepicker/jquery.js' %}
@@ -40,5 +41,6 @@
           <script src="{{ asset_url }}"></script>
         {% endjavascripts %}
       {% endblock %}
-  </body>
+    </body>
+  {% endblock %}
 </html>

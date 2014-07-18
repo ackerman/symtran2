@@ -1,10 +1,10 @@
 {# Layout template for the Admin portion of the website #}
 {% extends '::base.html.twig' %}
-{% block stylesheets %}
-  {% stylesheets 'bundles/ginsbergtransportation/css/*' filter='cssrewrite' %}
-    <link rel="stylesheet" href="{{ asset_url }}" />
-  {% endstylesheets %}
-{% endblock %}
+  {% block stylesheets %}
+    {% stylesheets 'bundles/ginsbergtransportation/css/admin/*' filter='cssrewrite' %}
+      <link rel="stylesheet" href="{{ asset_url }}" />
+    {% endstylesheets %}
+  {% endblock %}   
 {% block nav %}
   <li class="first" id="nav-people"><a href="{{ path('person') }}">People</a></li>
   <li class="first" id="nav-reservations"><a href="{{ path('reservation') }}">Reservations</a></li>
@@ -15,5 +15,3 @@
   <li class="first" id="nav-installation"><a href="{{ path('installation') }}">Installation</a></li>
   <li class="first" id="nav-reports"><a href="">Reports</a></li>
 {% endblock %}
-{% block body %}{% endblock %}
-{% block privacy %}{% endblock %}

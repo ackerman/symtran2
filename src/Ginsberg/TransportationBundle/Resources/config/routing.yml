@@ -1,13 +1,10 @@
 ginsberg_transportation:
-  resource: "@GinsbergTransportationBundle/Controller/"
+  resource: "@GinsbergTransportationBundle/Controller"
   type: annotation
   prefix: /
 ginsberg_transportation_homepage:
-    pattern:  /hello/{name}
-    defaults: { _controller: GinsbergTransportationBundle:Default:index }
-site:
-  pattern: /site
-  defaults: { _controller: "GinsbergTransportationBundle:Default:index" }
+  path: / 
+  defaults: { _controller: GinsbergTransportationBundle:Site:index }
 login:
   path: /login
   defaults: { _controller: "GinsbergTransportationBundle:Security:login" }
