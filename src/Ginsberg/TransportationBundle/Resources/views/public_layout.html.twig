@@ -3,11 +3,40 @@
   {% stylesheets 'bundles/ginsbergtransportation/css/user/*' filter='cssrewrite' %}
     <link rel="stylesheet" href="{{ asset_url }}" />
   {% endstylesheets %}
-  {% stylesheets 'bundles/ginsbergtransportation/css/user/smoothness/*' filter='cssrewrite' %}
+    {% stylesheets 'bundles/ginsbergtransportation/css/user/smoothness/*' filter='cssrewrite' %}
     <link rel="stylesheet" href="{{ asset_url }}" />
   {% endstylesheets %}
 {% endblock %}
-{% block nav %}
-  <li>Nav 1</li>
-  <li>Nav 2</li>
+{% block htmlbody %}
+    <body>
+  <div data-role="page" class="container" id="page" data-theme="d">
+
+	<div id="header" data-role="header" data-theme="b">
+		<h1 id="logo">Ginsberg Transportation System</h1>
+		<a href="{{ path('site') }}" class="ui-btn-left" data-icon="home" data-iconpos="notext"
+               data-direction="reverse">Home</a>
+	</div><!-- header -->
+<div data-role="controlgroup" data-type="horizontal">
+  <a href="{{ path('site') }}" data-role="button" data-theme="b">Home</a>
+
+  <a href="" data-role="button">Make a reservation</a>
+
+  <a href="" data-role="button">Past reservations</a>
+</div>
+	<div  data-role="content">
+  {% block body %}{% endblock %}
+	</div>
+
+	<div id="footer" data-role="footer" data-theme="c">
+	  <h4><a href="http://ginsberg.umich.edu/transportation/privacy-policy">Privacy Policy</a></h4>
+	</div><!-- footer -->
+  {% block javascripts %}
+    {{ parent() }}
+    {% javascripts 'bundles/ginsbergtransportation/js/user/*' %}
+           <script src="{{ asset_url }}"></script>
+        {% endjavascripts %}
+  {% endblock %}
+  
+</div><!-- page -->
+    </body>
 {% endblock %}
