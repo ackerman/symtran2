@@ -25,42 +25,4 @@ class InstallationRepository extends EntityRepository
 	    $this->$attribute = '';
 	  endif;
 	}
-  
-  /**
-	 * Return whether or not a date falls on a Ginsberg holiday
-	 */
-	public function getIsHoliday($date) {
-    $params = array('date' => $date);
-    $dql = 'SELECT COUNT(i) FROM GinsbergTransportationBundle:Installation i WHERE 
-            :date BETWEEN i.thanksgivingStart AND i.thanksgivingEnd
-            OR :date BETWEEN i.mlkStart AND i.mlkEnd
-            OR :date BETWEEN i.springbreakStart AND i.springbreakEnd';
-    
-    $query = $this->getEntityManager()->createQuery($dql)->setParameters($params);
-
-    try {
-      $result = $query->getSingleScalarResult();
-      return ((bool) $result) ? TRUE : FALSE;
-    } catch (\Doctrine\ORM\NoResultException $ex) {
-      return null;
-    }
-	}
-
-	/**
-	 * Return whether or not a date falls on a Ginsberg holiday
-	 */
-	public static function is_semester_break($date) {
-		$check_date = Installation::model()->count(
-      ':date < fall_start OR
-			:date BETWEEN fall_end AND winter_start OR
-			:date > winter_end',
-      array(
-        ':date' => $date,
-      )
-    );
-		if ( (bool) $check_date ):
-      return true;
-    endif;
-    return false;
-	}
 }

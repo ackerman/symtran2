@@ -1,9 +1,10 @@
 parameters:
-    ginsberg_transportation.user.class: Ginsberg\TransportationBundle\Services\User
-    ginsberg_transportation.res_utils.class: Ginsberg\TransportationBundle\Services\ReservationUtils
-    ginsberg_transportation.program_service.class: Ginsberg\TransportationBundle\Services\ProgramService
-    ginsberg_transportation.person_service.class: Ginsberg\TransportationBundle\Services\PersonService
-    user_provider.class: Ginsberg\TransportationBundle\Security\User\UserProvider
+  ginsberg_transportation.user.class: Ginsberg\TransportationBundle\Services\User
+  ginsberg_transportation.res_utils.class: Ginsberg\TransportationBundle\Services\ReservationUtils
+  ginsberg_transportation.program_service.class: Ginsberg\TransportationBundle\Services\ProgramService
+  ginsberg_transportation.person_service.class: Ginsberg\TransportationBundle\Services\PersonService
+  ginsberg_transportation.installation_service.class: Ginsberg\TransportationBundle\Services\InstallationService
+  user_provider.class: Ginsberg\TransportationBundle\Security\User\UserProvider
     
 services:
   ginsberg_user:
@@ -23,6 +24,10 @@ services:
     class: %ginsberg_transportation.person_service.class%
     arguments: 
       ["@ginsberg_person.person_repository", "@logger"]
+  installation_service:
+    class: %ginsberg_transportation.installation_service.class%
+    arguments:
+      ["@ginsberg_installation.installation_repository", "@logger"]
   ginsberg_transportation.form.type.person:
     class: Ginsberg\TransportationBundle\Form\Type\PersonType
     tags:
@@ -39,3 +44,14 @@ services:
     factory_method: getRepository
     arguments:
       - Ginsberg\TransportationBundle\Entity\Program
+  ginsberg_installation.installation_repository:
+    class: Doctrine\ORM\EntityRepository
+    factory_service: doctrine.orm.default_entity_manager
+    factory_method: getRepository
+    arguments:
+      - Ginsberg\TransportationBundle\Entity\Installation
+  validator.unique.IsNotBlackedOutValidator:
+    class: Ginsberg\TransportationBundle\Validator\Constraints\IsNotBlackedOutValidator
+    tags:
+      - { name: validator.IsNotBlackedOutValidator, alias: blackout }
+  
