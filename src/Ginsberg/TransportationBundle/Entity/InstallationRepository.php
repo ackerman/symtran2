@@ -29,19 +29,21 @@ class InstallationRepository extends EntityRepository
   /**
 	 * Return whether or not a date falls on a Ginsberg holiday
 	 */
-	public static function is_holiday($date) {
-		$check_date = Installation::model()->count(
-      ':date BETWEEN thanksgiving_start AND thanksgiving_end OR
-			:date BETWEEN mlk_start AND mlk_end OR
-			:date BETWEEN springbreak_start AND springbreak_end',
-      array(
-        ':date' => $date,
-      )
-    );
-		if ( (bool) $check_date ):
-      return true;
-    endif;
-    return false;
+	public function getIsHoliday($date) {
+    $params = array('date' => $date);
+    $dql = 'SELECT COUNT(i) FROM GinsbergTransportationBundle:Installation i WHERE 
+            :date BETWEEN i.thanksgivingStart AND i.thanksgivingEnd
+            OR :date BETWEEN i.mlkStart AND i.mlkEnd
+            OR :date BETWEEN i.springbreakStart AND i.springbreakEnd';
+    
+    $query = $this->getEntityManager()->createQuery($dql)->setParameters($params);
+
+    try {
+      $result = $query->getSingleScalarResult();
+      return ((bool) $result) ? TRUE : FALSE;
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
 	}
 
 	/**

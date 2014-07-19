@@ -47,9 +47,9 @@
                 <td>{% if upcoming_trip.end %}{{ upcoming_trip.end|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if upcoming_trip.checkout %}{{ upcoming_trip.checkout|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if upcoming_trip.checkin %}{{ upcoming_trip.checkin|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{{ upcoming_trip.vehicle }}</td>
+                <td><a href="{{ path('vehicle_show', { 'id': upcoming_trip.vehicle.id }) }}">{{ upcoming_trip.vehicle }}</a></td>
                 <td>{{ upcoming_trip.seatsRequired }}</td>
-                <td>{{ upcoming_trip.person }}</td>
+                <td><a href="{{ path('person_show', { 'id': upcoming_trip.person.id }) }}">{{ upcoming_trip.person }}</a></td>
                 <td>{{ upcoming_trip.program }}</td>
                 <td>{{ upcoming_trip.destination }}</td>
                 <td>{{ upcoming_trip.destinationText }}</td>
@@ -105,9 +105,9 @@
                 <td>{% if ongoing_trip.end %}{{ ongoing_trip.end|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if ongoing_trip.checkout %}{{ ongoing_trip.checkout|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if ongoing_trip.checkin %}{{ ongoing_trip.checkin|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{{ ongoing_trip.vehicle }}</td>
+                <td><a href="{{ path('vehicle_show', { 'id': ongoing_trip.vehicle.id }) }}">{{ ongoing_trip.vehicle }}</a></td>
                 <td>{{ ongoing_trip.seatsRequired }}</td>
-                <td>{{ ongoing_trip.person }}</td>
+                <td><a href="{{ path('person_show', { 'id': ongoing_trip.person.id }) }}">{{ ongoing_trip.person }}</a></td>
                 <td>{{ ongoing_trip.program }}</td>
                 <td>{{ ongoing_trip.destination }}</td>
                 <td>{{ ongoing_trip.destinationText }}</td>
@@ -164,9 +164,9 @@
                 <td>{% if checkedInTrip.end %}{{ checkedInTrip.end|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if checkedInTrip.checkout %}{{ checkedInTrip.checkout|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if checkedInTrip.checkin %}{{ checkedInTrip.checkin|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{{ checkedInTrip.vehicle }}</td>
+                <td><a href="{{ path('vehicle_show', { 'id': checkedInTrip.vehicle.id }) }}">{{ checkedInTrip.vehicle }}</a></td>
                 <td>{{ checkedInTrip.seatsRequired }}</td>
-                <td>{{ checkedInTrip.person }}</td>
+                <td><a href="{{ path('person_show', { 'id': checkedInTrip.person.id }) }}">{{ checkedInTrip.person }}</a></td>
                 <td>{{ checkedInTrip.program }}</td>
                 <td>{{ checkedInTrip.destination }}</td>
                 <td>{{ checkedInTrip.destinationText }}</td>

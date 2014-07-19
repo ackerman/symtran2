@@ -1,4 +1,4 @@
-{% extends '::base.html.twig' %}
+{% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
     <h1>Installation creation</h1>
@@ -12,4 +12,17 @@
         </a>
     </li>
 </ul>
+{% endblock %}
+{% block javascripts %}
+  {% javascripts 
+    '@GinsbergTransportationBundle/Resources/public/js/moment.js' %}
+    {{ parent() }}
+    <script src="{{ asset_url }}"></script>
+    <script>moment().format();</script>
+  {% endjavascripts %}
+  {% javascripts 
+    '@GinsbergTransportationBundle/Resources/public/js/installation_datetimepicker.js' %}
+    {{ parent() }}
+    <script src="{{ asset_url }}"></script>
+  {% endjavascripts %}
 {% endblock %}

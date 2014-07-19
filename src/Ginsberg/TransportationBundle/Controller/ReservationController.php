@@ -62,7 +62,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
     /**
      * Returns reservations for the date selected.
      *
-     * @Route("/", name="reservation_search")
+     * @Route("/for_date", name="reservation_search")
      * @Method("POST")
      * @Template("GinsbergTransportationBundle:Reservation:index.html.twig")
      */
@@ -77,11 +77,12 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
         
         
         if ($form->isValid()) {
+          $dateToShow = new \DateTime(date('Y-m-d'));
           // If they clicked the "Today" button, show the index page from the 
           // indexAction with ongoing trips, etc.
           if ($form->get('today')->isClicked()) {
             return $this->redirect($this->generateUrl('reservation'));
-          } else {
+          } elseif (is_object($form->get('dateToShow')->getData())) {
             $dateToShow = $form->get('dateToShow')->getData();
           }
           //$logger->info('In searchAction, form is valid, dateToShow = ' . $dateToShow->format('c'));
@@ -164,15 +165,17 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
      */
     public function createAction(Request $request)
     {
+      $logger = $this->get('logger');
+      $logger->info('In ReservationController::createAction()');    
         $entity = new Reservation();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
           // We'll use the Entity Manager in severall places, so get it now
+          $logger->info('Form is valid');
           $em = $this->getDoctrine()->getManager();
           
-          $logger = $this->get('logger');
           
           // Create arrays to hold successful and unsuccessful vehicle 
           // assignments
@@ -275,7 +278,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
               $reservation->setNotes($entity->getNotes());
               $reservation->setCheckout(NULL);
               $reservation->setCheckin(NULL);
-              $reservation->setCreated(new DateTime());
+              $reservation->setCreated(new \DateTime());
               
               $reservation->setStart($repetitionStart);
               $reservation->setEnd($repetitionEnd);
@@ -350,13 +353,16 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
     */
     private function createCreateForm(Reservation $entity)
     {
+      $logger = $this->get('logger');
+      $logger->info('in ReservationController::createCreateForm');
         $form = $this->createForm(new ReservationType(), $entity, array(
             'action' => $this->generateUrl('reservation_create'),
             'method' => 'POST',
         ));
 
         $form->add('submit', 'submit', array('label' => 'Create'));
-
+        
+        $logger->info('action = ' . $this->generateUrl('reservation_create'));
         return $form;
     }
 
@@ -369,6 +375,9 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
      */
     public function newAction()
     {
+      $logger = $this->get('logger');
+      $logger->info('in ReservationController::newAction');
+      
         $entity = new Reservation();
         $entity->setCreated(new \DateTime());
         $form   = $this->createCreateForm($entity);

@@ -75,16 +75,16 @@ class ReservationType extends AbstractType
                     'class' => 'datetime',
                   )
                 ))
-            ->add('vehicle', NULL, array('empty_value' => 'Manually Select a Vehicle'))
+            ->add('vehicle', NULL, array('required' => FALSE, 'empty_value' => 'Manually Select a Vehicle'))
             ->add('person')
             ->add('program', NULL, array('empty_value' => 'Select a Program'))
             ->add('seatsRequired')
-            ->add('destination', NULL, array('empty_value' => 'Select a Destination'))
-            ->add('destinationText')
-            ->add('notes')
-            ->add('isNoShow')
+            ->add('destination', NULL, array('required' => FALSE, 'empty_value' => 'Select a Destination'))
+            ->add('destinationText', NULL, array('required' => FALSE))
+            ->add('notes', NULL, array('required' => FALSE))
+            ->add('isNoShow', NULL, array('required' => FALSE))
             ->add('created')
-            ->add('modified')
+            ->add('modified', NULL, array('required' => FALSE))
         ;
     }
     
