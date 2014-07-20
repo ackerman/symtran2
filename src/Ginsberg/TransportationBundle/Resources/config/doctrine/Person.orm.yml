@@ -33,7 +33,7 @@ Ginsberg\TransportationBundle\Entity\Person:
           type: boolean
           nullable: true
         hasUnpaidTicket:
-          type: smallint
+          type: boolean
           nullable: true
         created:
           type: datetime

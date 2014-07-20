@@ -1,0 +1,58 @@
+{% extends 'GinsbergTransportationBundle::public_layout.html.twig' %}
+
+{% block body -%}
+<h1>Welcome, {{ entity.firstName }}</h1>
+
+<h2>Terms and Conditions for Driving a Ginsberg Vehicle</h2>
+
+<h3>The Transportation Contract</h3>
+<p>By registering to be a driver, you understand and agree to the following terms. Your failure to comply with the rules and regulations may result in your inability to use University of Michigan vehicles. You agree that you:</p>
+<ol>
+<li>Will abide by all State of Michigan vehicular laws, including no drugs or alcohol.</li>
+<li>Will not smoke in the vehicle.</li>
+<li>Are responsible for knowing and following the proper procedures for all vehicle use. This includes proper Sign Out/In procedures and vehicle parking.</li>
+<li>Are responsible for returning the vehicle with at least 1/2 tank of gas.</li>
+<li>Are responsible for following the proper procedures in the event of a breakdown and/or accident.</li>
+<li>Are responsible for all tickets or towing fees incurred while the vehicle is signed out in your name.</li>
+<li>Are responsible for reporting any damage incurred while the vehicle is signed out in your name.</li>
+<li>Are responsible for cleaning up any trash from the vehicle.</li>
+<li>Are responsible for canceling unneeded vehicle requests.</li>
+<li>Are the only authorized driver when you request a vehicle, and that any other drivers must be approved in advance by Parking and Transportation and the Ginsberg Center.</li>
+<li>Will not use a Ginsberg Center vehicle for personal use.</li>
+</ol>
+
+    {{ form_start(register_form) }}
+<p class="note">Fields with <span class="required">*</span> are required.</p>
+      {{ form_errors(register_form) }}
+      {{ form_row(register_form.firstName) }}
+      {{ form_row(register_form.lastName) }}
+      {{ form_row(register_form.uniqname) }}
+      {{ form_row(register_form.phone) }}
+      {{ form_row(register_form.status) }}
+      {{ form_row(register_form.dateApproved) }}
+      {{ form_row(register_form.hasUnpaidTicket) }}
+      {{ form_row(register_form.program) }}
+      {{ form_row(register_form._token) }}
+      {{ form_row(register_form.created) }}
+      {{ form_row(register_form.modified) }}
+      {{ form_row(register_form.isTermsAgreed) }}
+      
+      {{ form_row(register_form.submit, {'label': 'Submit Registration' }) }}
+      
+    {{ form_end(register_form) }}
+
+        <ul class="record_actions">
+    <li>
+        <a href="{{ path('site') }}">
+            Back to the list
+        </a>
+    </li>
+</ul>
+{% endblock %}
+{% block javascripts %}
+  {% javascripts 
+    '@GinsbergTransportationBundle/Resources/public/js/person_datetimepicker.js' %}
+    {{ parent() }}
+    <script src="{{ asset_url }}"></script>
+  {% endjavascripts %}
+{% endblock %}

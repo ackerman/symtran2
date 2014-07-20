@@ -33,6 +33,9 @@ class ReservationType extends AbstractType
             ->add('repeatsUntil', 'datetime', array(
               'mapped' => FALSE,
               'required' => FALSE,
+              'constraints' => array(
+                new \Ginsberg\TransportationBundle\Validator\Constraints\IsNotBlackedOut(),
+              ),
               'widget' => 'single_text',
               'format' => 'yyyy-MM-dd 20:00',
               'attr' => array(
@@ -44,7 +47,7 @@ class ReservationType extends AbstractType
               'required' => FALSE,
             ))
             ->add('start', 'datetime', array(
-                'required' => TRUE,
+                'required' => FALSE,
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd hh:mm a',
                 'attr' => array(
@@ -75,16 +78,16 @@ class ReservationType extends AbstractType
                     'class' => 'datetime',
                   )
                 ))
-            ->add('vehicle', NULL, array('empty_value' => 'Manually Select a Vehicle'))
+            ->add('vehicle', NULL, array('required' => FALSE, 'empty_value' => 'Manually Select a Vehicle'))
             ->add('person')
             ->add('program', NULL, array('empty_value' => 'Select a Program'))
             ->add('seatsRequired')
-            ->add('destination', NULL, array('empty_value' => 'Select a Destination'))
-            ->add('destinationText')
-            ->add('notes')
-            ->add('isNoShow')
+            ->add('destination', NULL, array('required' => FALSE, 'empty_value' => 'Select a Destination'))
+            ->add('destinationText', NULL, array('required' => FALSE))
+            ->add('notes', NULL, array('required' => FALSE))
+            ->add('isNoShow', NULL, array('required' => FALSE))
             ->add('created')
-            ->add('modified')
+            ->add('modified', NULL, array('required' => FALSE))
         ;
     }
     
@@ -95,7 +98,6 @@ class ReservationType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => 'Ginsberg\TransportationBundle\Entity\Reservation',
-          'validation_groups' => FALSE,
         ));
     }
 

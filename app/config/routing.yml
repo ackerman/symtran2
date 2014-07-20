@@ -1,4 +1,6 @@
 ginsberg_transportation:
     resource: "@GinsbergTransportationBundle/Resources/config/routing.yml"
     prefix:   /
+logout:
+  path: /logout
 

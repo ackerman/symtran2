@@ -53,7 +53,7 @@ class Person
     private $isTermsAgreed;
 
     /**
-     * @var integer
+     * @var boolean
      */
     private $hasUnpaidTicket;
 
@@ -265,7 +265,7 @@ class Person
     /**
      * Set hasUnpaidTicket
      *
-     * @param integer $hasUnpaidTicket
+     * @param boolean $hasUnpaidTicket
      * @return Person
      */
     public function setHasUnpaidTicket($hasUnpaidTicket)
@@ -278,7 +278,7 @@ class Person
     /**
      * Get hasUnpaidTicket
      *
-     * @return integer 
+     * @return boolean 
      */
     public function getHasUnpaidTicket()
     {

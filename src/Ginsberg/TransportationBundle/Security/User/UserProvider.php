@@ -7,6 +7,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Ginsberg\TransportationBundle\Entity\Person;
+use Ginsberg\TransportationBundle\Services\PersonService;
 use Doctrine\ORM\EntityRepository;
 
 /* 
@@ -16,7 +17,15 @@ use Doctrine\ORM\EntityRepository;
  */
 class UserProvider implements UserProviderInterface
 {
-  public $personRepository;
+  private $personRepository;
+  private $personService;
+  private $logger;
+  
+  public function __construct(\Ginsberg\TransportationBundle\Entity\PersonRepository $personRepository, \Ginsberg\TransportationBundle\Services\PersonService $personService, \Monolog\Logger $logger) {
+    $this->personRepository = $personRepository;
+    $this->personService = $personService;
+    $this->logger = $logger;
+  }
   
    protected static $_host = 'ldap.itd.umich.edu';
     // The umbrella group that lists the subgroups of eligible drivers
@@ -37,7 +46,7 @@ class UserProvider implements UserProviderInterface
           $roles[] = 'ROLE_SUPER_ADMIN';
         } elseif (self::is_admin()) {
           $roles[] = 'ROLE_ADMIN';
-        } elseif (self::is_eligible() && self::is_approved()) {
+        } elseif (self::is_eligible()) {
           $roles[] = 'ROLE_USER';
         }
         
@@ -170,12 +179,15 @@ class UserProvider implements UserProviderInterface
      *
      * @return string The first name of the user
      */
-    public static function get_first_name()
+    public function get_first_name()
     {
       // First check if the user is in the database
-      $person = Person::find_by_uniqname(self::get_uniqname());
+      $person = $this->personRepository->findByUniqname(self::get_uniqname());
+      if (is_array($person)) {
+        $person = $person[0];
+      }
       if ($person){
-        return $person->first_name;
+        return $person->getFirstName();
       }
 
       // Then guess the first name from the LDAP entry
@@ -214,10 +226,10 @@ class UserProvider implements UserProviderInterface
      *
      * @return boolean Whether user is approved
      */
-    public static function is_approved()
+    public function is_approved()
     {
       $uniqname = self::get_uniqname();
-      $status = $personRepository->findStatusByUniqname($uniqname);
+      $status = $this->personService->getStatusByUniqname($uniqname);
        
       return($status == 'approved') ? TRUE : FALSE;
         

@@ -25,40 +25,4 @@ class InstallationRepository extends EntityRepository
 	    $this->$attribute = '';
 	  endif;
 	}
-  
-  /**
-	 * Return whether or not a date falls on a Ginsberg holiday
-	 */
-	public static function is_holiday($date) {
-		$check_date = Installation::model()->count(
-      ':date BETWEEN thanksgiving_start AND thanksgiving_end OR
-			:date BETWEEN mlk_start AND mlk_end OR
-			:date BETWEEN springbreak_start AND springbreak_end',
-      array(
-        ':date' => $date,
-      )
-    );
-		if ( (bool) $check_date ):
-      return true;
-    endif;
-    return false;
-	}
-
-	/**
-	 * Return whether or not a date falls on a Ginsberg holiday
-	 */
-	public static function is_semester_break($date) {
-		$check_date = Installation::model()->count(
-      ':date < fall_start OR
-			:date BETWEEN fall_end AND winter_start OR
-			:date > winter_end',
-      array(
-        ':date' => $date,
-      )
-    );
-		if ( (bool) $check_date ):
-      return true;
-    endif;
-    return false;
-	}
 }
