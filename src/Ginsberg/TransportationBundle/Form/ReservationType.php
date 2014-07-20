@@ -33,6 +33,9 @@ class ReservationType extends AbstractType
             ->add('repeatsUntil', 'datetime', array(
               'mapped' => FALSE,
               'required' => FALSE,
+              'constraints' => array(
+                new \Ginsberg\TransportationBundle\Validator\Constraints\IsNotBlackedOut(),
+              ),
               'widget' => 'single_text',
               'format' => 'yyyy-MM-dd 20:00',
               'attr' => array(
@@ -44,7 +47,7 @@ class ReservationType extends AbstractType
               'required' => FALSE,
             ))
             ->add('start', 'datetime', array(
-                'required' => TRUE,
+                'required' => FALSE,
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd hh:mm a',
                 'attr' => array(
@@ -95,7 +98,6 @@ class ReservationType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => 'Ginsberg\TransportationBundle\Entity\Reservation',
-          'validation_groups' => FALSE,
         ));
     }
 

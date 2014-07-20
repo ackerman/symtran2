@@ -5,5 +5,11 @@ Ginsberg\TransportationBundle\Entity\Destination:
       - Length:
           min: 4
           max: 255
-    
-      
+Ginsberg\TransportationBundle\Entity\Reservation:
+  properties:
+    start:
+      - NotBlank: ~
+      - Ginsberg\TransportationBundle\Validator\Constraints\IsNotBlackedOut: ~   
+    end:
+      - NotBlank: ~
+      - Ginsberg\TransportationBundle\Validator\Constraints\IsNotBlackedOut: ~ 
