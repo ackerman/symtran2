@@ -14,7 +14,6 @@ use Ginsberg\TransportationBundle\Entity\Program;
 use Ginsberg\TransportationBundle\Security\User\UserProvider;
 use Ginsberg\TransportationBundle\Form\ReservationType;
 use Ginsberg\TransportationBundle\Form\PersonType;
-use Ginsberg\TransportationBundle\Services\ProgramService;
 use Ginsberg\TransportationBundle\Services\PersonService;
 
 /**
@@ -109,13 +108,13 @@ class SiteController extends Controller
 		$uniqname = $provider->get_uniqname();
 
 		// User::is_eligible will either return the name of the first eligibility group found
-		// for the user, or false. Save the name of the $ldap_group for later.
-		$ldap_group = $provider->is_eligible();
-    $logger->info("ldap group = $ldap_group");
+		// for the user, or false. Save the name of the $ldapGroup for later.
+		$ldapGroup = $provider->is_eligible();
+    $logger->info("ldap group = $ldapGroup");
 
 		// If the user is not eligible, (that is, they are not in a subgroup of the group
 		// 'ginsberg transpo eligible'), send them to the 'ineligible' view.
-		if ($ldap_group == FALSE) {
+		if ($ldapGroup == FALSE) {
 			return $this->render('GinsbergTransportationBundle:Site:ineligible.html.twig', array(
 				'name' => $provider->get_first_name(),
 			));
@@ -175,7 +174,7 @@ class SiteController extends Controller
 				// Otherwise, set it based on the eligibility group they are in.
         // We know the person has a program set if isTermsAgreed is true, since
         // they had to set a program on the registration form.
-				$program = $em->getRepository('GinsbergTransportationBundle:Program')->findByEligibilityGroup($ldap_group);
+				$program = $em->getRepository('GinsbergTransportationBundle:Program')->findByEligibilityGroup($ldapGroup);
 				if (is_array($program)) {
           $program = $program[0];
         }
@@ -282,13 +281,13 @@ class SiteController extends Controller
     $provider = $this->get('user_provider');
     
 // User::is_eligible will either return the name of the first eligibility group found
-		// for the user, or false. Save the name of the $ldap_group for later.
-		$ldap_group = $provider->is_eligible();
+		// for the user, or false. Save the name of the $ldapGroup for later.
+		$ldapGroup = $provider->is_eligible();
 
 		// If the user is not eligible, (that is, they are not in a subgroup of the group
 		// 'ginsberg transpo eligible'), send them to the 'ineligible' view.
-		$logger->info('about to check $ldap_group early in  initiateRegistrationAction');
-    if ($ldap_group == FALSE) {
+		$logger->info('about to check $ldapGroup early in  initiateRegistrationAction');
+    if ($ldapGroup == FALSE) {
 			return $this->render('GinsbergTransportationBundle:Site:ineligible.html.twig', array(
 				'name' => $provider->get_first_name(),
 			));
@@ -302,7 +301,7 @@ class SiteController extends Controller
     //$mvr_status = 'Approved'; // ***FOR TESTING***
     $logger->info('mvr_status = ' . $mvr_status);
 
-    $program = $em->getRepository('GinsbergTransportationBundle:Program')->findByEligibilityGroup($ldap_group);
+    $program = $em->getRepository('GinsbergTransportationBundle:Program')->findByEligibilityGroup($ldapGroup);
     if (is_array($program)) {
       $program = $program[0];
     }
@@ -491,17 +490,78 @@ class SiteController extends Controller
 	  return Assert(False);
 	}
 
+  /**
+    * Creates a form to create a Reservation entity.
+    *
+    * @param Reservation $entity The entity
+    *
+    * @return \Symfony\Component\Form\Form The form
+    */
+    private function createCreateForm(Reservation $entity)
+    {
+      $logger = $this->get('logger');
+      $logger->info('in SiteController::createCreateForm');
+        $form = $this->createForm(new ReservationType(), $entity, array(
+            'action' => $this->generateUrl('site_create'),
+            'method' => 'POST',
+        ));
+
+        $form->add('submit', 'submit', array('label' => 'Create'));
+        
+        $logger->info('action = ' . $this->generateUrl('reservation_create'));
+        return $form;
+    }
+
+    /**
+     * Displays a form to a regular user to create a new Reservation entity.
+     *
+     * @Route("/new", name="site_new")
+     * @Method("GET")
+     * @Template()
+     */
+    public function newAction()
+    {
+      $logger = $this->get('logger');
+      $logger->info('in SiteController::newAction');
+      
+        $entity = new Reservation();
+        $entity->setCreated(new \DateTime());
+        $form   = $this->createCreateForm($entity);
+
+        return array(
+            'entity' => $entity,
+            'form'   => $form->createView(),
+        );
+    }
+
 
 	/**
-	 * Create a reservation
-	 */
-	public function actionCreate()
+   * Creates a new Reservation entity.
+   *
+   * @Route("/", name="site_create")
+   * @Method("POST")
+   * @Template("GinsbergTransportationBundle:Site:new.html.twig")
+   */
+	public function createAction()
 	{
-	  $uniqname = User::get_uniqname();
-		$ldap_group = User::is_eligible();
-		$users_program = Program::get_program_name_by_ldap_group($ldap_group);
-	  $model = new Reservation;
-		if ($users_program) {
+    $logger = $this->get('logger');
+    $em = $this->getDoctrine()->getManager();
+    $provider = $this->get('user_provider');
+    
+    // Ensure that user is eligible
+    $ldapGroup = $provider->is_eligible();
+    if ($ldapGroup == FALSE) {
+			return $this->render('GinsbergTransportationBundle:Site:ineligible.html.twig', array(
+				'name' => $provider->get_first_name(),
+			));
+    }
+    
+	  $uniqname = $provider->get_uniqname();
+    $person = $em->getRepository('GinsbergTransportationBundle:Person')->finByUniqname($uniqname);
+		$program = $person->getProgram();
+    $logger->info('In SiteController::createAction(). uniqname = ' . $uniqname . ' program: ' . $program->getName());
+    $model = new Reservation;
+		if ($program) {
 			$model->program = $users_program;
 		}
 	  if(isset($_POST['Reservation'])){
@@ -673,8 +733,14 @@ class SiteController extends Controller
 		));
 	}
 
-
-	public function actionPast()
+	/**
+   * Creates a new Reservation entity.
+   *
+   * @Route("/past", name="site_past")
+   * @Method("POST")
+   * @Template("GinsbergTransportationBundle:Site:past.html.twig")
+   */
+	public function pastAction()
  	{
      $now=date("Y-m-d H:i:s");
  	   $criteria=new CDbCriteria;

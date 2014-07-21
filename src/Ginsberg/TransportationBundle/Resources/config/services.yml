@@ -24,10 +24,6 @@ services:
     class: %ginsberg_transportation.person_service.class%
     arguments: 
       ["@ginsberg_person.person_repository", "@logger"]
-  installation_service:
-    class: %ginsberg_transportation.installation_service.class%
-    arguments:
-      [@doctrine.orm.entity_manager, "@ginsberg_installation.installation_repository", "@logger"]
   ginsberg_transportation.form.type.person:
     class: Ginsberg\TransportationBundle\Form\Type\PersonType
     tags:
@@ -52,7 +48,7 @@ services:
       - Ginsberg\TransportationBundle\Entity\Installation
   validator.unique.IsNotBlackedOutValidator:
     class: Ginsberg\TransportationBundle\Validator\Constraints\IsNotBlackedOutValidator
-    arguments: ["@installation_service", "@logger"]
+    arguments: ["@ginsberg_installation.installation_repository", "@logger"]
     tags:
       - { name: validator.constraint_validator, alias: blackout }
   

@@ -1,0 +1,33 @@
+{% extends 'GinsbergTransportationBundle::public_layout.html.twig' %}
+
+{% block body -%}
+
+<h2>Create a Reservation</h2>
+
+    <ul class="record_actions">
+      <li>
+          <a href="{{ path('reservation') }}">
+              Back to the list
+          </a>
+      </li>
+    </ul>
+    {{ form_start(form, {'att': {'novalidate': 'novalidate'}}) }}
+      {{ form_errors(form) }}
+      {{ form_row(form.isRepeating) }}
+      {{ form_row(form.repeatsUntil) }}
+      {{ form_row(form.start) }}
+      {{ form_row(form.end) }}
+      {{ form_row(form.seatsRequired) }}
+      {{ form_row(form.program) }}
+      {{ form_row(form.destinationText) }}
+      {{ form_row(form.notes) }}
+      {{ form_row(form._token) }}
+      {{ form_row(form.created) }}
+      {{ form_row(form.modified) }}
+      
+      {{ form_row(form.submit, {'label': 'Submit' }) }}
+      
+    {{ form_end(form, {'render_rest': false}) }}
+
+        
+{% endblock %}

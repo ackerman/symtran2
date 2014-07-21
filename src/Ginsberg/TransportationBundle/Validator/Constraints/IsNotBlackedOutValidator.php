@@ -4,22 +4,23 @@ namespace Ginsberg\TransportationBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Ginsberg\TransportationBundle\Entity\InstallationRepository; 
+use Ginsberg\TransportationBundle\Entity\InstallationRepository;
+use Doctrine\ORM\EntityManager;
 use Ginsberg\TransportationBundle\Services\InstallationService;
 use Monolog\Logger;
 
 class IsNotBlackedOutValidator extends ConstraintValidator
 {
-  public $installationService;
+  public $installationRepository;
   
-  public function __construct($installationService, $logger) {
-    $this->installationService = $installationService;
+  public function __construct($installationRepository, $logger) {
+    $this->installationRepository = $installationRepository;
     $this->logger = $logger;
   }
   
   public function validate($value, Constraint $constraint) 
   {
-    if ($this->installationService->getIsHoliday($value)) {
+    if ($this->installationRepository->getIsHoliday($value)) {
       $this->logger->info("In IsNotBlackedOutValidator::validate(). getIsHoliday returned true.");
       $date = clone($value);
       $dateString = date('D, M d', $date->getTimestamp());
@@ -27,7 +28,7 @@ class IsNotBlackedOutValidator extends ConstraintValidator
         $constraint->message,
         array('%string%' => $dateString)
         );
-    } elseif ($this->installationService->getIsSemesterBreak($value)) {
+    } elseif ($this->installationRepository->getIsSemesterBreak($value)) {
       $this->logger->info("In IsNotBlackedOutValidator::validate(). getIsSemesterBreak returned true.");
       $date = clone($value);
       $dateString = date('D, M d', $date->getTimestamp());

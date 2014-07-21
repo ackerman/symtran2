@@ -33,12 +33,9 @@
       </footer>
       {% block javascripts %}
         {% javascripts 
-          '@GinsbergTransportationBundle/Resources/public/js/datetimepicker/jquery.js' %}
+          '@GinsbergTransportationBundle/Resources/public/js/user/jquery-1.11.1.js'
+          %}
            <script src="{{ asset_url }}"></script>
-        {% endjavascripts %}
-        {% javascripts 
-          '@GinsbergTransportationBundle/Resources/public/js/datetimepicker/jquery.datetimepicker_modified.js' %}
-          <script src="{{ asset_url }}"></script>
         {% endjavascripts %}
       {% endblock %}
     </body>
