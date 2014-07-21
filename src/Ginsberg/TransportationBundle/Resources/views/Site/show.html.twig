@@ -1,0 +1,111 @@
+{% extends 'GinsbergTransportationBundle::public_layout.html.twig' %}
+
+{% block body -%}
+    <h1>Reservation</h1>
+<ul class="record_actions">
+    <li>
+        <a href="{{ path('site') }}">
+            Home
+        </a>
+    </li>
+</ul>
+    {% for flashMessage in app.session.flashbag.get('success') %}
+      <div class="flash-notice save-success">
+        {{ flashMessage }}
+      </div>
+    {% endfor %}
+    {% for flashMessage in app.session.flashbag.get('failure') %}
+      <div class="flash-notice save-failure">
+        {{ flashMessage }}
+      </div>
+    {% endfor %}
+    {% for flashMessage in app.session.flashbag.get('repeating') %}
+      <div class="flash-notice reservation-repeating">
+        {{ flashMessage }}
+      </div>
+    {% endfor %}
+    <table class="record_properties">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ entity.id }}</td>
+            </tr>
+            <tr>
+                <th>Start</th>
+                <td>{{ entity.start|date('Y-m-d H:i:s') }}</td>
+            </tr>
+            <tr>
+                <th>End</th>
+                <td>{{ entity.end|date('Y-m-d H:i:s') }}</td>
+            </tr>
+            <tr>
+                <th>Checkout</th>
+                <td>{{ entity.checkout is empty ? '' : entity.checkout|date('Y-m-d H:i:s') }}</td>
+            </tr>
+            <tr>
+                <th>Checkin</th>
+                <td>{{ entity.checkin is empty ? '' : entity.checkin|date('Y-m-d H:i:s') }}</td>
+            </tr>
+            <tr>
+                <th>Vehicle</th>
+                <td>
+                  {% if entity.vehicle %}
+                    {{ entity.vehicle }}
+                  {% else %}
+                    <span style="color: red; font-weight: bold;">No Vehicle Available!</span>
+                  {% endif %}
+                  </td>
+            </tr>
+            <tr>
+                <th>Seats Required</th>
+                <td>{{ entity.seatsRequired }}</td>
+            </tr>
+            <tr>
+                <th>Person</th>
+                <td>{{ entity.person }}</td>
+            </tr>
+            <tr>
+                <th>Program</th>
+                <td>{{ entity.program }}</td>
+            </tr>
+            <tr>
+                <th>Destination</th>
+                <td>{{ entity.destination }}</td>
+            </tr>
+            <tr>
+                <th>Destination Text</th>
+                <td>{{ entity.destinationText }}</td>
+            </tr>
+            <tr>
+                <th>Series</th>
+                <td>{{ entity.series }}</td>
+            </tr>
+            <tr>
+                <th>Notes</th>
+                <td>{{ entity.notes }}</td>
+            </tr>
+            <tr>
+                <th>No Show</th>
+                <td>{{ entity.isNoShow }}</td>
+            </tr>
+            <tr>
+                <th>Created</th>
+                <td>{{ entity.created|date('Y-m-d H:i:s') }}</td>
+            </tr>
+            <tr>
+                <th>Modified</th>
+                <td>{{ entity.modified is empty ? '' : entity.modified|date('Y-m-d H:i:s') }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+{% endblock %}
+{% block javascripts %}
+  {{ parent() }}
+    {% javascripts 
+      '@GinsbergTransportationBundle/Resources/public/js/datetimepicker/jquery.datetimepicker_modified.js'
+      'bundles/ginsbergtransportation/js/user/site_datetimepicker.js'
+    %}
+        <script src="{{ asset_url }}"></script>
+     {% endjavascripts %}
+{% endblock %}

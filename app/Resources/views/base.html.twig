@@ -31,13 +31,7 @@
         {% block privacy %}
         {% endblock %}
       </footer>
-      {% block javascripts %}
-        {% javascripts 
-          '@GinsbergTransportationBundle/Resources/public/js/user/jquery-1.11.1.js'
-          %}
-           <script src="{{ asset_url }}"></script>
-        {% endjavascripts %}
-      {% endblock %}
+      {% block javascripts %}{% endblock %}
     </body>
   {% endblock %}
 </html>

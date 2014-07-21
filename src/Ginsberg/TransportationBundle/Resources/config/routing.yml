@@ -2,9 +2,6 @@ ginsberg_transportation:
   resource: "@GinsbergTransportationBundle/Controller"
   type: annotation
   prefix: /
-ginsberg_transportation_homepage:
-  path: / 
-  defaults: { _controller: GinsbergTransportationBundle:Site:index }
 login:
   path: /login
   defaults: { _controller: "GinsbergTransportationBundle:Security:login" }

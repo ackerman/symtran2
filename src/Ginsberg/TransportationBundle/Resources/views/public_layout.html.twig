@@ -34,14 +34,13 @@
 	  <h4><a href="http://ginsberg.umich.edu/transportation/privacy-policy">Privacy Policy</a></h4>
 	</div><!-- footer -->
   {% block javascripts %}
-    {{ parent() }}
-    {% javascripts 'bundles/ginsbergtransportation/js/user/jquery-1.11.1.js' 
-      '@GinsbergTransportationBundle/Resources/public/js/datetimepicker/jquery.datetimepicker_modified.js'
-      'bundles/ginsbergtransportation/js/user/jquery.mobile-1.4.3.js'
-      'bundles/ginsbergtransportation/js/user/site_datetimepicker.js'
-%}
-        <script src="{{ asset_url }}"></script>
-     {% endjavascripts %}
+    {% javascripts 
+      '@GinsbergTransportationBundle/Resources/public/js/user/jquery-1.11.1.js'
+      '@GinsbergTransportationBundle/Resources/public/js/user/jquerymobile_config.js'
+      '@GinsbergTransportationBundle/Resources/public/js/user/jquery.mobile-1.4.3.js'
+    %}
+      <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
   {% endblock %}
   
 </div><!-- page -->

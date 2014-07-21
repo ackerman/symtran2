@@ -508,7 +508,7 @@ class SiteController extends Controller
 
         $form->add('submit', 'submit', array('label' => 'Create'));
         
-        $logger->info('action = ' . $this->generateUrl('reservation_create'));
+        //$logger->info('action = ' . $this->generateUrl('site_create'));
         return $form;
     }
 
@@ -523,15 +523,35 @@ class SiteController extends Controller
     {
       $logger = $this->get('logger');
       $logger->info('in SiteController::newAction');
-      
-        $entity = new Reservation();
-        $entity->setCreated(new \DateTime());
-        $form   = $this->createCreateForm($entity);
+      $em = $this->getDoctrine()->getManager();
+      $provider = $this->get('user_provider');
 
-        return array(
-            'entity' => $entity,
-            'form'   => $form->createView(),
-        );
+      // Ensure that user is eligible
+      $ldapGroup = $provider->is_eligible();
+      if ($ldapGroup == FALSE) {
+        return $this->render('GinsbergTransportationBundle:Site:ineligible.html.twig', array(
+          'name' => $provider->get_first_name(),
+        ));
+      }
+
+      $uniqname = $provider->get_uniqname();
+      $person = $em->getRepository('GinsbergTransportationBundle:Person')->findByUniqname($uniqname);
+      if (is_array($person)) {
+        $person = $person[0];
+      }
+      $program = $person->getProgram();
+      $logger->info('In SiteController::newAction(). uniqname = ' . $person->getUniqname() . ' program: ' . $person->getProgram()->getName());
+    
+      $entity = new Reservation();
+      $entity->setPerson($person);
+      $entity->setProgram($program);
+      $entity->setCreated(new \DateTime());
+      $form   = $this->createCreateForm($entity);
+
+      return array(
+          'entity' => $entity,
+          'form'   => $form->createView(),
+      );
     }
 
 
@@ -542,9 +562,10 @@ class SiteController extends Controller
    * @Method("POST")
    * @Template("GinsbergTransportationBundle:Site:new.html.twig")
    */
-	public function createAction()
+	public function createAction(Request $request)
 	{
     $logger = $this->get('logger');
+    $logger->info("In SiteController::createAction()");
     $em = $this->getDoctrine()->getManager();
     $provider = $this->get('user_provider');
     
@@ -557,136 +578,176 @@ class SiteController extends Controller
     }
     
 	  $uniqname = $provider->get_uniqname();
-    $person = $em->getRepository('GinsbergTransportationBundle:Person')->finByUniqname($uniqname);
-		$program = $person->getProgram();
-    $logger->info('In SiteController::createAction(). uniqname = ' . $uniqname . ' program: ' . $program->getName());
-    $model = new Reservation;
-		if ($program) {
-			$model->program = $users_program;
-		}
-	  if(isset($_POST['Reservation'])){
+    $person = $em->getRepository('GinsbergTransportationBundle:Person')->findByUniqname($uniqname);
+		if (is_array($person)) {
+      $person = $person[0];
+    }
+    $program = $person->getProgram();
+    $logger->info('In SiteController::createAction(). uniqname = ' . $person->getUniqname() . ' program: ' . $person->getProgram()->getName());
+    
+    $entity = new Reservation();
+		$entity->setPerson($person);
+    $entity->setProgram($program);
+    //var_dump($entity->getPerson());
+    $form = $this->createCreateForm($entity);
+    $form->handleRequest($request);
+		
+	  if($form->isValid()){
+      $logger->info('In SiteController::createAction(), form is valid.');
+      // TODO
 			// Use the program_id to determine whether to set the scenario to "pc_reservation" or "non_pc_reservation".
 			// This will determine with it is the "destination_id" select list field that is required (for Project Community), or
 			// the "destination" textfield (everybody else). Program_id 2 == Project Community
-			if (isset($_POST['Reservation']['program_id'])) {
+			/*if (isset($_POST['Reservation']['program_id'])) {
 				if ($_POST['Reservation']['program_id'] == '2') {
-					$model->scenario = 'pc_reservation';
+					$entity->scenario = 'pc_reservation';
 				} else {
-					$model->scenario = 'non_pc_reservation';
+					$entity->scenario = 'non_pc_reservation';
 				}
-			}
+			}*/
 
-		  $model->attributes=$_POST['Reservation'];
-			$model->driver_uniqname = User::get_uniqname();
+		  // Create arrays to hold successful and unsuccessful vehicle 
+      // assignments
+      $successfulReservations = array();
+      $failedReservations = array();
 
-			// Convert text dates like "tomorrow" into a datetime for saving in MySQL
-		  $start_datetime_str = date('Y-m-d H:i:s', strtotime($model->start));
-		  $model->start = $start_datetime_str;
-		  $end_datetime_str = date('Y-m-d H:i:s', strtotime($model->end));
-      $model->end = $end_datetime_str;
+      // Is this a repeating reservation?
+      $isRepeatingReservation = $form->get('isRepeating')->getData();
+      $logger->info("isRepeatingReservation = $isRepeatingReservation");
+			
+      // This is a regular user, so they can't request a particular vehicle
+      $vehicleRequested = FALSE;
+      
+			// If this is a repeating reservation, create the Series and get the
+      // series id to set in the Reservation entity.
+      if ($isRepeatingReservation)
+      {
+        $seriesEntity = new Series();
+        $em->persist($seriesEntity);
+        $em->flush();
+        $entity->setSeries($seriesEntity);
+      }
+			// Save the Reservation before attempting to assign it to a vehicle.
+			$em->persist($entity);
+      $logger->info('Just persisted reservation entity prior to assigning vehicle. person Id: ');
+      //var_dump($entity->getPerson());
+    
+      $em->flush(); 
+      
+      // Get the ReservationRepository in order to assign the vehicle
+      $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
+      $entity = $reservationRepository->assignReservationToVehicle($entity, $vehicleRequested);
 
-			$repeating = False;
-			// If this is a repeating reservation, create the series and get the series_id to save in the Reservation $model
-			if(array_key_exists('repeating', $_POST)) {
-				if($_POST['repeating'] === 'on'){
-					$series_model = new Series;
-					$series_model->save();
-					$series_id = $series_model->id;
-					$model->series_id = $series_id;
-					$repeating = True;
-				}
-			}
-			// If the reservation can be successfully saved, attempt to assign it to
-			// a vehicle.
-			if($model->save()){
-			  $model->assign_reservation_to_vehicle();
+      $em->flush();
+      
+      // Check if this is a repeating reservation.
+      if($isRepeatingReservation) {
+        $entity->getSeries()->addReservation($entity);
+        $logger->info('Just saved first reservation in series. entity->getVehicle = ' . $entity->getVehicle());
+        if ($entity->getVehicle())
+        {
+          $successfulReservations[] = $entity;
+        } 
+        else 
+        {
+          $failedReservations[] = $entity;
+        }
 
-        // Check if this is a repeating reservation.
-    	  if(array_key_exists('repeating', $_POST)) {
-    	    if ($_POST['repeating'] === 'on'){
-    	      $logger->info('testing', 'info', 'system.debug');
+        // The "repeatsUntil" field in the Reservation form is not mapped 
+        // to the database or the entity, so we get it from the $form
+        $repeatsUntil = $form->get('repeatsUntil')->getData();
+        $reservationEndTime = clone($entity->getEnd());
+        $reservationEndTime = date('H:i', $reservationEndTime->getTimestamp());
+        $logger->info('repeatsUntil starts out as ' . date('Y-m-d H:i:s', $repeatsUntil->getTimestamp()));
+        list($repeatHour, $repeatMinute) = explode(':', $reservationEndTime);
+        $logger->info('repeatHour = ' . $repeatHour . ', repeatMinute = ' . $repeatMinute);
+        $repeatsUntil->setTime($repeatHour, $repeatMinute);
+        $logger->info('After setting time, repeatsUntil is ' . date('Y-m-d H:i:s', $repeatsUntil->getTimestamp()));
 
-      	    $repeating_reservations_created = 0; // counter
-        	  $no_vehicle_available = Array(); // to keep track of reservations we can't make
-        	  //$interval = new DateInterval("P7D"); // DateInterval for 7 days
+        // Get the datetime one week from the base reservation (the
+        // reservation that we are calculating the repetitions from).
+        // DO NOT USE PHP DateTime CALCULATIONS. THEY ADJUST RESERVATION 
+        // TIMES FOR DAYLIGHT SAVINGS TIME, WHICH IS _NOT_ WHAT WE WANT.
+        // E.g., a reservation for 4pm can become a reservation for 3pm or
+        // 5pm if you use PHP calculations. 
+        $formatter = $this->get('res_utils');
+        $repetitionStart = $formatter->getRepeatInterval($entity->getStart());
+        $repetitionEnd = $formatter->getRepeatInterval($entity->getEnd());
+
+        while ($repetitionStart < $repeatsUntil) {
+          // Create reservation for new date
+          $reservation = new Reservation();
+          $reservation->setSeatsRequired($entity->getSeatsRequired());
+          $reservation->setSeries($entity->getSeries());
+          $reservation->setPerson($entity->getPerson());
+          $reservation->setProgram($entity->getProgram());
+          $reservation->setVehicle(NULL);
+          $reservation->setDestination($entity->getDestination());
+          $reservation->setDestinationText($entity->getDestinationText());
+          $reservation->setNotes($entity->getNotes());
+          $reservation->setCheckout(NULL);
+          $reservation->setCheckin(NULL);
+          $reservation->setCreated(new \DateTime());
+
+          $reservation->setStart($repetitionStart);
+          $reservation->setEnd($repetitionEnd);
+
+          $em->persist($reservation);   
 
 
-        	  // calculate final repeat date.
-      	    $repeat_until = strtotime($_POST['until'] . ' 22:00:00');
+          $reservation = $em->getRepository('GinsbergTransportationBundle:Reservation')->assignReservationToVehicle($reservation, $vehicleRequested);
+          if (!$reservation->getVehicle())
+          {
+            $failedReservations[] = $reservation;
+          }
+          else
+          {
+            $successfulReservations[] = $reservation;
+          }
 
-      	    // translate the start and end times into datetime objects
-      	    $start_datetime = strtotime($start_datetime_str);
-      	    $end_datetime = strtotime($end_datetime_str);
+          // Save the reservation with Vehicle assigned (or failed)
+          $em->flush();
 
-						$start_datetime = Format::get_repeat_interval($start_datetime);
-						$end_datetime = Format::get_repeat_interval($end_datetime);
+          $reservation->getSeries()->addReservation($reservation);
 
-      	    while($start_datetime < $repeat_until) {
-      	      // create reservation for new date
-      	      $reservation = new Reservation;
-							// Use the program_id to determine whether to set the scenario to "pc_reservation" or "non_pc_reservation".
-							// This will determine with it is the "destination_id" select list field that is required (for Project Community), or
-							// the "destination" textfield (everybody else). Program_id 2 == Project Community
-							if (isset($_POST['Reservation']['program_id'])) {
-								if ($_POST['Reservation']['program_id'] == '2') {
-									$reservation->scenario = 'pc_reservation';
-								} else {
-									$reservation->scenario = 'non_pc_reservation';
-								}
-							}
-      	      $reservation->attributes=$_POST['Reservation'];
-							$reservation->series_id = $series_id;
-      	      $reservation->start = date('Y-m-d H:i:s', $start_datetime);
-      	      $reservation->end = date('Y-m-d H:i:s', $end_datetime);
-      	      $reservation->driver_uniqname = User::get_uniqname();
-      	      $reservation->save();
-      	      $logger->info(serialize($reservation->getErrors()));
+          // Set up the dates for the next repetition of the reservation
+          $repetitionStart = $formatter->getRepeatInterval($repetitionStart);
+          $repetitionEnd = $formatter->getRepeatInterval($repetitionEnd);
+        } // End while loop that creates repeating reservations
+      } // End if that handles repeating reservations
+      
+      // Reservation(s) created, now direct to appropriate view
+      if ($isRepeatingReservation) {
+        return $this->render('GinsbergTransportationBundle:Site:list_created_repeating.html.twig', array(
+            'successes' => count($successfulReservations), 
+            'failures' => count($failedReservations),
+            'entities' => $entity->getSeries()->getReservations()));
+      } else {
+        // It's just a single reservation. Redirect to the Show template  
+        // with a success or failure Flash message
+        //$logger->info('This is a single reservation with Id ' . $entity->getId());
+        if ($entity->getVehicle()) {
+          $id = $entity->getId();
+          $vehicleName = $entity->getVehicle()->getName();
+          $this->get('session')->getFlashBag()->add(
+              'sucess',
+              "Success! Reservation $id with vehicle $vehicleName has been created."
+          );
+          return $this->redirect($this->generateUrl('site_show', array('id' => $entity->getId())));
+        } else {
+          $this->get('session')->getFlashBag()->add(
+              'failure',
+              'Sorry! No vehicle is available at the requested time.'
+          );
+          return $this->redirect($this->generateUrl('site_show', array('id' => $entity->getId())));
+        }
+      }
+    } // End $form->isValid()
 
-      	      $logger->info("Reservation start time: " . $reservation->start);
-
-      	      // save & find vehicle
-      	      // if no vehicle available, add to list
-      	      if(!$reservation->assign_reservation_to_vehicle()) {
-      	        array_push($no_vehicle_available, $reservation);
-							}
-
-      	      $repeating_reservations_created += 1; // increment counter
-
-							$start_datetime = Format::get_repeat_interval($start_datetime);
-							$end_datetime = Format::get_repeat_interval($end_datetime);
-						}
-
-					}
-				}
-				if($repeating) {
-					/*
-					$series_data = new CActiveDataProvider('Reservation', array(
-						'criteria'=>array('condition'=>'series_id='.$series_id,
-															'order'=>'start ASC',),
-						'pagination'=>array(
-								'pageSize'=>100,
-						),
-					));
-					*/
-					$series_data = Reservation::get_reservations_in_series($series_id);
-					$this->render('view_repeating',array(
-						'series_id'=>$series_id,
-						'series_data'=>$series_data,
-					));
-				} else {
-					$this->redirect(array('site/view/' . $model->id));
-				}
-
-			}
-
-		}
-
-	  $this->render('create',array(
-	    'model'=>$model,
-	    //'repeating'=>$repeating,
-			//'repeating_reservations_created'=> $repeating_reservations_created,
-			//'no_vehicle_available' => $no_vehicle_available,
-    ));
+    return array(
+        'entity' => $entity,
+        'form'   => $form->createView(),
+    );
 	}
 
 	/*
@@ -723,18 +784,32 @@ class SiteController extends Controller
 	}
 
 	/**
-	 * Displays a reservation.
-	 * @param integer $id the ID of the model to be displayed
-	 */
-	public function actionView($id)
-	{
-		$this->render('view',array(
-			'model'=>$this->loadReservation($id),
-		));
-	}
+   * Finds and displays a Reservation entity.
+   *
+   * @Route("/show/{id}", name="site_show")
+   * @Method("GET")
+   * @Template()
+   */
+    public function showAction($id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
+
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find Reservation entity.');
+        }
+
+        //$deleteForm = $this->createDeleteForm($id);
+
+        return array(
+            'entity'      => $entity,
+            //'delete_form' => $deleteForm->createView(),
+        );
+    }
 
 	/**
-   * Creates a new Reservation entity.
+   * Display a list of past reservations.
    *
    * @Route("/past", name="site_past")
    * @Method("POST")
