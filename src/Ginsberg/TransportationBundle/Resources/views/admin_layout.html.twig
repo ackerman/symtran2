@@ -18,3 +18,11 @@
   <li class="first" id="nav-installation"><a href="{{ path('installation') }}">Installation</a></li>
   <li class="first" id="nav-reports"><a href="">Reports</a></li>
 {% endblock %}
+{% block javascripts %}
+    {% javascripts 
+      '@GinsbergTransportationBundle/Resources/public/js/user/jquery-1.11.1.js'
+      'bundles/ginsbergtransportation/js/datetimepicker/jquery.datetimepicker.js'
+    %}
+      <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+  {% endblock %}

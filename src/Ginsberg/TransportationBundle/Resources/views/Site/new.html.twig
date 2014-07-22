@@ -4,13 +4,6 @@
 
 <h2>Create a Reservation</h2>
 
-    <ul class="record_actions">
-      <li>
-          <a href="{{ path('site') }}">
-              Back to the list
-          </a>
-      </li>
-    </ul>
     {{ form_start(form, {'att': {'novalidate': 'novalidate'}}) }}
       {{ form_errors(form) }}
       {{ form_row(form.isRepeating) }}
@@ -23,8 +16,9 @@
       {{ form_row(form.destinationText) }}
       {{ form_row(form.notes) }}
       {{ form_row(form._token) }}
-      {{ form_row(form.created) }}
-      {{ form_row(form.modified) }}
+      <div style="display: none;">
+        {{ form_row(form.created) }}
+      </div>
       
       {{ form_row(form.submit, {'label': 'Create' }) }}
       

@@ -438,4 +438,27 @@ class ReservationRepository extends EntityRepository
     $futureReservationsInSeries = $query->getResult();
     return $futureReservationsInSeries;
 	}
+  
+  /**
+   * Returns a Person's past Reservations. 
+   * 
+   * @param Person $person The Person whose past trips we want to find
+   * 
+   * @return array 
+   */
+  public function findPastTripsByPerson($person)
+  {
+    $now = new \DateTime();
+    $em = $this->getEntityManager();
+    $query = $em->createQuery('SELECT r FROM GinsbergTransportationBundle:Reservation r 
+            WHERE r.end < :now AND r.person = :person AND r.vehicle IS NOT NULL ORDER BY r.start')
+            ->setParameters(array('now' => $now, 'person' => $person));
+    
+    try {
+      $pastTripsByPerson = $query->getResult();
+      return $pastTripsByPerson;
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return NULL;
+    }	
+  }
 }

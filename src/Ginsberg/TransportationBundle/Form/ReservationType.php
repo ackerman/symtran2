@@ -87,7 +87,7 @@ class ReservationType extends AbstractType
             ->add('notes', NULL, array('required' => FALSE))
             ->add('isNoShow', NULL, array('required' => FALSE))
             ->add('created')
-            ->add('modified', NULL, array('required' => FALSE))
+            ->add('modified', 'datetime', array('required' => FALSE))
         ;
     }
     

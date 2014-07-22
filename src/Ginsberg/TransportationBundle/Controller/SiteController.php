@@ -812,25 +812,25 @@ class SiteController extends Controller
    * Display a list of past reservations.
    *
    * @Route("/past", name="site_past")
-   * @Method("POST")
+   * @Method("GET")
    * @Template("GinsbergTransportationBundle:Site:past.html.twig")
    */
 	public function pastAction()
  	{
-     $now=date("Y-m-d H:i:s");
- 	   $criteria=new CDbCriteria;
-     $criteria->condition='end < :now AND driver_uniqname = :uniqname';
-     $criteria->params=array(':now'=>$now, ':uniqname'=>User::get_uniqname());
-//   $results = Reservation::model()->find($criteria);
+    $provider = $this->get('user_provider');
+    $uniqname = $provider->get_uniqname();
+    $em = $this->getDoctrine()->getManager();
+    $person = $em->getRepository('GinsbergTransportationBundle:Person')->findByUniqname($uniqname);
+		if (is_array($person)) {
+      $person = $person[0];
+    }
+    
+    $pastTripsForPerson = $em->getRepository('GinsbergTransportationBundle:Reservation')->findPastTripsByPerson($person);
+    
 
-     $dataProvider = new CActiveDataProvider('Reservation', array(
-       'criteria'=>$criteria,
-     ));
-
-
- 		$this->render('past',array(
- 			'dataProvider'=>$dataProvider,
- 		));
+ 		return array(
+        'pastTripsForPerson' => $pastTripsForPerson,
+    );
  	}
 
 

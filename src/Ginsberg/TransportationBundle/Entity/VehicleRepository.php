@@ -15,7 +15,7 @@ class VehicleRepository extends EntityRepository
   public function findActiveVehiclesByProgram($reservation)
   {
     $dql = 'SELECT v FROM GinsbergTransportationBundle:Vehicle v WHERE 
-            v.isActive = 1 AND v.program = :program AND v.capacity >= :capacity';
+            v.isActive = 1 AND v.program = :program AND v.capacity >= :capacity ORDER BY v.capacity ASC';
     $query = $this->getEntityManager()->createQuery($dql)->setParameters(array(':program' => $reservation->getProgram(), ':capacity' => $reservation->getSeatsRequired()));
 
     try {
@@ -28,7 +28,7 @@ class VehicleRepository extends EntityRepository
   public function findActiveVehiclesByCapacity($reservation)
   {
     $dql = 'SELECT v FROM GinsbergTransportationBundle:Vehicle v WHERE 
-            v.isActive = 1 AND v.capacity >= :capacity';
+            v.isActive = 1 AND v.capacity >= :capacity ORDER BY v.capacity ASC';
     $query = $this->getEntityManager()->createQuery($dql)->setParameters(array(':capacity' => $reservation->getSeatsRequired()));
 
     try {
