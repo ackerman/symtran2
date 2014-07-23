@@ -62,7 +62,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
     /**
      * Returns reservations for the date selected.
      *
-     * @Route("/", name="reservation_search")
+     * @Route("/for_date", name="reservation_search")
      * @Method("POST")
      * @Template("GinsbergTransportationBundle:Reservation:index.html.twig")
      */
@@ -77,11 +77,12 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
         
         
         if ($form->isValid()) {
+          $dateToShow = new \DateTime(date('Y-m-d'));
           // If they clicked the "Today" button, show the index page from the 
           // indexAction with ongoing trips, etc.
           if ($form->get('today')->isClicked()) {
             return $this->redirect($this->generateUrl('reservation'));
-          } else {
+          } elseif (is_object($form->get('dateToShow')->getData())) {
             $dateToShow = $form->get('dateToShow')->getData();
           }
           //$logger->info('In searchAction, form is valid, dateToShow = ' . $dateToShow->format('c'));
@@ -164,15 +165,17 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
      */
     public function createAction(Request $request)
     {
+      $logger = $this->get('logger');
+      $logger->info('In ReservationController::createAction()');    
         $entity = new Reservation();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
           // We'll use the Entity Manager in severall places, so get it now
+          $logger->info('Form is valid');
           $em = $this->getDoctrine()->getManager();
           
-          $logger = $this->get('logger');
           
           // Create arrays to hold successful and unsuccessful vehicle 
           // assignments
@@ -220,7 +223,8 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           $logger->info('vehicleRequested is of type ' . gettype($vehicleRequested));
           //$vehicle = $em->getRepository('Vehicle')->find($);
 
-          $entity = $this->_assignReservationToVehicle($entity, $vehicleRequested);
+          $resRep = $em->getRepository('GinsbergTransportationBundle:Reservation');
+          $entity = $resRep->assignReservationToVehicle($entity, $vehicleRequested);
 
           $em->flush();
           
@@ -275,14 +279,14 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
               $reservation->setNotes($entity->getNotes());
               $reservation->setCheckout(NULL);
               $reservation->setCheckin(NULL);
-              $reservation->setCreated(new DateTime());
+              $reservation->setCreated(new \DateTime());
               
               $reservation->setStart($repetitionStart);
               $reservation->setEnd($repetitionEnd);
               
               $em->persist($reservation);              
               
-              $reservation = $this->_assignReservationToVehicle($reservation, $vehicleRequested);
+              $reservation = $em->getRepository('GinsbergTransportationBundle:Reservation')->assignReservationToVehicle($reservation, $vehicleRequested);
               if (!$reservation->getVehicle())
               {
                 $failedReservations[] = $reservation;
@@ -350,13 +354,16 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
     */
     private function createCreateForm(Reservation $entity)
     {
+      $logger = $this->get('logger');
+      $logger->info('in ReservationController::createCreateForm');
         $form = $this->createForm(new ReservationType(), $entity, array(
             'action' => $this->generateUrl('reservation_create'),
             'method' => 'POST',
         ));
 
         $form->add('submit', 'submit', array('label' => 'Create'));
-
+        
+        $logger->info('action = ' . $this->generateUrl('reservation_create'));
         return $form;
     }
 
@@ -369,6 +376,9 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
      */
     public function newAction()
     {
+      $logger = $this->get('logger');
+      $logger->info('in ReservationController::newAction');
+      
         $entity = new Reservation();
         $entity->setCreated(new \DateTime());
         $form   = $this->createCreateForm($entity);
@@ -415,8 +425,8 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
     {
       $logger = $this->get('logger');
         $em = $this->getDoctrine()->getManager();
-
-        $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
+        $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation'); 
+        $entity = $reservationRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Reservation entity.');
@@ -446,7 +456,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
         $lastReservationInSeries = NULL;
         if ($isRepeating) {
 
-          $lastReservationInSeries = $this->_getLastReservationInSeries($series);
+          $lastReservationInSeries = $reservationRepository->getLastReservationInSeries($series);
           //$logger->info(var_dump($lastReservationInSeries));
           // Calculate the "original" until date based on the date of last 
           // reservation in the series at Installation's dailyClose time.
@@ -494,7 +504,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
         if ($isRepeating) {
           $em = $this->getDoctrine()->getManager();
           
-          $lastReservationInSeries = $this->_getLastReservationInSeries($series);
+          $lastReservationInSeries = $em->getRepository('GinsbergTransportationBundle:Reservation')->getLastReservationInSeries($series);
           //$logger->info(var_dump($lastReservationInSeries));
           // Calculate the "original" until date based on the date of last 
           // reservation in the series at Installation's dailyClose time.
@@ -524,8 +534,8 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
       $em = $this->getDoctrine()->getManager();
       
       $logger = $this->get('logger');
-      
-      $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
+      $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
+      $entity = $reservationRepository->find($id);
 
       if (!$entity) {
           throw $this->createNotFoundException('Unable to find Reservation entity.');
@@ -555,7 +565,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
       $lastReservationInSeries = NULL;
       if ($isRepeating) {
 
-        $lastReservationInSeries = $this->_getLastReservationInSeries($series);
+        $lastReservationInSeries = $reservationRepository->getLastReservationInSeries($series);
         //$logger->info(var_dump($lastReservationInSeries));
         // Calculate the "original" until date based on the date of last 
         // reservation in the series at Installation's dailyClose time.
@@ -611,9 +621,9 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
         // Get the number of days (positive or negative) between the old 
         // start date and the new one. Prevent PHP date calculations from
         // "helping us" by adjusting for daylights savings.
-        $startInterval = $this->_getIntervalInDays($originalStartDate, $entity->getStart());
+        $startInterval = $reservationRepository->getIntervalInDays($originalStartDate, $entity->getStart());
         // Get the number of days (positive or negative) between the old end date and the new one.
-        $endInterval = $this->_getIntervalInDays($originalEndDate, $entity->getEnd());
+        $endInterval = $reservationRepository->getIntervalInDays($originalEndDate, $entity->getEnd());
         // Save the start and end times so we can set them independently from 
         // the dates. This allows us to avoid problems with PHP's automatic adjustment for daylight savings time
         $logger->info('start interval = ' . $startInterval . ', ' . $startInterval * 24*60*60);
@@ -646,7 +656,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           
           $em->flush();
           
-          $this->_assignReservationToVehicle($entity, $vehicleRequested);
+          $reservationRepository->assignReservationToVehicle($entity, $vehicleRequested);
           
           $entity->setModified(new \DateTime);
           $em->flush();
@@ -674,7 +684,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           
           if ($repeatsUntil < $originalUntilDate) {
             $logger->info('Going to delete some records. start = ' . date('Y-m-d H:i:s', $entity->getStart()->getTimestamp()) . ', repeat_until = ' . date('Y-m-d H:i:s', $repeatsUntil->getTimestamp()) . ' original_until_date = ' . date('Y-m-d H:i:s', $originalUntilDate->getTimestamp()));
-            $reservationsToDelete = $this->_getFutureReservationsInSeries($entity, $repeatsUntil);
+            $reservationsToDelete = $reservationRepository->getFutureReservationsInSeries($entity, $repeatsUntil);
             
             $deletedReservations = 0;
             foreach($reservationsToDelete as $deleteMe) {
@@ -691,7 +701,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           $startInterval = Format::get_repeat_interval(strtotime($originalStartDate), strtotime($entity->start));
           $endInterval = Format::get_repeat_interval(strtotime($originalEndDate), strtotime($entity->end));
           */
-          $futureReservations = $this->_getFutureReservationsInSeries($entity, $entity->getStart());
+          $futureReservations = $reservationRepository->getFutureReservationsInSeries($entity, $entity->getStart());
 
           foreach($futureReservations as $reservation) {
             $logger->info('starting out in foreach to modify each future reservation, id = ' . $reservation->getId());
@@ -732,7 +742,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
             $logger->info('Repeating reservation saved: ' );
             
             if ($needNewVehicle) {
-              $reservation = $this->_assignReservationToVehicle($reservation, $vehicleRequested);
+              $reservation = $reservationRepository->assignReservationToVehicle($reservation, $vehicleRequested);
               $em->flush();
               if ($reservation->getVehicle()) {
                 $successfulReservations[] = $reservation;
@@ -749,7 +759,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           // Prepare data for rendering the results page summarizing the 
           // changes made.
           $logger->info("Calling _getChangedReservationsInSeries().");
-          $seriesData = $this->_getChangedReservationsInSeries($entity);
+          $seriesData = $reservationRepository->getChangedReservationsInSeries($entity);
           return $this->render('GinsbergTransportationBundle:Reservation:list_updated_repeating.html.twig', array(
               'deleted' => $deletedReservations, 
               'successes' => count($successfulReservations),
@@ -836,368 +846,4 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
         ;
     }
     
-  /**
-	 * Given a start and end time and a vehicle id, returns true if the vehicle
-	 * is free in the given timeframe.
-   * 
-	 * @param string $start the start of the time period formatted as 'Y-m-d H:i:s'
-	 * @param string $end the end of the time period formatted as 'Y-m-d H:i:s'
-	 * @param Vehicle $vehicle The vehicle we are testing for availability
-	 * @return boolean True if the time slot is free, False if there is a reservation.
-	*/
-	private function _timeSlotAvailable($start, $end, $vehicle) 
-  {
-    $logger = $this->get('logger');
-    $logger->info('in _timeSlotAvailable(). Type of vehicle is ' . gettype($vehicle));
-    //$request = $this->requestStack->getCurrentRequest();
-    
-		// find all reservations where the given start time is exactly the same as start
-    $em = $this->getDoctrine()->getManager();
-    $query = $em->createQuery(
-        'SELECT COUNT(r.vehicle)
-          FROM GinsbergTransportationBundle:Reservation r
-          WHERE r.start = :start AND r.vehicle = :vehicle')
-        ->setParameters(array(':start' => $start, ':vehicle' => $vehicle));
-    
-    $startEqualOverlap = $query->getSingleScalarResult();
-
-		// find all reservations where the given end time is exactly the same as end
-    //$repository = $this->getDoctrine()->getRepository('GinsbergTransportationBundle:Reservation');
-		
-    $query = $em->createQuery(
-      'SELECT COUNT(r.vehicle)
-        FROM GinsbergTransportationBundle:Reservation r
-        WHERE r.end = :end AND r.vehicle = :vehicle')
-      ->setParameters(array(':end' => $end, ':vehicle' => $vehicle));
-    
-    $endEqualOverlap = $query->getSingleScalarResult();
-/*
-    $end_equal_overlap = Reservation::model()->count(
-			'end = :end AND vehicle_id = :vehicle_id',
-			array(
-						':end' => $end,
-						':vehicle_id' => $vehicle_id,)
-		);
-*/
-	  // find all reservations where the given start time is between start and end.
-    //         3pm ------------ 5pm (given $start and $end)
-    // 2pm ------------ 4pm (existing reservation, will be found)
-    // also catches situations like this:
-    //         3pm ------------ 5pm (given $start and $end)
-    // 2pm ---------------------------- 6pm (existing reservation, will be found)
-    $query = $em->createQuery(
-      'SELECT COUNT(r.vehicle)
-        FROM GinsbergTransportationBundle:Reservation r
-        WHERE r.start < :start AND r.end > :start AND r.vehicle = :vehicle')
-      ->setParameters(array(':start' => $start, ':vehicle' => $vehicle));
-    
-    $startOverlap = $query->getSingleScalarResult();
-/*
-    $start_overlap = Reservation::model()->count(
-      'start < :start AND end > :start AND vehicle_id = :vehicle_id',
-      array(
-        ':start' => $start,
-        ':vehicle_id' => $vehicle_id,
-      )
-    );
- */
-
-    // find all reservations where the given end time is between start and end.
-    // 2pm ----------- 4pm (given $start and end)
-    //        3pm ------------- 5pm (existing reservation, will be found)
-    $query = $em->createQuery(
-      'SELECT COUNT(r.vehicle)
-        FROM GinsbergTransportationBundle:Reservation r
-        WHERE r.start < :end AND r.end > :end AND r.vehicle = :vehicle')
-      ->setParameters(array(':end' => $end, ':vehicle' => $vehicle));
-    
-    $endOverlap = $query->getSingleScalarResult();
-/*
-    $end_overlap = Reservation::model()->count(
-      'start < :end AND end > :end AND vehicle_id = :vehicle_id',
-      array(
-        ':end' => $end,
-        ':vehicle_id' => $vehicle_id,
-      )
-    );
-*/
-
-    // find all reservations where the given start and end time completely
-    // cover a reservation, like so:
-    //    2pm --------------------------- 5pm (given $start and $end)
-    //            3pm ----------- 4pm (existing reservation, will be found)
-    $query = $em->createQuery(
-      'SELECT COUNT(r.vehicle)
-        FROM GinsbergTransportationBundle:Reservation r
-        WHERE r.start > :start AND r.end < :end AND r.vehicle = :vehicle')
-      ->setParameters(array(':start' => $start, ':end' => $end, ':vehicle' => $vehicle));
-    
-    $fullOverlap = $query->getSingleScalarResult();
-/*
-    $full_overlap = Reservation::model()->count(
-      'start > :start AND end < :end AND vehicle_id = :vehicle_id',
-      array(
-        ':start' => $start,
-        ':end' => $end,
-        ':vehicle_id' => $vehicle_id,
-      )
-    );
-*/
-    // var_dump("vehicle " . $vehicle_id);   // debug
-    // var_dump($start_overlap);   // debug
-    // var_dump($end_overlap);     // debug
-    // var_dump($full_overlap);    // debug
-		$logger->info("In Reservation::time_slot_available, start_equal_overlap = $startEqualOverlap, start_overlap = $startOverlap, end_equal_overlap = $endEqualOverlap, end_overlap = $endOverlap, full_overlap = $fullOverlap, vehicle_id =  " . $vehicle->getId());
-    if ( (bool) $startEqualOverlap or (bool) $startOverlap or (bool) $endEqualOverlap or (bool) $endOverlap or (bool) $fullOverlap )
-    {
-      return FALSE;
-    } else {
-      return TRUE;
-    }
-	}
-  
-  /**
-	* Attempts to find an available vehicle belonging to the model's program that
-	* and assign it to the current reservation.
-  * 
-  * @param datetime $start The start time of the reservation
-  * @param datetime $end The end time of the reservation
-  * @param Vehicle $requestedVehicle Vehicle if admin selected one
-	* @return Reservation $entity The reservation with a vehicle assigned if available assigned
-	*/
-	private function _assignReservationToVehicle($entity, $requestedVehicle = FALSE)
-  {
-    $em = $this->getDoctrine()->getManager();
-    $logger = $this->get('logger');
-		// If a particular car has been requested from the admin Reservation screen,
-		// see if that particular vehicle is available
-    if ($requestedVehicle) 
-    {
-      $logger->info('requestedVehicle must exist');
-      // Is the vehicle active and big enough?
-      if ($requestedVehicle->getIsActive() && $requestedVehicle->getCapacity() >= $entity->getSeatsRequired())
-      {
-        $logger->info('requestedVehicle active and big enough');
-        if ($this->_timeSlotAvailable($entity->getStart(), $entity->getEnd(), $requestedVehicle)){
-					$entity->setVehicle($requestedVehicle);
-          return $entity;
-				} else 
-        {
-          $entity->setVehicle(NULL);
-          return $entity;
-        }
-      }
-    } else
-    { // No particular vehicle was requested
-      
-      // Find vehicles that are active, in the right program, and have the 
-      // required capacity.
-			// If reservation is for AR, only let them use AR vehicles
-			// If reservation is for PC, only let them use PC vehicles
-			// If contract or staff, they can use any vehicle
-      $vehicles = array();
-      $prog = $entity->getProgram();
-      if ($prog->getName() == 'Project Community' || $prog->getName() == 'America Reads')
-      {
-        $logger->info('prog = ' . $prog->getName());
-        
-        $vehicles = $em->getRepository('GinsbergTransportationBundle:Vehicle')->findActiveVehiclesByProgram($entity);
-      } else
-      {
-        $logger->info('Thinks not PC or AR. prog name = ' . $prog->getName());
-        $vehicles = $em->getRepository('GinsbergTransportationBundle:Vehicle')->findActiveVehiclesByCapacity($entity);
-        //$vehicles = \Ginsberg\TransportationBundle\Entity\Vehicle::findActiveVehiclesByCapacity($entity);
-      }
-      
-      // For each vehicle, check if the timeslot is free.
-			// (this works fine for 10 cars but might not scale to 100 due to the number
-			// of queries required.)
-			foreach ($vehicles as $vehicle) {
-				$logger->info("Calling time_slot_available for vehicle: " . $vehicle->getName());
-				if($this->_timeSlotAvailable($entity->getStart(), $entity->getEnd(), $vehicle)){
-					$entity->setVehicle($vehicle);
-					return $entity;
-				} else {
-          continue;
-        }
-			}
-      
-      // No vehicle available; mark the problem.
-			$entity->setVehicle(NULL);
-			$logger->info('In _assignReservationToVehicle. Assignment failed, no vehicle available.');
-			return $entity;
-    }
-		/*if ($requestedVehicle) {
-			// Is the vehicle active and big enough?
-			$vehicle = Vehicle::model()->findByPk($requestedVehicle);
-			$logger->info('this->id = ' . $this->id);
-			$logger->info('vehicle->name = ' . $vehicle->name);
-			if ($vehicle->active && $vehicle->capacity >= $this->seats_required) {
-				if(Reservation::time_slot_available($this->start, $this->end, $vehicle->id)){
-					$this->vehicle_id = $vehicle->id;
-					$this->save();
-					return True;
-				}
-			}
-     */
-
-			// The requested vehicle was not available; mark the problem.
-			
-
-
-			// Find vehicles that are active, in the right program, and have the required capacity
-			// If reservation is for AR, only let them use AR vehicles
-			// If reservation is for PC, only let them use PC vehicles
-			// If contract or staff, they can use any vehicle
-     /* 
-			$prog = Program::model()->findByPk($this->program_id);
-			if($prog->name == "Project Community" || $prog->name == "America Reads") {
-				$logger->info('prog name = ' . $prog->name);
-				$vehicles = Vehicle::find_active_vehicles_by_program($this->program_id, $this->seats_required);
-			} else {
-				$logger->info('Thinks not PC or AR. prog name = ' . $prog->name);
-				$vehicles = Vehicle::find_active_vehicles($this->seats_required);
-			}
-      
-			$vehicles = '';
-			$prog = Program::model()->findByPk($this->program_id);
-			if($prog->name == "Project Community" || $prog->name == "America Reads") {
-				$logger->info('prog name = ' . $prog->name);
-				$vehicles = Vehicle::find_active_vehicles_by_program($this->program_id, $this->seats_required);
-			} else {
-				$logger->info('Thinks not PC or AR. prog name = ' . $prog->name);
-				$vehicles = Vehicle::find_active_vehicles($this->seats_required);
-			}
-       
-
-
-			// For each vehicle, check if the timeslot is free.
-			// (this works fine for 10 cars but might not scale to 100 due to the number
-			// of queries required.)
-			foreach ($vehicles as $vehicle) {
-				$logger->info("Calling time_slot_available for start: " . $this->start . ", end: " . $this->end . ", vehicle: " . $vehicle->id);
-				if(Reservation::time_slot_available($this->start, $this->end, $vehicle->id)){
-					$this->vehicle_id = $vehicle->id;
-					$this->save();
-					return True;
-				} else {
-
-				}
-			}
-			// No vehicle available; mark the problem.
-			$this->vehicle_id = Null;
-			//$this->program = Null;
-			if(!$this->save()) {
-				$logger->info('In assign_reservation_to_vehicle. Assignment and save failed. Res id = ' . $this->id . ' Vehicle_id = ' . $this->vehicle_id);
-			} else {
-				$logger->info('In assign_reservation_to_vehicle. Assignment failed, but save succeeded. Res id = ' . $this->id . ' Vehicle_id = ' . $this->vehicle_id);
-			}
-			return False;
-		}
-      */
-  }
-  
-  /**
-   * Returns the last Reservation in the series
-   * 
-   * @param Series $series The series for which we need the last reservation
-   * @return Reservation The last reservation in the series
-   */
-	private function _getLastReservationInSeries($series) {
-		$logger = $this->get('logger');
-    $logger->info('in _getLastReservationInSeries(). Series id is ' . $series->getId());
-    //$request = $this->requestStack->getCurrentRequest();
-    
-		// find all reservations where the given start time is exactly the same as start
-    $em = $this->getDoctrine()->getManager();
-    $query = $em->createQuery(
-        'SELECT r
-          FROM GinsbergTransportationBundle:Reservation r
-          WHERE r.series = :series AND r.start = (SELECT MAX(r1.start) from GinsbergTransportationBundle:Reservation r1 where r1.series = :series)')
-        ->setParameter(':series', $series);
-    
-    $lastReservation = $query->getOneOrNullResult();
-    return $lastReservation;
-	}
-  
-  /**
-	 * Return the positive or negative interval in days between two dates, 
-   * adjusting for time lost due to spring forward.
-	 *
-	 * Allows a reservation model to reset its date when the reservation is edited.
-	 *
-   * @param datetime $oldDate The original date of the Reservation
-   * @param datetime $newDate The newly requested date from the Reservation form
-   * @return int The interval in seconds between the old and the new dates
-	 */
-	private function _getIntervalInDays($oldDate, $newDate) {
-		// Number of seconds in a day
-    $oneday = 24*60*60;
-		// Get the date with no time for each date
-		$oldDate = strtotime(date('Y-m-d', $oldDate->getTimestamp()));
-		$newDate = strtotime(date('Y-m-d', $newDate->getTimestamp()));
-		// get the interval in seconds
-		$interval = $newDate - $oldDate;
-		// Divide $interval by 86400 seconds to get the number of days for rounding.
-		$interval = $interval/$oneday;
-		// If we sprang forward by an hour, the interval is too short, so round up.
-		// If we fell back, rounding down will just keep the same number for the interval.
-		$interval = round($interval);
-		// Now convert $interval into seconds for date manipulation
-		return $interval * $oneday;
-	}
-
-  /**
-   * Returns an array of all Reservations in the series starting after the 
-   * provided date
-   * 
-   * @param Series $series The series we need the future dates in
-   * @param datetime $date The date after which we want the reservations
-   * @return array An array of future reservations in this series
-   */
-	private function _getFutureReservationsInSeries($entity, $date) 
-  {
-    $logger = $this->get('logger');
-    $logger->info('in _getFutureReservationsInSeries. Series id is ' . $entity->getSeries()->getId()) . ' date ($repeatsUntil)= ' . date('Y-m-d H:i:s', $date->getTimestamp()) . ' start = ' . date('Y-m-d H:i:s', $entity->getStart()->getTimestamp());
-    //$request = $this->requestStack->getCurrentRequest();
-    
-		// find all reservations where the given start time is exactly the same as start
-    $em = $this->getDoctrine()->getManager();
-    $query = $em->createQuery(
-        'SELECT r
-          FROM GinsbergTransportationBundle:Reservation r
-          WHERE r.series = :series AND r.start > :date')
-        ->setParameters(array(':series' => $entity->getSeries(), ':date' => $date));
-    
-    $futureReservationsInSeries = $query->getResult();
-    foreach ($futureReservationsInSeries as $res) {
-      $logger->info('Id = ' . $res->getId() . ' start = ' . date('Y-m-d H:i:s', $res->getStart()->getTimestamp()) . ' repeatsUntil = ' . ' date ($repeatsUntil)= ' . date('Y-m-d H:i:s', $date->getTimestamp()));
-    }
-    return $futureReservationsInSeries;
-	}
-  
-  /**
-   * Returns an array containing all Reservations in the series 
-   * that changed at a certain time. 
-   * 
-   * The save process for the series may extend over a few milliseconds, so 
-   * select for a time period. 
-   */
-	private function _getChangedReservationsInSeries($entity) {
-		$logger = $this->get('logger');
-    $logger->info('in _getChangedReservationsInSeries. Series id is ' . $entity->getSeries()->getId());
-    
-    $endRange = $entity->getEnd()->getTimestamp() + 1;
-		$endRange = date('Y-m-d H:i:s', $endRange);
-    
-    $em = $this->getDoctrine()->getManager();
-    $query = $em->createQuery(
-        'SELECT r
-          FROM GinsbergTransportationBundle:Reservation r
-          WHERE r.series = :series AND r.modified BETWEEN :date AND :endRange')
-        ->setParameters(array(':series' => $entity->getSeries(), ':date' => $entity->getModified(), ':endRange' => $endRange));
-    
-    $futureReservationsInSeries = $query->getResult();
-    return $futureReservationsInSeries;
-	}
 }

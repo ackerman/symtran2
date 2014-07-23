@@ -1,20 +1,29 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
-    <h1>Reservation</h1>
-<ul class="record_actions">
-    <li>
-        <a href="{{ path('reservation') }}">
-            Back to the list
+    <h1>Trip {{ entity.id }}</h1>
+<div class="record_actions">
+    <span class="back button"><a href="{{ path('reservation') }}">
+            Reservations
         </a>
-    </li>
-    <li>
+    </span>
+    <span class="edit button">
         <a href="{{ path('reservation_edit', { 'id': entity.id }) }}">
             Edit
         </a>
-    </li>
-    <li>{{ form(delete_form) }}</li>
-</ul>
+    </span>
+    <span class="ticket button">
+        <a href="{{ path('reservation_edit', { 'id': entity.id }) }}">
+            Ticket
+        </a>
+    </span>
+    <span class="delete button">{{ form(delete_form) }}</span>
+    <span class="deleteSeries button">
+        <a href="{{ path('reservation_edit', { 'id': entity.id }) }}">
+            Delete Series
+        </a>
+    </span>
+</div>
     {% for flashMessage in app.session.flashbag.get('success') %}
       <div class="flash-notice save-success">
         {{ flashMessage }}

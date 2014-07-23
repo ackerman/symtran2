@@ -1,0 +1,37 @@
+{% extends 'GinsbergTransportationBundle::public_layout.html.twig' %}
+
+{% block body -%}
+
+<h2>Create a Reservation</h2>
+
+    {{ form_start(form, {'att': {'novalidate': 'novalidate'}}) }}
+      {{ form_errors(form) }}
+      {{ form_row(form.isRepeating) }}
+      {{ form_row(form.repeatsUntil) }}
+      {{ form_row(form.start) }}
+      {{ form_row(form.end) }}
+      {{ form_row(form.seatsRequired) }}
+      {{ form_row(form.person) }}
+      {{ form_row(form.program) }}
+      {{ form_row(form.destinationText) }}
+      {{ form_row(form.notes) }}
+      {{ form_row(form._token) }}
+      <div style="display: none;">
+        {{ form_row(form.created) }}
+      </div>
+      
+      {{ form_row(form.submit, {'label': 'Create' }) }}
+      
+    {{ form_end(form, {'render_rest': false}) }}
+
+        
+{% endblock %}
+{% block javascripts %}
+  {{ parent() }}
+    {% javascripts
+      '@GinsbergTransportationBundle/Resources/public/js/datetimepicker/jquery.datetimepicker_modified.js'
+      'bundles/ginsbergtransportation/js/user/site_datetimepicker.js'
+%}
+        <script src="{{ asset_url }}"></script>
+     {% endjavascripts %}
+{% endblock %}

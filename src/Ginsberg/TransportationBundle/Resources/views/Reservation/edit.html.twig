@@ -1,7 +1,7 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
-    <h1>Reservation edit</h1>
+    <h1>Update reservation {{ entity.id }}</h1>
     
     {% if isReservationPast == true %}
       <p><span style="font-weight: bold; color: #FF0000;">Warning: This reservation occurred in the past. Do you really want to edit it?</span><br />

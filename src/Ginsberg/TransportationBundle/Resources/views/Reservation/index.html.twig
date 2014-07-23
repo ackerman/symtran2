@@ -6,60 +6,36 @@
   {% else %}
     {% set day = dateToShow %}
   {% endif %}
-    <h1>Reservations</h1>
-    <ul>
-      <li>
-        <a href="{{ path('reservation_new') }}">
+    <h1>Reservations <span class="button"><a href="{{ path('reservation_new') }}">
             Add
-        </a>
-      </li>
-    </ul>
+        </a></span></h1>
+    <h2>Reservations for {% if day == "Today" %}{{ day }}{%else %}{{ day|date('Y-m-d') }}{% endif %}</h2>
+    
     {{ render(controller('GinsbergTransportationBundle:Reservation:searchCriteria')) }}
     
-    <h2>Reservations for {% if day == "Today" %} {{ day }}{%else %}{{ day|date('Y-m-d') }}{% endif %}</h2>
     <table class="records_list">
         <thead>
             <tr>
-                <th>Id</th>
                 <th>Start</th>
                 <th>End</th>
-                <th>Checkout</th>
-                <th>Checkin</th>
+                <th>Check out</th>
+                <th>Check in</th>
                 <th>Vehicle</th>
-                <th>Seats required</th>
-                <th>Person</th>
-                <th>Program</th>
-                <th>Destination</th>
-                <th>Destination text</th>
-                <th>Series</th>
-                <th>Notes</th>
-                <th>No Show</th>
-                <th>Created</th>
-                <th>Modified</th>
+                <th>Driver</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
         {% for upcoming_trip in upcoming %}
             <tr>
-                <td><a href="{{ path('reservation_show', { 'id': upcoming_trip.id }) }}">{{ upcoming_trip.id }}</a></td>
-                <td>{% if upcoming_trip.start %}{{ upcoming_trip.start|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if upcoming_trip.end %}{{ upcoming_trip.end|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if upcoming_trip.checkout %}{{ upcoming_trip.checkout|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if upcoming_trip.checkin %}{{ upcoming_trip.checkin|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{{ upcoming_trip.vehicle }}</td>
-                <td>{{ upcoming_trip.seatsRequired }}</td>
-                <td>{{ upcoming_trip.person }}</td>
-                <td>{{ upcoming_trip.program }}</td>
-                <td>{{ upcoming_trip.destination }}</td>
-                <td>{{ upcoming_trip.destinationText }}</td>
-                <td>{{ upcoming_trip.series }}</td>
-                <td>{{ upcoming_trip.notes }}</td>
-                <td>{{ upcoming_trip.isNoShow }}</td>
-                <td>{% if upcoming_trip.created %}{{ upcoming_trip.created|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if upcoming_trip.modified %}{{ upcoming_trip.modified|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if upcoming_trip.start %}{{ upcoming_trip.start|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if upcoming_trip.end %}{{ upcoming_trip.end|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if upcoming_trip.checkout %}{{ upcoming_trip.checkout|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if upcoming_trip.checkin %}{{ upcoming_trip.checkin|date('g:i a F j Y') }}{% endif %}</td>
+                <td><a href="{{ path('vehicle_show', { 'id': upcoming_trip.vehicle.id }) }}">{{ upcoming_trip.vehicle }}</a></td>
+                <td><a href="{{ path('person_show', { 'id': upcoming_trip.person.id }) }}">{{ upcoming_trip.person.firstName }} {{ upcoming_trip.person.lastName }}</a></td>
                 <td>
-                <ul>
+                <ul class="actions">
                     <li>
                         <a href="{{ path('reservation_show', { 'id': upcoming_trip.id }) }}">show</a>
                     </li>
@@ -69,6 +45,9 @@
                 </ul>
                 </td>
             </tr>
+            {% if upcoming_trip.notes %}
+              <tr><td colspan="7">{{ upcoming_trip.notes }}</td></tr>
+            {% endif %}
         {% endfor %}
         </tbody>
     </table>
@@ -78,46 +57,28 @@
         <table class="records_list">
           <thead>
               <tr>
-                  <th>Id</th>
                   <th>Start</th>
                   <th>End</th>
-                  <th>Checkout</th>
-                  <th>Checkin</th>
+                  <th>Check out</th>
+                  <th>Check in</th>
                   <th>Vehicle</th>
-                  <th>Seats required</th>
-                  <th>Person</th>
-                  <th>Program</th>
-                  <th>Destination</th>
-                  <th>Destination text</th>
-                  <th>Series</th>
+                  <th>Driver</th>
                   <th>Notes</th>
-                  <th>No Show</th>
-                  <th>Created</th>
-                  <th>Modified</th>
                   <th>Actions</th>
               </tr>
           </thead>
           <tbody>
         {% for ongoing_trip in ongoing %}
             <tr>
-                <td><a href="{{ path('reservation_show', { 'id': ongoing_trip.id }) }}">{{ ongoing_trip.id }}</a></td>
-                <td>{% if ongoing_trip.start %}{{ ongoing_trip.start|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if ongoing_trip.end %}{{ ongoing_trip.end|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if ongoing_trip.checkout %}{{ ongoing_trip.checkout|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if ongoing_trip.checkin %}{{ ongoing_trip.checkin|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{{ ongoing_trip.vehicle }}</td>
-                <td>{{ ongoing_trip.seatsRequired }}</td>
-                <td>{{ ongoing_trip.person }}</td>
-                <td>{{ ongoing_trip.program }}</td>
-                <td>{{ ongoing_trip.destination }}</td>
-                <td>{{ ongoing_trip.destinationText }}</td>
-                <td>{{ ongoing_trip.series }}</td>
+                <td>{% if ongoing_trip.start %}{{ ongoing_trip.start|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if ongoing_trip.end %}{{ ongoing_trip.end|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if ongoing_trip.checkout %}{{ ongoing_trip.checkout|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if ongoing_trip.checkin %}{{ ongoing_trip.checkin|date('g:i a F j Y') }}{% endif %}</td>
+                <td><a href="{{ path('vehicle_show', { 'id': ongoing_trip.vehicle.id }) }}">{{ ongoing_trip.vehicle }}</a></td>
+                <td><a href="{{ path('person_show', { 'id': ongoing_trip.person.id }) }}">{{ ongoing_trip.person }}</a></td>
                 <td>{{ ongoing_trip.notes }}</td>
-                <td>{{ ongoing_trip.isNoShow }}</td>
-                <td>{% if ongoing_trip.created %}{{ ongoing_trip.created|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if ongoing_trip.modified %}{{ ongoing_trip.modified|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>
-                <ul>
+                <ul class="actions">
                     <li>
                         <a href="{{ path('reservation_show', { 'id': ongoing_trip.id }) }}">show</a>
                     </li>
@@ -137,46 +98,28 @@
         <table class="records_list">
           <thead>
               <tr>
-                  <th>Id</th>
                   <th>Start</th>
                   <th>End</th>
-                  <th>Checkout</th>
-                  <th>Checkin</th>
+                  <th>Check out</th>
+                  <th>Check in</th>
                   <th>Vehicle</th>
-                  <th>Seats required</th>
-                  <th>Person</th>
-                  <th>Program</th>
-                  <th>Destination</th>
-                  <th>Destination text</th>
-                  <th>Series</th>
+                  <th>Driver</th>
                   <th>Notes</th>
-                  <th>No Show</th>
-                  <th>Created</th>
-                  <th>Modified</th>
                   <th>Actions</th>
               </tr>
           </thead>
           <tbody>
         {% for checkedInTrip in checkinsToday %}
             <tr>
-                <td><a href="{{ path('reservation_show', { 'id': checkedInTrip.id }) }}">{{ checkedInTrip.id }}</a></td>
-                <td>{% if checkedInTrip.start %}{{ checkedInTrip.start|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if checkedInTrip.end %}{{ checkedInTrip.end|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if checkedInTrip.checkout %}{{ checkedInTrip.checkout|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if checkedInTrip.checkin %}{{ checkedInTrip.checkin|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{{ checkedInTrip.vehicle }}</td>
-                <td>{{ checkedInTrip.seatsRequired }}</td>
-                <td>{{ checkedInTrip.person }}</td>
-                <td>{{ checkedInTrip.program }}</td>
-                <td>{{ checkedInTrip.destination }}</td>
-                <td>{{ checkedInTrip.destinationText }}</td>
-                <td>{{ checkedInTrip.series }}</td>
+                <td>{% if checkedInTrip.start %}{{ checkedInTrip.start|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if checkedInTrip.end %}{{ checkedInTrip.end|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if checkedInTrip.checkout %}{{ checkedInTrip.checkout|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if checkedInTrip.checkin %}{{ checkedInTrip.checkin|date('g:i a F j Y') }}{% endif %}</td>
+                <td><a href="{{ path('vehicle_show', { 'id': checkedInTrip.vehicle.id }) }}">{{ checkedInTrip.vehicle }}</a></td>
+                <td><a href="{{ path('person_show', { 'id': checkedInTrip.person.id }) }}">{{ checkedInTrip.person }}</a></td>
                 <td>{{ checkedInTrip.notes }}</td>
-                <td>{{ checkedInTrip.isNoShow }}</td>
-                <td>{% if checkedInTrip.created %}{{ checkedInTrip.created|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if checkedInTrip.modified %}{{ checkedInTrip.modified|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>
-                <ul>
+                <ul class="actions">
                     <li>
                         <a href="{{ path('reservation_show', { 'id': checkedInTrip.id }) }}">show</a>
                     </li>
@@ -217,10 +160,10 @@
         {% for entity in entities %}
             <tr>
                 <td><a href="{{ path('reservation_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
-                <td>{% if entity.start %}{{ entity.start|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if entity.end %}{{ entity.end|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if entity.checkout %}{{ entity.checkout|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if entity.checkin %}{{ entity.checkin|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.start %}{{ entity.start|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if entity.end %}{{ entity.end|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if entity.checkout %}{{ entity.checkout|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if entity.checkin %}{{ entity.checkin|date('g:i a F j Y') }}{% endif %}</td>
                 <td>{{ entity.vehicle }}</td>
                 <td>{{ entity.seatsRequired }}</td>
                 <td>{{ entity.person }}</td>
@@ -230,8 +173,8 @@
                 <td>{{ entity.series }}</td>
                 <td>{{ entity.notes }}</td>
                 <td>{{ entity.isNoShow }}</td>
-                <td>{% if entity.created %}{{ entity.created|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if entity.modified %}{{ entity.modified|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.created %}{{ entity.created|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if entity.modified %}{{ entity.modified|date('g:i a F j Y') }}{% endif %}</td>
                 <td>
                 <ul>
                     <li>
@@ -248,6 +191,7 @@
     </table>
 {% endblock %}
 {% block javascripts %}
+  {{ parent() }}
   {% javascripts 
     '@GinsbergTransportationBundle/Resources/public/js/moment.js' %}
     {{ parent() }}
@@ -256,7 +200,6 @@
   {% endjavascripts %}
   {% javascripts 
     '@GinsbergTransportationBundle/Resources/public/js/reservation_datetimepicker.js' %}
-    {{ parent() }}
     <script src="{{ asset_url }}"></script>
   {% endjavascripts %}
 {% endblock %}

@@ -1,7 +1,17 @@
 {# Layout template for the Admin portion of the website #}
 {% extends '::base.html.twig' %}
   {% block stylesheets %}
-    {% stylesheets 'bundles/ginsbergtransportation/css/admin/*' filter='cssrewrite' %}
+    {% stylesheets 'bundles/ginsbergtransportation/css/ie.css'
+      'bundles/ginsbergtransportation/css/jquery.datetimepicker.css'
+        
+        filter='cssrewrite' %}
+      <link rel="stylesheet" href="{{ asset_url }}" />
+    {% endstylesheets %}
+    {% stylesheets 'bundles/ginsbergtransportation/css/admin/form.css'
+        'bundles/ginsbergtransportation/css/admin/print.css' 
+        'bundles/ginsbergtransportation/css/admin/screen.css' 
+        'bundles/ginsbergtransportation/css/admin/main.css'
+        filter='cssrewrite' %}
       <link rel="stylesheet" href="{{ asset_url }}" />
     {% endstylesheets %}
   {% endblock %}   
@@ -15,3 +25,15 @@
   <li class="first" id="nav-installation"><a href="{{ path('installation') }}">Installation</a></li>
   <li class="first" id="nav-reports"><a href="">Reports</a></li>
 {% endblock %}
+{% block javascripts %}
+    {% javascripts 
+      '@GinsbergTransportationBundle/Resources/public/js/user/jquery-1.11.1.js'
+      'bundles/ginsbergtransportation/js/datetimepicker/jquery.datetimepicker_modified.js'
+      'bundles/ginsbergtransportation/js/moment.js'
+    %}
+      <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+    <script>
+      moment().format();
+    </script>
+  {% endblock %}

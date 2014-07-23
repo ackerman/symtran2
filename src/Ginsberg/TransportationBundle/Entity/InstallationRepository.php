@@ -3,6 +3,7 @@
 namespace Ginsberg\TransportationBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\EntityManager;
 
 /**
  * InstallationRepository
@@ -28,37 +29,85 @@ class InstallationRepository extends EntityRepository
   
   /**
 	 * Return whether or not a date falls on a Ginsberg holiday
+   * 
+   * @param datetime $date The date to check
+   * 
+   * @return bool|null Whether or not the date is a holiday
+   * 
+   * @throws \Doctrine\ORM\NoResultException
 	 */
-	public static function is_holiday($date) {
-		$check_date = Installation::model()->count(
-      ':date BETWEEN thanksgiving_start AND thanksgiving_end OR
-			:date BETWEEN mlk_start AND mlk_end OR
-			:date BETWEEN springbreak_start AND springbreak_end',
-      array(
-        ':date' => $date,
-      )
-    );
-		if ( (bool) $check_date ):
-      return true;
-    endif;
-    return false;
+	public function getIsHoliday($date) {
+    //$this->logger->info('In InstallationService::getIsHoliday()');
+    $params = array('date' => $date);
+    $dql = 'SELECT COUNT(i) FROM GinsbergTransportationBundle:Installation i WHERE 
+            :date BETWEEN i.thanksgivingStart AND i.thanksgivingEnd
+            OR :date BETWEEN i.mlkStart AND i.mlkEnd
+            OR :date BETWEEN i.springbreakStart AND i.springbreakEnd';
+    
+    $query = $this->getEntityManager()->createQuery($dql)->setParameters($params);
+
+    try {
+      $result = $query->getSingleScalarResult();
+      return ((bool) $result) ? TRUE : FALSE;
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
 	}
 
 	/**
-	 * Return whether or not a date falls on a Ginsberg holiday
+	 * Return whether or not a date falls during a semester break
+   * 
+   * @param datetime $date The date to check
+   * 
+   * @return bool|null Whether or not the date falls during a semester break
+   * 
+   * @throws \Doctrine\ORM\NoResultException
 	 */
-	public static function is_semester_break($date) {
-		$check_date = Installation::model()->count(
-      ':date < fall_start OR
-			:date BETWEEN fall_end AND winter_start OR
-			:date > winter_end',
-      array(
-        ':date' => $date,
-      )
-    );
-		if ( (bool) $check_date ):
-      return true;
-    endif;
-    return false;
-	}
+	public function getIsSemesterBreak($date) {
+    //$this->logger->info('In InstallationService::getIsSemesterBreak()');
+    
+		$params = array('date' => $date);
+    $dql = 'SELECT COUNT(i) FROM GinsbergTransportationBundle:Installation i WHERE 
+            :date < i.fallStart
+            OR :date BETWEEN i.fallEnd AND i.winterStart
+            OR :date > i.winterEnd';
+    
+    $query = $this->getEntityManager()->createQuery($dql)->setParameters($params);
+
+    try {
+      $result = $query->getSingleScalarResult();
+      return ((bool) $result) ? TRUE : FALSE;
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
+  }
+  
+  // TODO: Need to force all reservations to be in the same semester
+  /**
+	 * Return whether "start" and "repeatsUntil" are in the same semester
+   * 
+   * @param datetime $date The date to check
+   * 
+   * @return bool|null Whether start and repeatsUntil are in the same semester
+   * 
+   * @throws \Doctrine\ORM\NoResultException
+	 */
+	public function getReservationsAreInOneSemester($start, $repeatsUntil) {
+    //$this->logger->info('In InstallationService::getIsSemesterBreak()');
+    
+		$params = array('start' => $date, repeatsUntil);
+    $dql = 'SELECT COUNT(i) FROM GinsbergTransportationBundle:Installation i WHERE 
+            :date < i.fallStart
+            OR :date BETWEEN i.fallEnd AND i.winterStart
+            OR :date > winterEnd';
+    
+    $query = $this->em->createQuery($dql)->setParameters($params);
+
+    try {
+      $result = $query->getSingleScalarResult();
+      return ((bool) $result) ? TRUE : FALSE;
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
+  }
 }

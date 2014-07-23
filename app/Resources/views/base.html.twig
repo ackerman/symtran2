@@ -31,16 +31,7 @@
         {% block privacy %}
         {% endblock %}
       </footer>
-      {% block javascripts %}
-        {% javascripts 
-          '@GinsbergTransportationBundle/Resources/public/js/datetimepicker/jquery.js' %}
-           <script src="{{ asset_url }}"></script>
-        {% endjavascripts %}
-        {% javascripts 
-          '@GinsbergTransportationBundle/Resources/public/js/datetimepicker/jquery.datetimepicker_modified.js' %}
-          <script src="{{ asset_url }}"></script>
-        {% endjavascripts %}
-      {% endblock %}
+      {% block javascripts %}{% endblock %}
     </body>
   {% endblock %}
 </html>

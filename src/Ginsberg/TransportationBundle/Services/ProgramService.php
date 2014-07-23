@@ -21,31 +21,6 @@ class ProgramService
     $this->logger = $logger;
   }
   
-  /**
-  * Get Program name based on official name of the program's MCommunity eligibility group.
-  */
-  public function get_program_name_by_ldap_group($ldap_group) 
-  {
-    $program = $this->programRepository->findByEligibilityGroup($ldap_group);
-    $this->logger->info('in get_program_name_by_ldap_group. $program = ' . var_dump($program));
-    if ($program) {
-      return true;
-    } else {
-      return false;
-    }
-  }
   
-  /**
-  * Get Program Id based on official name of the program's MCommunity eligibility group.
-  */
-  public static function get_program_id_by_ldap_group($ldap_group) 
-  {
-    $program = $this->programRepository->findBy($ldap_group);
-    if ($program) {
-      return $program->getId();
-    } else {
-      return false;
-    }
-  }
 }
 

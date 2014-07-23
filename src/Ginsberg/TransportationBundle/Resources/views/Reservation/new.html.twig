@@ -9,7 +9,7 @@
           </a>
       </li>
     </ul>
-    {{ form_start(form) }}
+    {{ form_start(form, {'att': {'novalidate': 'novalidate'}}) }}
       {{ form_errors(form) }}
       {{ form_row(form.isRepeating) }}
       {{ form_row(form.repeatsUntil) }}

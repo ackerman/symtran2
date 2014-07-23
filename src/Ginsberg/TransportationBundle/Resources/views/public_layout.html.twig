@@ -6,6 +6,9 @@
     {% stylesheets 'bundles/ginsbergtransportation/css/user/smoothness/*' filter='cssrewrite' %}
     <link rel="stylesheet" href="{{ asset_url }}" />
   {% endstylesheets %}
+    {% stylesheets 'bundles/ginsbergtransportation/css/jquery.datetimepicker.css*' filter='cssrewrite' %}
+    <link rel="stylesheet" href="{{ asset_url }}" />
+  {% endstylesheets %}
 {% endblock %}
 {% block htmlbody %}
     <body>
@@ -19,9 +22,9 @@
 <div data-role="controlgroup" data-type="horizontal">
   <a href="{{ path('site') }}" data-role="button" data-theme="b">Home</a>
 
-  <a href="" data-role="button">Make a reservation</a>
+  <a href="{{ path('site_new') }}" data-role="button">Make a reservation</a>
 
-  <a href="" data-role="button">Past reservations</a>
+  <a href="{{ path('site_past') }}" data-role="button">Past reservations</a>
 </div>
 	<div  data-role="content">
   {% block body %}{% endblock %}
@@ -31,10 +34,13 @@
 	  <h4><a href="http://ginsberg.umich.edu/transportation/privacy-policy">Privacy Policy</a></h4>
 	</div><!-- footer -->
   {% block javascripts %}
-    {{ parent() }}
-    {% javascripts 'bundles/ginsbergtransportation/js/user/*' %}
-           <script src="{{ asset_url }}"></script>
-        {% endjavascripts %}
+    {% javascripts 
+      '@GinsbergTransportationBundle/Resources/public/js/user/jquery-1.11.1.js'
+      '@GinsbergTransportationBundle/Resources/public/js/user/jquerymobile_config.js'
+      '@GinsbergTransportationBundle/Resources/public/js/user/jquery.mobile-1.4.3.js'
+    %}
+      <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
   {% endblock %}
   
 </div><!-- page -->
