@@ -27,6 +27,8 @@ header h2 {
   width: 40%;
   float: right;
   text-align: right;
+  margin-top: 0;
+  font-size: 1.25em;
 }
 
 .group:after {
@@ -46,7 +48,7 @@ main {
 }
 
 main > h1 {
-  width: 25%;
+  /*width: 25%;*/
   text-align: left;
 }
 
@@ -116,36 +118,40 @@ nav ul #nav-programs a,
 nav ul #nav-reports a,
 nav ul #nav-vehicles a,
 nav ul #nav-destinations a,
+nav ul #nav-tickets a,
 nav ul #nav-installation a {
   padding-left:48px;
 }
 
 nav ul #nav-people a {
-  background:#fff url(../images/icons/people-24.png) no-repeat 15px center;
+  background:#fff url(images/icons/people-24.png) no-repeat 15px center;
 }
 
 nav ul #nav-reservations a {
-  background:#fff url(../images/icons/reservation-24.png) no-repeat 15px center;
+  background:#fff url(images/icons/reservation-24.png) no-repeat 15px center;
 }
 
 nav ul #nav-vehicles a {
-  background:#fff url(../images/icons/car-24.png) no-repeat 15px center;
+  background:#fff url(images/icons/car-24.png) no-repeat 15px center;
 }
 
 nav ul #nav-programs a {
-  background:#fff url(../images/icons/book-24.png) no-repeat 15px center;
+  background:#fff url(images/icons/book-24.png) no-repeat 15px center;
 }
 
 nav ul #nav-reports a {
-  background:#fff url(../images/icons/graph-24.png) no-repeat 15px center;
+  background:#fff url(images/icons/graph-24.png) no-repeat 15px center;
 }
 
 nav ul #nav-destinations a {
-  background:#fff url(../images/icons/destinations-24.png) no-repeat 15px center;
+  background:#fff url(images/icons/destinations-24.png) no-repeat 15px center;
 }
 
+nav ul #nav-tickets a {
+  background:#fff url(images/icons/book-24.png) no-repeat 15px center;
+}
 nav ul #nav-installation a {
-  background:#fff url(../images/icons/power-24.png) no-repeat 15px center;
+  background:#fff url(images/icons/power-24.png) no-repeat 15px center;
 }
 
 
@@ -393,3 +399,24 @@ div.calendar_time {height: 38px; vertical-align: top; margin:0; padding: 0 5px 0
 #calendar_11pm {top: 608px; }
 .calendar_vehicle {float: left; width: 120px; height: 646px; border-left: 1px solid #aaaaaa; border-bottom: 1px solid #aaaaaa; border-right: 1px solid #aaaaaa; margin-left: 15px;}
 .calendar_trip {position: absolute; width: 120px; background-color: #cccccc; border: 1px solid #aaaaaa;}
+
+/* Added for Symfony */
+body {text-align: left;}
+#reservation_date_to_show {text-align: left;}
+h2 {text-align: left;}
+ul.actions {padding: 0; margin: 0;}
+ul.actions li {display: inline;}
+table.record_properties { text-align: left; }
+table.record_properties th {
+  position: relative;
+	width: 10em;
+	display:inline-block;
+	margin:0 0 .5em 0;
+}
+table.record_properties td {
+  width:18em;
+  display:inline-block;
+  margin:0 0 .5em 0;
+}
+.record_actions {margin-bottom:1em;}
+.record_actions div, .record_actions form {display: inline;}

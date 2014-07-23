@@ -19,6 +19,8 @@ jQuery(document).ready(function($) {
   }
   allowTimesArray.push('20:00');
   
+  var endInput = $('#ginsberg_transportationbundle_reservation_end');
+  
   //var today = moment().format("YYYY-MM-DD");
   //$('#ginsberg_transportationbundle_reservation_dateToShow').val(today);
   $('#ginsberg_transportationbundle_reservation_dateToShow').datetimepicker({
@@ -35,7 +37,8 @@ jQuery(document).ready(function($) {
     roundTime: 'round',
     format: 'Y-m-d',
     scrollInput: false,
-    lang: 'en'
+    lang: 'en',
+    closeOnDateSelect: true
   });
   $('#ginsberg_transportationbundle_reservation_start').datetimepicker({
     onGenerate:function( ct ){
@@ -119,8 +122,15 @@ jQuery(document).ready(function($) {
     roundTime: 'round',
     format: 'Y-m-d 20:00',
     scrollInput: false,
-    lang: 'en'
+    lang: 'en',
+    closeOnDateSelect: true
   });
+  
+  var startToday = moment().set('hour', 8).set('minute', 0);
+  $('#ginsberg_transportationbundle_reservation_start').val(startToday.format('YYYY-MM-DD hh:mm a'));
+  $('#ginsberg_transportationbundle_reservation_start').on("change", function(event) {
+    $('#ginsberg_transportationbundle_reservation_end').val($('#ginsberg_transportationbundle_reservation_start').val());
+  })
 });
 
 

@@ -425,8 +425,8 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
     {
       $logger = $this->get('logger');
         $em = $this->getDoctrine()->getManager();
-
-        $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
+        $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation'); 
+        $entity = $reservationRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Reservation entity.');
@@ -456,7 +456,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
         $lastReservationInSeries = NULL;
         if ($isRepeating) {
 
-          $lastReservationInSeries = $this->_getLastReservationInSeries($series);
+          $lastReservationInSeries = $reservationRepository->getLastReservationInSeries($series);
           //$logger->info(var_dump($lastReservationInSeries));
           // Calculate the "original" until date based on the date of last 
           // reservation in the series at Installation's dailyClose time.
@@ -504,7 +504,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
         if ($isRepeating) {
           $em = $this->getDoctrine()->getManager();
           
-          $lastReservationInSeries = $this->_getLastReservationInSeries($series);
+          $lastReservationInSeries = $em->getRepository('GinsbergTransportationBundle:Reservation')->getLastReservationInSeries($series);
           //$logger->info(var_dump($lastReservationInSeries));
           // Calculate the "original" until date based on the date of last 
           // reservation in the series at Installation's dailyClose time.
@@ -534,8 +534,8 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
       $em = $this->getDoctrine()->getManager();
       
       $logger = $this->get('logger');
-      
-      $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
+      $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
+      $entity = $reservationRepository->find($id);
 
       if (!$entity) {
           throw $this->createNotFoundException('Unable to find Reservation entity.');
@@ -565,7 +565,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
       $lastReservationInSeries = NULL;
       if ($isRepeating) {
 
-        $lastReservationInSeries = $this->_getLastReservationInSeries($series);
+        $lastReservationInSeries = $reservationRepository->getLastReservationInSeries($series);
         //$logger->info(var_dump($lastReservationInSeries));
         // Calculate the "original" until date based on the date of last 
         // reservation in the series at Installation's dailyClose time.
@@ -621,9 +621,9 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
         // Get the number of days (positive or negative) between the old 
         // start date and the new one. Prevent PHP date calculations from
         // "helping us" by adjusting for daylights savings.
-        $startInterval = $this->_getIntervalInDays($originalStartDate, $entity->getStart());
+        $startInterval = $reservationRepository->getIntervalInDays($originalStartDate, $entity->getStart());
         // Get the number of days (positive or negative) between the old end date and the new one.
-        $endInterval = $this->_getIntervalInDays($originalEndDate, $entity->getEnd());
+        $endInterval = $reservationRepository->getIntervalInDays($originalEndDate, $entity->getEnd());
         // Save the start and end times so we can set them independently from 
         // the dates. This allows us to avoid problems with PHP's automatic adjustment for daylight savings time
         $logger->info('start interval = ' . $startInterval . ', ' . $startInterval * 24*60*60);
@@ -656,7 +656,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           
           $em->flush();
           
-          $this->_assignReservationToVehicle($entity, $vehicleRequested);
+          $reservationRepository->assignReservationToVehicle($entity, $vehicleRequested);
           
           $entity->setModified(new \DateTime);
           $em->flush();
@@ -684,7 +684,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           
           if ($repeatsUntil < $originalUntilDate) {
             $logger->info('Going to delete some records. start = ' . date('Y-m-d H:i:s', $entity->getStart()->getTimestamp()) . ', repeat_until = ' . date('Y-m-d H:i:s', $repeatsUntil->getTimestamp()) . ' original_until_date = ' . date('Y-m-d H:i:s', $originalUntilDate->getTimestamp()));
-            $reservationsToDelete = $this->_getFutureReservationsInSeries($entity, $repeatsUntil);
+            $reservationsToDelete = $reservationRepository->getFutureReservationsInSeries($entity, $repeatsUntil);
             
             $deletedReservations = 0;
             foreach($reservationsToDelete as $deleteMe) {
@@ -701,7 +701,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           $startInterval = Format::get_repeat_interval(strtotime($originalStartDate), strtotime($entity->start));
           $endInterval = Format::get_repeat_interval(strtotime($originalEndDate), strtotime($entity->end));
           */
-          $futureReservations = $this->_getFutureReservationsInSeries($entity, $entity->getStart());
+          $futureReservations = $reservationRepository->getFutureReservationsInSeries($entity, $entity->getStart());
 
           foreach($futureReservations as $reservation) {
             $logger->info('starting out in foreach to modify each future reservation, id = ' . $reservation->getId());
@@ -742,7 +742,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
             $logger->info('Repeating reservation saved: ' );
             
             if ($needNewVehicle) {
-              $reservation = $this->_assignReservationToVehicle($reservation, $vehicleRequested);
+              $reservation = $reservationRepository->assignReservationToVehicle($reservation, $vehicleRequested);
               $em->flush();
               if ($reservation->getVehicle()) {
                 $successfulReservations[] = $reservation;
@@ -759,7 +759,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
           // Prepare data for rendering the results page summarizing the 
           // changes made.
           $logger->info("Calling _getChangedReservationsInSeries().");
-          $seriesData = $this->_getChangedReservationsInSeries($entity);
+          $seriesData = $reservationRepository->getChangedReservationsInSeries($entity);
           return $this->render('GinsbergTransportationBundle:Reservation:list_updated_repeating.html.twig', array(
               'deleted' => $deletedReservations, 
               'successes' => count($successfulReservations),

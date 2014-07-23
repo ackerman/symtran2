@@ -25,6 +25,8 @@ class ReservationRepository extends EntityRepository
   * 
   * @param date $date The date we are finding reservations for (could be sometime today or a date selected)
   * @param date $date_end The beginning of the day following $date (could be tomorrow, could be based on a date selected)
+   * 
+   * @return array Array of upcoming trips
   */
   public function findUpcomingTrips($date, $date_end)
   {
@@ -36,8 +38,8 @@ class ReservationRepository extends EntityRepository
             OR (r.start <= :date AND r.end >= :date AND r.end <= :date_end) 
             OR (r.start >= :date AND r.start < :date_end AND r.end < :date_end) 
             OR (r.start >= :date AND r.start < :date_end AND r.end >= :date_end))
-            AND r.isNoShow is NULL
-            AND r.checkout is NULL
+            AND (r.isNoShow is NULL OR r.isNoShow = 0)
+            AND (r.checkout is NULL OR r.checkout = 0)
             AND r.vehicle is not NULL';
     $query = $this->getEntityManager()->createQuery($dql)->setParameters($params);
 
@@ -49,9 +51,11 @@ class ReservationRepository extends EntityRepository
   }
   
   /**
-  * Return all reservations that under way (checked out but not checked in yet).
+  * Return all reservations currently under way (checked out but not checked in).
   * 
   * @param date $now Not actually used
+   * 
+   * @return array Array of ongoing trips
   */ 
   public function findOngoingTrips($now)
   {
@@ -70,6 +74,8 @@ class ReservationRepository extends EntityRepository
    * Return all reservations that were checked in today
    * 
    * @param date $now Not actually used
+   * 
+   * @return array Array of reservations checked in today
    */
   public function findCheckinsToday($now) 
   {
@@ -146,6 +152,7 @@ class ReservationRepository extends EntityRepository
 	 * @param string $start the start of the time period formatted as 'Y-m-d H:i:s'
 	 * @param string $end the end of the time period formatted as 'Y-m-d H:i:s'
 	 * @param Vehicle $vehicle The vehicle we are testing for availability
+   * 
 	 * @return boolean True if the time slot is free, False if there is a reservation.
 	*/
 	public function timeSlotAvailable($start, $end, $vehicle) 
@@ -165,7 +172,7 @@ class ReservationRepository extends EntityRepository
     $startEqualOverlap = $query->getSingleScalarResult();
 
 		// find all reservations where the given end time is exactly the same as end
-    //$repository = $this->getDoctrine()->getRepository('GinsbergTransportationBundle:Reservation');
+    //$repository = $this->getEntityRepository('GinsbergTransportationBundle:Reservation');
 		
     $query = $em->createQuery(
       'SELECT COUNT(r.vehicle)
@@ -266,6 +273,7 @@ class ReservationRepository extends EntityRepository
   * @param datetime $start The start time of the reservation
   * @param datetime $end The end time of the reservation
   * @param Vehicle $requestedVehicle Vehicle if admin selected one
+   * 
 	* @return Reservation $entity The reservation with a vehicle assigned if available assigned
 	*/
 	public function assignReservationToVehicle($entity, $requestedVehicle = FALSE)
@@ -337,20 +345,18 @@ class ReservationRepository extends EntityRepository
    * Returns the last Reservation in the series
    * 
    * @param Series $series The series for which we need the last reservation
+   * 
    * @return Reservation The last reservation in the series
    */
-	public function getLastReservationInSeries($series) {
-		$logger = $this->get('logger');
-    $logger->info('in _getLastReservationInSeries(). Series id is ' . $series->getId());
-    //$request = $this->requestStack->getCurrentRequest();
-    
-		// find all reservations where the given start time is exactly the same as start
+	public function getLastReservationInSeries($series) 
+  {
+		// find the reservation in the series that has the last start time 
     $em = $this->getEntityManager();
     $query = $em->createQuery(
         'SELECT r
           FROM GinsbergTransportationBundle:Reservation r
           WHERE r.series = :series AND r.start = (SELECT MAX(r1.start) from GinsbergTransportationBundle:Reservation r1 where r1.series = :series)')
-        ->setParameter(':series', $series);
+        ->setParameter('series', $series);
     
     $lastReservation = $query->getOneOrNullResult();
     return $lastReservation;
@@ -364,6 +370,7 @@ class ReservationRepository extends EntityRepository
 	 *
    * @param datetime $oldDate The original date of the Reservation
    * @param datetime $newDate The newly requested date from the Reservation form
+   * 
    * @return int The interval in seconds between the old and the new dates
 	 */
 	public function getIntervalInDays($oldDate, $newDate) {
@@ -393,22 +400,16 @@ class ReservationRepository extends EntityRepository
    */
 	public function getFutureReservationsInSeries($entity, $date) 
   {
-    $logger = $this->get('logger');
-    $logger->info('in _getFutureReservationsInSeries. Series id is ' . $entity->getSeries()->getId()) . ' date ($repeatsUntil)= ' . date('Y-m-d H:i:s', $date->getTimestamp()) . ' start = ' . date('Y-m-d H:i:s', $entity->getStart()->getTimestamp());
-    //$request = $this->requestStack->getCurrentRequest();
-    
 		// find all reservations where the given start time is exactly the same as start
-    $em = $this->getDoctrine()->getManager();
+    $em = $this->getEntityManager();
     $query = $em->createQuery(
         'SELECT r
           FROM GinsbergTransportationBundle:Reservation r
           WHERE r.series = :series AND r.start > :date')
-        ->setParameters(array(':series' => $entity->getSeries(), ':date' => $date));
+        ->setParameters(array('series' => $entity->getSeries(), ':date' => $date));
     
     $futureReservationsInSeries = $query->getResult();
-    foreach ($futureReservationsInSeries as $res) {
-      $logger->info('Id = ' . $res->getId() . ' start = ' . date('Y-m-d H:i:s', $res->getStart()->getTimestamp()) . ' repeatsUntil = ' . ' date ($repeatsUntil)= ' . date('Y-m-d H:i:s', $date->getTimestamp()));
-    }
+ 
     return $futureReservationsInSeries;
 	}
   
@@ -422,9 +423,6 @@ class ReservationRepository extends EntityRepository
    * @param Reservation $entity Description
    */
 	public function getChangedReservationsInSeries($entity) {
-		$logger = $this->get('logger');
-    $logger->info('in _getChangedReservationsInSeries. Series id is ' . $entity->getSeries()->getId());
-    
     $endRange = $entity->getEnd()->getTimestamp() + 1;
 		$endRange = date('Y-m-d H:i:s', $endRange);
     
@@ -433,7 +431,7 @@ class ReservationRepository extends EntityRepository
         'SELECT r
           FROM GinsbergTransportationBundle:Reservation r
           WHERE r.series = :series AND r.modified BETWEEN :date AND :endRange')
-        ->setParameters(array(':series' => $entity->getSeries(), ':date' => $entity->getModified(), ':endRange' => $endRange));
+        ->setParameters(array('series' => $entity->getSeries(), ':date' => $entity->getModified(), ':endRange' => $endRange));
     
     $futureReservationsInSeries = $query->getResult();
     return $futureReservationsInSeries;
