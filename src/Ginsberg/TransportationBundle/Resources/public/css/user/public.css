@@ -2,7 +2,7 @@ body {
 	margin: 0;
 	padding: 0;
 	font-family: Myriad Pro, Arial,Helvetica,sans-serif!important;
-	background:#eee;
+	background:#ffffff;
 }
 
 body * {
@@ -114,4 +114,8 @@ th {
 
 .show {
   display: block;
+}
+
+/* Added for Symfony */
+.ui-content {
 }
