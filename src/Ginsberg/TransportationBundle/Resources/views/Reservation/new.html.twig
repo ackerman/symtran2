@@ -2,13 +2,13 @@
 
 {% block body -%}
     <h1>Add a Reservation</h1>
-    <ul class="record_actions">
-      <li>
+    <div class="record_actions">
+      <span class='back button'>
           <a href="{{ path('reservation') }}">
-              Back to the list
+              Reservations
           </a>
-      </li>
-    </ul>
+      </span>
+    </div>
     {{ form_start(form, {'att': {'novalidate': 'novalidate'}}) }}
       {{ form_errors(form) }}
       {{ form_row(form.isRepeating) }}
@@ -21,12 +21,14 @@
       {{ form_row(form.seatsRequired) }}
       {{ form_row(form.person) }}
       {{ form_row(form.program) }}
+      {{ form_row(form.destination) }}
       {{ form_row(form.destinationText) }}
       {{ form_row(form.notes) }}
-      {{ form_row(form.isNoShow) }}
       {{ form_row(form._token) }}
+      <div style='display: none;'>
       {{ form_row(form.created) }}
       {{ form_row(form.modified) }}
+      </div>
       
       {{ form_row(form.submit, {'label': 'Submit' }) }}
       
