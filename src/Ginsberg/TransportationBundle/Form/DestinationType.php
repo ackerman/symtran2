@@ -16,8 +16,8 @@ class DestinationType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('is_active')
             ->add('program')
+            ->add('is_active')
         ;
     }
     

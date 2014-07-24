@@ -15,7 +15,7 @@
       <span class='delete button'>{{ form(delete_form) }}</span>
     </div>
     
-    <h1>{{ entity.firstName }} {{ entity.lastName }} | <span id='approval'  
+    <h1>{{ entity.firstName }} {{ entity.lastName }} <span id='approval'  
                                                              {% if entity.status == 'pending' %} class='pending' {%  endif %}>{{ entity.status }}</span>
     </h1>
     
