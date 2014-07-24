@@ -43,11 +43,12 @@ class ReservationController extends Controller
       // Find today's upcoming trips.
       // Looks for trips where the reservation has an assigned vehicle
       // and the vehicle has not been checked out yet.
-      $upcoming = $em->getRepository('GinsbergTransportationBundle:Reservation')->findUpcomingTrips($date, $dateEnd);
-      $ongoing = $em->getRepository('GinsbergTransportationBundle:Reservation')->findOngoingTrips($now);
-      $checkinsToday = $em->getRepository('GinsbergTransportationBundle:Reservation')->findCheckinsToday($now);
+      $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
+      $upcoming = $reservationRepository->findUpcomingTrips($date, $dateEnd);
+      $ongoing = $reservationRepository->findOngoingTrips($now);
+      $checkinsToday = $reservationRepository->findCheckinsToday($now);
       
-$entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->findAll();
+$entities = $reservationRepository->findAll();
 
       return array(
         'upcoming' => $upcoming,

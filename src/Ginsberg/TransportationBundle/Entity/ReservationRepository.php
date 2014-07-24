@@ -135,7 +135,7 @@ class ReservationRepository extends EntityRepository
   public function findUpcomingTripsByPerson($now, $person) {
     $params = array('now' => $now, ':person' => $person);
     $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE
-        r.start >= :now AND r.person = :person ORDER BY r.start ASC';
+        r.start >= :now AND r.person = :person AND r.vehicle IS NOT NULL ORDER BY r.start';
     $query = $this->getEntityManager()->createQuery($dql)->setParameters($params);
     
     try {
@@ -143,6 +143,29 @@ class ReservationRepository extends EntityRepository
     } catch (\Doctrine\ORM\NoResultException $ex) {
       return NULL;
     }			
+  }
+  
+  /**
+   * Returns a Person's past Reservations. 
+   * 
+   * @param Person $person The Person whose past trips we want to find
+   * 
+   * @return array 
+   */
+  public function findPastTripsByPerson($person)
+  {
+    $now = new \DateTime();
+    $em = $this->getEntityManager();
+    $query = $em->createQuery('SELECT r FROM GinsbergTransportationBundle:Reservation r 
+            WHERE r.end < :now AND r.person = :person AND r.vehicle IS NOT NULL ORDER BY r.start')
+            ->setParameters(array('now' => $now, 'person' => $person));
+    
+    try {
+      $pastTripsByPerson = $query->getResult();
+      return $pastTripsByPerson;
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return NULL;
+    }	
   }
   
   /**
@@ -437,26 +460,4 @@ class ReservationRepository extends EntityRepository
     return $futureReservationsInSeries;
 	}
   
-  /**
-   * Returns a Person's past Reservations. 
-   * 
-   * @param Person $person The Person whose past trips we want to find
-   * 
-   * @return array 
-   */
-  public function findPastTripsByPerson($person)
-  {
-    $now = new \DateTime();
-    $em = $this->getEntityManager();
-    $query = $em->createQuery('SELECT r FROM GinsbergTransportationBundle:Reservation r 
-            WHERE r.end < :now AND r.person = :person AND r.vehicle IS NOT NULL ORDER BY r.start')
-            ->setParameters(array('now' => $now, 'person' => $person));
-    
-    try {
-      $pastTripsByPerson = $query->getResult();
-      return $pastTripsByPerson;
-    } catch (\Doctrine\ORM\NoResultException $ex) {
-      return NULL;
-    }	
-  }
 }

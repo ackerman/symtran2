@@ -2,31 +2,31 @@
 
 {% block body -%}
     <h1>Add a Person</h1>
+    <div class="record_actions">
+      <span class='back button'>
+          <a href="{{ path('person') }}">
+              People
+          </a>
+      </span>
+    </div>
     {{ form_start(form) }}
       {{ form_errors(form) }}
       {{ form_row(form.firstName) }}
       {{ form_row(form.lastName) }}
       {{ form_row(form.uniqname) }}
+      {{ form_row(form.program) }}
       {{ form_row(form.phone) }}
       {{ form_row(form.status) }}
       {{ form_row(form.dateApproved) }}
-      {{ form_row(form.hasUnpaidTicket) }}
-      {{ form_row(form.program) }}
+      <div style='display: none;'>
+        {{ form_row(form.created) }}
+      </div>
       {{ form_row(form._token) }}
-      {{ form_row(form.created) }}
-      {{ form_row(form.modified) }}
       
       {{ form_row(form.submit, {'label': 'Submit' }) }}
       
-    {{ form_end(form) }}
+    {{ form_end(form, {'render_rest': false}) }}
 
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('person') }}">
-            Back to the list
-        </a>
-    </li>
-</ul>
 {% endblock %}
 {% block javascripts %}
   {% javascripts 
