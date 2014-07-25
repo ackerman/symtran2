@@ -28,11 +28,13 @@ class ReservationType extends AbstractType
             ->add('today', 'submit', array('label' => 'Today'))
             ->add('isRepeating', 'checkbox', array(
               'mapped' => FALSE,
+              'label' => 'Repeats every week',
               'required' => FALSE,
             ))
             ->add('repeatsUntil', 'datetime', array(
               'mapped' => FALSE,
               'required' => FALSE,
+              'label' => 'Repeats until',
               'constraints' => array(
                 new \Ginsberg\TransportationBundle\Validator\Constraints\IsNotBlackedOut(),
               ),

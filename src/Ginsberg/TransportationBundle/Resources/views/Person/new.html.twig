@@ -1,7 +1,6 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
-    <h1>Add a Person</h1>
     <div class="record_actions">
       <span class='back button'>
           <a href="{{ path('person') }}">
@@ -9,6 +8,9 @@
           </a>
       </span>
     </div>
+              
+    <h1>Add a Person</h1>
+    
     {{ form_start(form) }}
       {{ form_errors(form) }}
       {{ form_row(form.firstName) }}

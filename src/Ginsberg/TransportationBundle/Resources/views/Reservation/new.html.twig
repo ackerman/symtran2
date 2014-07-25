@@ -1,7 +1,6 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
-    <h1>Add a Reservation</h1>
     <div class="record_actions">
       <span class='back button'>
           <a href="{{ path('reservation') }}">
@@ -9,6 +8,9 @@
           </a>
       </span>
     </div>
+    
+    <h1>Add a Reservation</h1>
+    
     {{ form_start(form, {'att': {'novalidate': 'novalidate'}}) }}
       {{ form_errors(form) }}
       {{ form_row(form.isRepeating) }}

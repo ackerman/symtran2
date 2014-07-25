@@ -1,7 +1,6 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
-    <h1>Update reservation {{ entity.id }}</h1>
     <div class="record_actions">
     <span class='back button'>
         <a href="{{ path('reservation') }}">
@@ -10,6 +9,9 @@
     </span>
     <span class='delete button'>{{ form(delete_form) }}</span>
 </div>
+
+<h1>Update reservation {{ entity.id }}</h1>
+    
     {% if isReservationPast == true %}
       <p><span style="font-weight: bold; color: #FF0000;">Warning: This reservation occurred in the past. Do you really want to edit it?</span><br />
       <span style="color: #ff0000;">You will not be able to change the start or end dates or the seats required field.</span></p>

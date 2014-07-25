@@ -1,15 +1,16 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
-    <h1>Destination creation</h1>
+  <div class="record_actions">
+    <span class='back button'>
+        <a href="{{ path('destination') }}">
+            Destinations
+        </a>
+    </span>
+</div>
+    <h1>Add a Destination</h1>
 
     {{ form(form) }}
 
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('destination') }}">
-            Back to the list
-        </a>
-    </li>
-</ul>
+        
 {% endblock %}

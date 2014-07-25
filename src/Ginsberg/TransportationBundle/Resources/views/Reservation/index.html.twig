@@ -52,8 +52,11 @@
         </tbody>
     </table>
 
+        {% if dateToShow == date %}
+          <h2>Trips in Progress</h2>
+        {% endif %}
     {% if ongoing %}
-        <h2>Trips in Progress</h2>
+        
         <table class="records_list">
           <thead>
               <tr>
@@ -93,8 +96,11 @@
     </table>
         {% endif %}
         
+        {% if dateToShow == date %}
+          <h2>Today's Checkins</h2>
+        {% endif %}
         {% if checkinsToday %}
-        <h2>Today's Checkins</h2>
+        
         <table class="records_list">
           <thead>
               <tr>

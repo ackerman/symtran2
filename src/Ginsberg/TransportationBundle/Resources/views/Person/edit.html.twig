@@ -1,32 +1,33 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
-    <h1>Person edit</h1>
+  <div class="record_actions">
+    <span class='back button'>
+        <a href="{{ path('person') }}">
+            People
+        </a>
+    </span>
+    <span>{{ form(delete_form) }}</span>
+  </div>
+
+   <h1>Update {{ edit_form.firstName.vars.value }} {{ edit_form.lastName.vars.value }} ({{ edit_form.uniqname.vars.value }})</h1>
     {{ form_start(edit_form) }}
       {{ form_row(edit_form.firstName) }}
       {{ form_row(edit_form.lastName) }}
       {{ form_row(edit_form.uniqname) }}
+      {{ form_row(edit_form.program) }}
       {{ form_row(edit_form.phone) }}
       {{ form_row(edit_form.status) }}
-      {{ form_row(edit_form.dateApproved) }}
       {{ form_row(edit_form.hasUnpaidTicket) }}
-      {{ form_row(edit_form.program) }}
+      <div style='display: none;'>
+        {{ form_row(edit_form.created) }}
+      </div>
       {{ form_row(edit_form._token) }}
-      {{ form_row(edit_form.created) }}
-      {{ form_row(edit_form.modified) }}
       
       {{ form_row(edit_form.submit, {'label': 'Update' }) }}
       
     {{ form_end(edit_form, {'render_rest': false}) }}
-
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('person') }}">
-            Back to the list
-        </a>
-    </li>
-    <li>{{ form(delete_form) }}</li>
-</ul>
+  
 {% endblock %}
 {% block javascripts %}
   {% javascripts 
