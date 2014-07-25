@@ -426,56 +426,56 @@ $entities = $reservationRepository->findAll();
     public function editAction($id)
     {
       $logger = $this->get('logger');
-        $em = $this->getDoctrine()->getManager();
-        $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation'); 
-        $entity = $reservationRepository->find($id);
+      $em = $this->getDoctrine()->getManager();
+      $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation'); 
+      $entity = $reservationRepository->find($id);
 
-        if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Reservation entity.');
-        }
+      if (!$entity) {
+          throw $this->createNotFoundException('Unable to find Reservation entity.');
+      }
 
-        // Calculations that need to be made before the Edit form is displayed.
-        $now = new \DateTime();
-        $isReservationPast = ($entity->getEnd() < $now) ? TRUE : FALSE;
-        
-        // Hold on to the original start and end dates and seatsRequired to 
-        // find out if they have changed.
-        $originalStartDate = $entity->getStart();
-        $originalEndDate = $entity->getEnd();
-        $originalSeatsRequired = $entity->getSeatsRequired();
-        $originalUntilDate = '';
-        
-        // Get the entity's vehicle to see if the admin is trying to change 
-        // it. If so, we will later save the new id in $requestedVehicle
-        $originalVehicle = $entity->getVehicle();
-        $vehicleRequested = FALSE;
-        
-        // Is this a repeating reservation? If so, get the last reservation
-        // in the series
-        $series = $entity->getSeries();
-        $isRepeating = ($series) ? True : False;
-        $logger->info("isRepeating = $isRepeating");
-        $lastReservationInSeries = NULL;
-        if ($isRepeating) {
+      // Calculations that need to be made before the Edit form is displayed.
+      $now = new \DateTime();
+      $isReservationPast = ($entity->getEnd() < $now) ? TRUE : FALSE;
 
-          $lastReservationInSeries = $reservationRepository->getLastReservationInSeries($series);
-          //$logger->info(var_dump($lastReservationInSeries));
-          // Calculate the "original" until date based on the date of last 
-          // reservation in the series at Installation's dailyClose time.
-          $originalUntilDate = $lastReservationInSeries->getEnd();
-          list($repeatHour, $repeatMinute) = explode(':', $em->getRepository('GinsbergTransportationBundle:Installation')->find(1)->getDailyClose());
-          $originalUntilDate->setTime($repeatHour, $repeatMinute);
-        }
-        
-        $editForm = $this->createEditForm($entity);
-        $deleteForm = $this->createDeleteForm($id);
+      // Hold on to the original start and end dates and seatsRequired to 
+      // find out if they have changed.
+      $originalStartDate = $entity->getStart();
+      $originalEndDate = $entity->getEnd();
+      $originalSeatsRequired = $entity->getSeatsRequired();
+      $originalUntilDate = '';
 
-        return array(
-            'entity'      => $entity,
-            'isReservationPast' => $isReservationPast,
-            'edit_form'   => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        );
+      // Get the entity's vehicle to see if the admin is trying to change 
+      // it. If so, we will later save the new id in $requestedVehicle
+      $originalVehicle = $entity->getVehicle();
+      $vehicleRequested = FALSE;
+
+      // Is this a repeating reservation? If so, get the last reservation
+      // in the series
+      $series = $entity->getSeries();
+      $isRepeating = ($series) ? True : False;
+      $logger->info("isRepeating = $isRepeating");
+      $lastReservationInSeries = NULL;
+      if ($isRepeating) {
+
+        $lastReservationInSeries = $reservationRepository->getLastReservationInSeries($series);
+        //$logger->info(var_dump($lastReservationInSeries));
+        // Calculate the "original" until date based on the date of last 
+        // reservation in the series at Installation's dailyClose time.
+        $originalUntilDate = $lastReservationInSeries->getEnd();
+        list($repeatHour, $repeatMinute) = explode(':', $em->getRepository('GinsbergTransportationBundle:Installation')->find(1)->getDailyClose());
+        $originalUntilDate->setTime($repeatHour, $repeatMinute);
+      }
+
+      $editForm = $this->createEditForm($entity);
+      $deleteForm = $this->createDeleteForm($id);
+
+      return array(
+          'entity'      => $entity,
+          'isReservationPast' => $isReservationPast,
+          'edit_form'   => $editForm->createView(),
+          'delete_form' => $deleteForm->createView(),
+      );
     }
 
     /**
@@ -893,7 +893,7 @@ $entities = $reservationRepository->findAll();
    * @Method("POST")
    * @Template()
    */
-	public function checkoutAction($id)
+	public function checkoutAction(Request $request)
 	{
     $logger = $this->get('logger');
     $logger->info('in checkoutAction');
@@ -905,36 +905,89 @@ $entities = $reservationRepository->findAll();
 
 
     if ($form->isValid()) {
-      if ($entity->getPerson()->isApproved()) {
+      $em = $this->getDoctrine()->getManager();
+      $personRepository = $em->getRepository('GinsbergTransportationBundle:Person');
+      
+      if ($personRepository->isApproved($entity->getPerson())) {
         $entity->setCheckout(new \DateTime());
       
-      
-      $em = $this->getDoctrine()->getManager();
-      $em->persist($entity);
-      $em->flush();
-      
-      
-      return $this->redirect($this->generateUrl('reservation')); 
+        $logger->info('In ReservationController::checkoutAction, person is approved');
+        $em->persist($entity);
+        $em->flush();
+
+        return $this->redirect($this->generateUrl('reservation')); 
       } else {
-        return $this->render('GinsbergTransportationBundle:Reservation:driver_not_approved.html.twig');
+        $logger->info('In ReservationController::checkoutAction, person is NOT approved');
+        
+        return $this->render('GinsbergTransportationBundle:Person:driver_not_approved.html.twig');
       }
       
     }
 	}
-
-
-	// Mark a reservation as "checked in" -- that is, a driver has returned
-	// the vehicle.
-	public function actionCheckin($id)
+  
+  /**
+   * Mark a reservation as "checked in" -- that is, the driver has returned the vehicle.
+   *
+   * @Route("/checkin", name="reservation_checkin")
+   * @Method("POST")
+   * @Template()
+   */
+	public function checkinAction(Request $request)
 	{
-	  $reservation=$this->loadModel($id);
-	  $reservation->checkin = date("Y-m-d H:i:s");
-		//var_dump($reservation->getAttributes());
+    $logger = $this->get('logger');
+    $logger->info('in checkinAction');
+    $entity = new Reservation();
+    
+    $form = $this->createCreateForm($entity);
+    $form->handleRequest($request);
+    //$logger->info('After handleRequest, dateToShow = ' . date('Y-m-d H:i:s', $form->get('dateToShow')->getData()->getTimestamp()));
 
-	  $reservation->save();
-	  Yii::log(serialize($reservation->getErrors()), "info", "system.debug");
-		$this->redirect(array('reservation/index'));
+
+    if ($form->isValid()) {
+      $entity->setCheckin(new \DateTime());
+      
+      $em->persist($entity);
+      $em->flush();
+
+      return $this->redirect($this->generateUrl('reservation')); 
+    }
 	}
+
+  /**
+   * Display form for checking out the Reservation, possibly changing the driver.
+   *
+   * @Route("/checkin", name="reservation_checkin_criteria")
+   * @Method("GET")
+   * @Template("GinsbergTransportationBundle:Reservation:reservation_checkin.html.twig")
+   */
+  public function checkinCriteriaAction($entity)
+  {
+      $form = $this->createCheckoutForm($entity);
+
+      return array(
+          'entity' => $entity,
+          'form'   => $form->createView(),
+      );
+  }
+    
+  /**
+   * Creates a form to allow checking a vehicle out and optionally changing the driver.
+   *
+   * @param Reservation $entity The entity
+   *
+   * @return \Symfony\Component\Form\Form The form
+   */
+  private function createCheckinForm(Reservation $entity)
+  {
+    $form = $this->createForm(new ReservationType(), $entity, array(
+        'action' => $this->generateUrl('reservation_checkin'),
+        'method' => 'POST',
+    ));
+
+    $form->add('submit', 'submit', array('label' => "Checkin"));
+
+    return $form;
+  }
 
 	// Mark a reservation as "noshow" -- that is, the driver never came to take
 	// possesion of the vehicle, and did not cancel the reservation.

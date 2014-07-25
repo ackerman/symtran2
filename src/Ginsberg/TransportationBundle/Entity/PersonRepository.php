@@ -109,9 +109,9 @@ class PersonRepository extends EntityRepository
     }
 	}
   
-  public function isApproved()
+  public function isApproved($person)
 	{
-    if ($this->getStatus() === 'approved') {
+    if ($person->getStatus() === 'approved') {
      return TRUE;
     } else {
       return FALSE;  

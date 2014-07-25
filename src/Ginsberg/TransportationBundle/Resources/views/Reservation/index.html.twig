@@ -22,6 +22,7 @@
                 <th>Check in</th>
                 <th>Vehicle</th>
                 <th>Driver</th>
+                <th>Driver uniqname</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -34,6 +35,9 @@
                 <td>{% if upcoming_trip.checkin %}{{ upcoming_trip.checkin|date('g:i a F j Y') }}{% endif %}</td>
                 <td><a href="{{ path('vehicle_show', { 'id': upcoming_trip.vehicle.id }) }}">{{ upcoming_trip.vehicle }}</a></td>
                 <td><a href="{{ path('person_show', { 'id': upcoming_trip.person.id }) }}">{{ upcoming_trip.person.firstName }} {{ upcoming_trip.person.lastName }}</a></td>
+                
+                <td>{{ render(controller('GinsbergTransportationBundle:Reservation:checkoutCriteria', 
+                      {'entity': upcoming_trip})) }}</td>
                 <td>
                 <ul class="actions">
                     <li>
@@ -66,7 +70,7 @@
                   <th>Check in</th>
                   <th>Vehicle</th>
                   <th>Driver</th>
-                  <th>Notes</th>
+                  <th>Check In</th>
                   <th>Actions</th>
               </tr>
           </thead>
@@ -79,7 +83,8 @@
                 <td>{% if ongoing_trip.checkin %}{{ ongoing_trip.checkin|date('g:i a F j Y') }}{% endif %}</td>
                 <td><a href="{{ path('vehicle_show', { 'id': ongoing_trip.vehicle.id }) }}">{{ ongoing_trip.vehicle }}</a></td>
                 <td><a href="{{ path('person_show', { 'id': ongoing_trip.person.id }) }}">{{ ongoing_trip.person }}</a></td>
-                <td>{{ ongoing_trip.notes }}</td>
+                <td>{{ render(controller('GinsbergTransportationBundle:Reservation:checkinCriteria', 
+                      {'entity': ongoing_trip})) }}</td>
                 <td>
                 <ul class="actions">
                     <li>
@@ -91,6 +96,9 @@
                 </ul>
                 </td>
             </tr>
+            {% if ongoing_trip.notes %}
+              <tr><td colspan="7">{{ ongoing_trip.notes }}</td></tr>
+            {% endif %}
         {% endfor %}
         </tbody>
     </table>

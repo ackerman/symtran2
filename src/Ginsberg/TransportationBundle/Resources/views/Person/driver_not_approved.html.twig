@@ -1,0 +1,12 @@
+{% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
+
+{% block body -%}
+  <div class="record_actions">
+    <span class='back button'>
+        <a href="{{ path('reservation') }}">
+            Reservations
+        </a>
+    </span>
+  </div>
+<h1>Sorry, that person is not approved to drive.</h1>
+{% endblock %}

@@ -127,7 +127,9 @@ jQuery(document).ready(function($) {
   });
   
   var startToday = moment().set('hour', 8).set('minute', 0);
-  $('#ginsberg_transportationbundle_reservation_start').val(startToday.format('YYYY-MM-DD hh:mm a'));
+  if ($('#ginsberg_transportationbundle_reservation_start').val() == '') {
+    $('#ginsberg_transportationbundle_reservation_start').val(startToday.format('YYYY-MM-DD hh:mm a'));
+  }
   $('#ginsberg_transportationbundle_reservation_start').on("change", function(event) {
     $('#ginsberg_transportationbundle_reservation_end').val($('#ginsberg_transportationbundle_reservation_start').val());
   })
