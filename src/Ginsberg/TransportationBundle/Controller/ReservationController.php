@@ -70,54 +70,54 @@ $entities = $reservationRepository->findAll();
     public function searchAction(Request $request)
     {
       $logger = $this->get('logger');
-        $logger->info('in searchAction');
-        $entity = new Reservation();
-        $form = $this->createCreateForm($entity);
-        $form->handleRequest($request);
-        //$logger->info('After handleRequest, dateToShow = ' . date('Y-m-d H:i:s', $form->get('dateToShow')->getData()->getTimestamp()));
-        
-        
-        if ($form->isValid()) {
-          $dateToShow = new \DateTime(date('Y-m-d'));
-          // If they clicked the "Today" button, show the index page from the 
-          // indexAction with ongoing trips, etc.
-          if ($form->get('today')->isClicked()) {
-            return $this->redirect($this->generateUrl('reservation'));
-          } elseif (is_object($form->get('dateToShow')->getData())) {
-            $dateToShow = $form->get('dateToShow')->getData();
-          }
-          //$logger->info('In searchAction, form is valid, dateToShow = ' . $dateToShow->format('c'));
-          
-          // We have to clone $dateToShow so $dateEnd and $dateToShow aren't 
-          // pointing at the same value. We probably don't have to worry about
-          // PHP adjusting for daylight savings here, so using $dateEnd->add()
-          // should be okay.
-          $dateEnd = clone($dateToShow);
-          $dateEnd->add(new \DateInterval('P1D'));
-          //$logger->info('After changint $dateEnd, dateToShow = ' . $dateToShow->format('c'));
-          $ongoing = array();
-          $checkinsToday = array();
-          $today = new \DateTime(date('Y-m-d'));
-          
-          $em = $this->getDoctrine()->getManager();
-          $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->findTripsForDate($dateToShow, $dateEnd);
-          
-          $logger->info('count of entities = ' . count($entities));
-          return array(
-            'upcoming' => $entities,
-            'ongoing' => $ongoing,
-            'checkinsToday' => $checkinsToday,
-            'dateToShow' => $dateToShow,
-            'date' => $today,
-            'entities' => array(),
-          );
-          //return $this->redirect($this->generateUrl('person_search'));
-        }
+      $logger->info('in searchAction');
+      $entity = new Reservation();
+      $form = $this->createCreateForm($entity);
+      $form->handleRequest($request);
+      //$logger->info('After handleRequest, dateToShow = ' . date('Y-m-d H:i:s', $form->get('dateToShow')->getData()->getTimestamp()));
 
+
+      if ($form->isValid()) {
+        $dateToShow = new \DateTime(date('Y-m-d'));
+        // If they clicked the "Today" button, show the index page from the 
+        // indexAction with ongoing trips, etc.
+        if ($form->get('today')->isClicked()) {
+          return $this->redirect($this->generateUrl('reservation'));
+        } elseif (is_object($form->get('dateToShow')->getData())) {
+          $dateToShow = $form->get('dateToShow')->getData();
+        }
+        //$logger->info('In searchAction, form is valid, dateToShow = ' . $dateToShow->format('c'));
+
+        // We have to clone $dateToShow so $dateEnd and $dateToShow aren't 
+        // pointing at the same value. We probably don't have to worry about
+        // PHP adjusting for daylight savings here, so using $dateEnd->add()
+        // should be okay.
+        $dateEnd = clone($dateToShow);
+        $dateEnd->add(new \DateInterval('P1D'));
+        //$logger->info('After changint $dateEnd, dateToShow = ' . $dateToShow->format('c'));
+        $ongoing = array();
+        $checkinsToday = array();
+        $today = new \DateTime(date('Y-m-d'));
+
+        $em = $this->getDoctrine()->getManager();
+        $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->findTripsForDate($dateToShow, $dateEnd);
+
+        $logger->info('count of entities = ' . count($entities));
         return array(
-            'entity' => $entity,
-            'form'   => $form->createView(),
+          'upcoming' => $entities,
+          'ongoing' => $ongoing,
+          'checkinsToday' => $checkinsToday,
+          'dateToShow' => $dateToShow,
+          'date' => $today,
+          'entities' => array(),
         );
+        //return $this->redirect($this->generateUrl('person_search'));
+      }
+
+      return array(
+          'entity' => $entity,
+          'form'   => $form->createView(),
+      );
     }
  
     /**
@@ -138,6 +138,7 @@ $entities = $reservationRepository->findAll();
 
         return $form;
     }
+    
     /**
      * Allows user to display reservations for a different date.
      *
@@ -846,5 +847,117 @@ $entities = $reservationRepository->findAll();
             ->getForm()
         ;
     }
+   
+  /**
+   * Display form for checking out the Reservation, possibly changing the driver.
+   *
+   * @Route("/checkout", name="reservation_checkout_criteria")
+   * @Method("GET")
+   * @Template("GinsbergTransportationBundle:Reservation:reservation_checkout.html.twig")
+   */
+  public function checkoutCriteriaAction($entity)
+  {
+      $form = $this->createCheckoutForm($entity);
+
+      return array(
+          'entity' => $entity,
+          'form'   => $form->createView(),
+      );
+  }
+    
+  /**
+   * Creates a form to allow checking a vehicle out and optionally changing the driver.
+   *
+   * @param Reservation $entity The entity
+   *
+   * @return \Symfony\Component\Form\Form The form
+   */
+  private function createCheckoutForm(Reservation $entity)
+  {
+      $form = $this->createForm(new ReservationType(), $entity, array(
+          'action' => $this->generateUrl('reservation_checkout'),
+          'method' => 'POST',
+      ));
+
+      $form->add('submit', 'submit', array('label' => "Checkout"));
+
+      return $form;
+  }
+  
+  /**
+   * Mark a reservation as "checked out" -- that is, a driver has taken 
+   * possesion of the vehicle. Also make sure the person who picks up the
+	 * vehicle is approved.
+   *
+   * @Route("/checkout", name="reservation_checkout")
+   * @Method("POST")
+   * @Template()
+   */
+	public function checkoutAction($id)
+	{
+    $logger = $this->get('logger');
+    $logger->info('in checkoutAction');
+    $entity = new Reservation();
+    
+    $form = $this->createCreateForm($entity);
+    $form->handleRequest($request);
+    //$logger->info('After handleRequest, dateToShow = ' . date('Y-m-d H:i:s', $form->get('dateToShow')->getData()->getTimestamp()));
+
+
+    if ($form->isValid()) {
+      if ($entity->getPerson()->isApproved()) {
+        $entity->setCheckout(new \DateTime());
+      
+      
+      $em = $this->getDoctrine()->getManager();
+      $em->persist($entity);
+      $em->flush();
+      
+      
+      return $this->redirect($this->generateUrl('reservation')); 
+      } else {
+        return $this->render('GinsbergTransportationBundle:Reservation:driver_not_approved.html.twig');
+      }
+      
+    }
+	}
+
+
+	// Mark a reservation as "checked in" -- that is, a driver has returned
+	// the vehicle.
+	public function actionCheckin($id)
+	{
+	  $reservation=$this->loadModel($id);
+	  $reservation->checkin = date("Y-m-d H:i:s");
+		//var_dump($reservation->getAttributes());
+
+	  $reservation->save();
+	  Yii::log(serialize($reservation->getErrors()), "info", "system.debug");
+		$this->redirect(array('reservation/index'));
+	}
+
+	// Mark a reservation as "noshow" -- that is, the driver never came to take
+	// possesion of the vehicle, and did not cancel the reservation.
+	// Upon clicking "No Show" the page will refresh and the reservation will no longer be displayed
+	public function actionNoshow($id)
+	{
+		$reservation=$this->loadModel($id);
+		// Set noshow to true.
+		$reservation->noshow = True;
+		// Make car available again
+		if (strtotime($reservation->end) > time()) {
+			if (strtotime($reservation->start) > time()) {
+				$reservation->end = $reservation->start;
+			} else {
+				$reservation->end = date("Y-m-d H:i:s");
+			}
+		}
+
+		$reservation->save();
+		if($reservation->getErrors()):
+			Yii::log(serialize($reservation->getErrors()), "info", "system.debug");
+		endif;
+		$this->redirect(array('reservation/index'));
+	}
     
 }

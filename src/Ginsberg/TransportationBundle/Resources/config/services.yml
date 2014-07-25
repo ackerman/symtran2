@@ -51,4 +51,12 @@ services:
     arguments: ["@ginsberg_installation.installation_repository", "@logger"]
     tags:
       - { name: validator.constraint_validator, alias: blackout }
+  ginsberg_checkout.form.checkout:
+    factory_method: checkout
+    factory_service: form.factory
+    class: Symfony\Component\Form\Form
+    arguments:
+      - reservation_checkout  # name of the form
+      - checkout              # alias of the form type
+      - reservation           # data to bind
   

@@ -1,0 +1,23 @@
+<div id="reservation_checkout">
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate' }}) }}
+      {{ form_errors(form) }}
+      {{ form_row(form.uniqname) }}
+      {{ form_row(form._token) }}
+      <div style='display: none;'>
+        {{ form_row(form.start) }}
+        {{ form_row(form.end) }}
+        {{ form_row(form.vehicle) }}
+        {{ form_row(form.seatsRequired) }}
+        {{ form_row(form.person) }}
+        {{ form_row(form.program) }}
+        {{ form_row(form.destination) }}
+        {{ form_row(form.destinationText) }}
+        {{ form_row(form.created) }}
+      </div>
+      {{ form_row(form._token) }}
+      
+      {{ form_row(form.submit, {'label': 'Checkout' }) }}
+      
+    {{ form_end(form, {'render_rest': false}) }}
+
+</div>

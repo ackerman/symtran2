@@ -66,7 +66,7 @@ class PersonRepository extends EntityRepository
    * @param type $ptsStatus
    * @return string
    */
-  public static function convertPtsStatusToGcStatus($ptsStatus) {
+  public function convertPtsStatusToGcStatus($ptsStatus) {
 		if ($ptsStatus == "Submitted" || $ptsStatus == "Waiting for Documentation") {
 			$gcStatus = 'pending';
 		} elseif ($ptsStatus == "Approved") {
@@ -106,6 +106,15 @@ class PersonRepository extends EntityRepository
     } else 
     {
       return False;
+    }
+	}
+  
+  public function isApproved()
+	{
+    if ($this->getStatus() === 'approved') {
+     return TRUE;
+    } else {
+      return FALSE;  
     }
 	}
   
