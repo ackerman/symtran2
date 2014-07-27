@@ -9,9 +9,10 @@
     <h1>Reservations <span class="button"><a href="{{ path('reservation_new') }}">
             Add
         </a></span></h1>
-    <h2>Reservations for {% if day == "Today" %}{{ day }}{%else %}{{ day|date('Y-m-d') }}{% endif %}</h2>
     
     {{ render(controller('GinsbergTransportationBundle:Reservation:searchCriteria')) }}
+   
+    <h2>Reservations for {% if day == "Today" %}{{ day }}{%else %}{{ day|date('Y-m-d') }}{% endif %}</h2>
     
     <table class="records_list">
         <thead>
@@ -37,7 +38,7 @@
                 <td><a href="{{ path('person_show', { 'id': upcoming_trip.person.id }) }}">{{ upcoming_trip.person.firstName }} {{ upcoming_trip.person.lastName }}</a></td>
                 
                 <td>{{ render(controller('GinsbergTransportationBundle:Reservation:checkoutCriteria', 
-                      {'entity': upcoming_trip})) }}</td>
+                      {'id': upcoming_trip.id})) }}</td>
                 <td>
                 <ul class="actions">
                     <li>
@@ -83,9 +84,9 @@
                 <td>{% if ongoing_trip.checkin %}{{ ongoing_trip.checkin|date('g:i a F j Y') }}{% endif %}</td>
                 <td><a href="{{ path('vehicle_show', { 'id': ongoing_trip.vehicle.id }) }}">{{ ongoing_trip.vehicle }}</a></td>
                 <td><a href="{{ path('person_show', { 'id': ongoing_trip.person.id }) }}">{{ ongoing_trip.person }}</a></td>
+                
                 <td>{{ render(controller('GinsbergTransportationBundle:Reservation:checkinCriteria', 
-                      {'entity': ongoing_trip})) }}</td>
-                <td>
+                      {'id': ongoing_trip.id})) }}</td>
                 <ul class="actions">
                     <li>
                         <a href="{{ path('reservation_show', { 'id': ongoing_trip.id }) }}">show</a>
@@ -129,8 +130,8 @@
                 <td>{% if checkedInTrip.end %}{{ checkedInTrip.end|date('g:i a F j Y') }}{% endif %}</td>
                 <td>{% if checkedInTrip.checkout %}{{ checkedInTrip.checkout|date('g:i a F j Y') }}{% endif %}</td>
                 <td>{% if checkedInTrip.checkin %}{{ checkedInTrip.checkin|date('g:i a F j Y') }}{% endif %}</td>
-                <td><a href="{{ path('vehicle_show', { 'id': checkedInTrip.vehicle.id }) }}">{{ checkedInTrip.vehicle }}</a></td>
-                <td><a href="{{ path('person_show', { 'id': checkedInTrip.person.id }) }}">{{ checkedInTrip.person }}</a></td>
+                <td>{{ checkedInTrip.vehicle }}</td>
+                <td>{{ checkedInTrip.person }}</td>
                 <td>{{ checkedInTrip.notes }}</td>
                 <td>
                 <ul class="actions">

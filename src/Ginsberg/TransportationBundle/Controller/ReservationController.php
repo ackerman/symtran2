@@ -72,12 +72,14 @@ $entities = $reservationRepository->findAll();
       $logger = $this->get('logger');
       $logger->info('in searchAction');
       $entity = new Reservation();
-      $form = $this->createCreateForm($entity);
+      $form = $this->createSearchForm($entity);
       $form->handleRequest($request);
-      //$logger->info('After handleRequest, dateToShow = ' . date('Y-m-d H:i:s', $form->get('dateToShow')->getData()->getTimestamp()));
+      
+      //$logger->info(var_dump($form));
 
-
-      if ($form->isValid()) {
+      // The form won't be valid, because it is populated with a blank Reservation
+      // entity. Go ahead and show the search results anyway.
+      
         $dateToShow = new \DateTime(date('Y-m-d'));
         // If they clicked the "Today" button, show the index page from the 
         // indexAction with ongoing trips, etc.
@@ -112,12 +114,7 @@ $entities = $reservationRepository->findAll();
           'entities' => array(),
         );
         //return $this->redirect($this->generateUrl('person_search'));
-      }
-
-      return array(
-          'entity' => $entity,
-          'form'   => $form->createView(),
-      );
+     
     }
  
     /**
@@ -855,8 +852,14 @@ $entities = $reservationRepository->findAll();
    * @Method("GET")
    * @Template("GinsbergTransportationBundle:Reservation:reservation_checkout.html.twig")
    */
-  public function checkoutCriteriaAction($entity)
+  public function checkoutCriteriaAction($id)
   {
+      $em = $this->getDoctrine()->getManager();
+      $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
+      
+      if (!$entity) {
+          throw $this->createNotFoundException('Unable to find Reservation ' . $id);
+      }
       $form = $this->createCheckoutForm($entity);
 
       return array(
@@ -875,7 +878,7 @@ $entities = $reservationRepository->findAll();
   private function createCheckoutForm(Reservation $entity)
   {
       $form = $this->createForm(new ReservationType(), $entity, array(
-          'action' => $this->generateUrl('reservation_checkout'),
+          'action' => $this->generateUrl('reservation_checkout', array('id' => $entity->getId())),
           'method' => 'POST',
       ));
 
@@ -889,15 +892,18 @@ $entities = $reservationRepository->findAll();
    * possesion of the vehicle. Also make sure the person who picks up the
 	 * vehicle is approved.
    *
-   * @Route("/checkout", name="reservation_checkout")
+   * @Route("/checkout/{id}", name="reservation_checkout")
    * @Method("POST")
    * @Template()
    */
-	public function checkoutAction(Request $request)
-	{
+    public function checkoutAction(Request $request, $id)
+    {
     $logger = $this->get('logger');
-    $logger->info('in checkoutAction');
-    $entity = new Reservation();
+    $logger->info('in checkoutAction. $id = ' . $id);
+    
+    $em = $this->getDoctrine()->getManager(); 
+    $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
+      
     
     $form = $this->createCreateForm($entity);
     $form->handleRequest($request);
@@ -905,7 +911,6 @@ $entities = $reservationRepository->findAll();
 
 
     if ($form->isValid()) {
-      $em = $this->getDoctrine()->getManager();
       $personRepository = $em->getRepository('GinsbergTransportationBundle:Person');
       
       if ($personRepository->isApproved($entity->getPerson())) {
@@ -928,41 +933,48 @@ $entities = $reservationRepository->findAll();
   /**
    * Mark a reservation as "checked in" -- that is, the driver has returned the vehicle.
    *
-   * @Route("/checkin", name="reservation_checkin")
+   * @Route("/checkin/{id}", name="reservation_checkin")
    * @Method("POST")
    * @Template()
    */
-	public function checkinAction(Request $request)
-	{
-    $logger = $this->get('logger');
-    $logger->info('in checkinAction');
-    $entity = new Reservation();
-    
-    $form = $this->createCreateForm($entity);
-    $form->handleRequest($request);
-    //$logger->info('After handleRequest, dateToShow = ' . date('Y-m-d H:i:s', $form->get('dateToShow')->getData()->getTimestamp()));
+    public function checkinAction(Request $request, $id)
+    {
+      $logger = $this->get('logger');
+      $logger->info('in checkinAction');
+      $em = $this->getDoctrine()->getManager(); 
+      $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
+
+      $form = $this->createCreateForm($entity);
+      $form->handleRequest($request);
+      //$logger->info('After handleRequest, dateToShow = ' . date('Y-m-d H:i:s', $form->get('dateToShow')->getData()->getTimestamp()));
 
 
-    if ($form->isValid()) {
-      $entity->setCheckin(new \DateTime());
-      
-      $em->persist($entity);
-      $em->flush();
+      if ($form->isValid()) {
+        $entity->setCheckin(new \DateTime());
 
-      return $this->redirect($this->generateUrl('reservation')); 
+        $em->persist($entity);
+        $em->flush();
+
+        return $this->redirect($this->generateUrl('reservation')); 
+      }
     }
-	}
 
   /**
-   * Display form for checking out the Reservation, possibly changing the driver.
+   * Display form for checking in the Reservation
    *
    * @Route("/checkin", name="reservation_checkin_criteria")
    * @Method("GET")
    * @Template("GinsbergTransportationBundle:Reservation:reservation_checkin.html.twig")
    */
-  public function checkinCriteriaAction($entity)
+  public function checkinCriteriaAction($id)
   {
-      $form = $this->createCheckoutForm($entity);
+    $em = $this->getDoctrine()->getManager();
+      $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
+      
+      if (!$entity) {
+          throw $this->createNotFoundException('Unable to find Reservation ' . $id);
+      }
+      $form = $this->createCheckinForm($entity);
 
       return array(
           'entity' => $entity,
@@ -980,13 +992,13 @@ $entities = $reservationRepository->findAll();
   private function createCheckinForm(Reservation $entity)
   {
     $form = $this->createForm(new ReservationType(), $entity, array(
-        'action' => $this->generateUrl('reservation_checkin'),
-        'method' => 'POST',
-    ));
+          'action' => $this->generateUrl('reservation_checkin', array('id' => $entity->getId())),
+          'method' => 'POST',
+      ));
 
-    $form->add('submit', 'submit', array('label' => "Checkin"));
+      $form->add('submit', 'submit', array('label' => "Checkin"));
 
-    return $form;
+      return $form;
   }
 
 	// Mark a reservation as "noshow" -- that is, the driver never came to take
