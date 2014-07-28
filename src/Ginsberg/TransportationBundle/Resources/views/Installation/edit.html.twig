@@ -1,6 +1,14 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
+<div class="record_actions">
+    <span class='back button'>
+        <a href="{{ path('installation') }}">
+            Installations
+        </a>
+    </span>
+    <span>{{ form(delete_form) }}</span>
+  </div>
     <h1>Installation Configuration</h1>
 
     {{ form(edit_form) }}
