@@ -203,7 +203,7 @@ class PersonController extends Controller
     }
 
     /**
-     * Finds and displays a Person entity.
+     * Finds and displays a Person entity, including lists of future and past reservations.
      *
      * @Route("/{id}", name="person_show")
      * @Method("GET")
@@ -212,9 +212,13 @@ class PersonController extends Controller
     public function showAction($id)
     {
         $em = $this->getDoctrine()->getManager();
-
+        
+        $now = new \DateTime();
         $entity = $em->getRepository('GinsbergTransportationBundle:Person')->find($id);
-
+        $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
+        $upcoming = $reservationRepository->findUpcomingTripsByPerson($now, $entity);
+        $past = $reservationRepository->findPastTripsByPerson($entity);
+      
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Person entity.');
         }
@@ -223,6 +227,8 @@ class PersonController extends Controller
 
         return array(
             'entity'      => $entity,
+            'upcoming_trips' => $upcoming,
+            'past_trips' => $past,
             'delete_form' => $deleteForm->createView(),
         );
     }

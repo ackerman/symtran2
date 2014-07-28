@@ -19,7 +19,7 @@ class VehicleType extends AbstractType
             ->add('type')
             ->add('capacity')
             ->add('notes')
-            ->add('is_active')
+            ->add('isActive')
             ->add('program', NULL, array('empty_value' => 'Select a Program'))
         ;
     }

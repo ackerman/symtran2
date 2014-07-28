@@ -3,14 +3,10 @@
 {% block body -%}
   <div class="record_actions">
     <span class='back button'>
-        <a href="{{ path('program') }}">
-            Programs
+        <a href="{{ path('reservation') }}">
+            Reservations
         </a>
     </span>
-    <span>{{ form(delete_form) }}</span>
   </div>
-    <h1>Update {{ edit_form.name.vars.value }}</h1>
-
-    {{ form(edit_form) }}
-
+<h1>Sorry, that person is not approved to drive.</h1>
 {% endblock %}

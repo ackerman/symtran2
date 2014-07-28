@@ -1,40 +1,28 @@
 {% extends 'GinsbergTransportationBundle::public_layout.html.twig' %}
 {% block body %}
   
-  <h2>Past Reservations</h2>
-    <table class="records_list">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Start</th>
-                <th>End</th>
-                <th>Checkout</th>
-                <th>Checkin</th>
-                <th>Vehicle</th>
-                <th>Seats required</th>
-                <th>Person</th>
-                <th>Program</th>
-                <th>Destination</th>
-                <th>Destination text</th>
-                <th>Series</th>
-            </tr>
-        </thead>
-        
-    {% for past_trip in pastTripsForPerson %}
+<h2>Past Reservations</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Start</th>
+      <th>End</th>
+      <th>Destination</th>
+      <th>View</th>
+    </tr>
+  </thead>
+  <tbody>
+      
+   {% for past_trip in pastTripsForPerson %}
       <tr>
-        <td><a href="{{ path('site_show', { 'id': past_trip.id }) }}">{{ past_trip.id }}</a></td>
           <td>{% if past_trip.start %}{{ past_trip.start|date('Y-m-d H:i:s') }}{% endif %}</td>
           <td>{% if past_trip.end %}{{ past_trip.end|date('Y-m-d H:i:s') }}{% endif %}</td>
-          <td>{% if past_trip.checkout %}{{ past_trip.checkout|date('Y-m-d H:i:s') }}{% endif %}</td>
-          <td>{% if past_trip.checkin %}{{ past_trip.checkin|date('Y-m-d H:i:s') }}{% endif %}</td>
-          <td>{{ past_trip.vehicle }}</td>
-          <td>{{ past_trip.seatsRequired }}</td>
-          <td>{{ past_trip.person }}</td>
-          <td>{{ past_trip.program }}</td>
-          <td>{{ past_trip.destination }}</td>
-          <td>{{ past_trip.destinationText }}</td>
-          <td>{{ past_trip.series }}</td>
+          <td>{% if entity.destination %}{{ entity.destination }}{% else %}{{ entity.destinationText }}{% endif %}</td>
+          <td><a href="{{ path('site_show', { 'id': past_trip.id }) }}" data-role="button" data-icon="arrow-r" data-iconpos="notext">{{ past_trip.id }}</a></td>
       </tr>
-    {% endfor %}
-    </table>
+   {% endfor %}
+  </tbody>
+</table>  
+
 {% endblock %}

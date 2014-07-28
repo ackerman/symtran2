@@ -7,7 +7,27 @@
     {{ form_start(form, {'att': {'novalidate': 'novalidate'}}) }}
       {{ form_errors(form) }}
       {{ form_row(form.isRepeating) }}
-      {{ form_row(form.repeatsUntil) }}
+    <div id="repeatsUntil" class="site-form-row">
+      {{ form_label(form.repeatsUntil) }}
+        <div class="errorMessage">
+      {{ form_errors(form.repeatsUntil) }}
+        </div>
+      {{ form_widget(form.repeatsUntil) }}
+    </div>
+    <div id="start" class="site-form-row">
+      {{ form_label(form.start) }}
+        <div class="errorMessage">
+      {{ form_errors(form.start) }}
+        </div>
+      {{ form_widget(form.start) }}
+    </div>
+    <div id="end" class="site-form-row">
+      {{ form_label(form.end) }}
+        <div class="errorMessage">
+      {{ form_errors(form.end) }}
+        </div>
+      {{ form_widget(form.end) }}
+    </div>
       {{ form_row(form.start) }}
       {{ form_row(form.end) }}
       {{ form_row(form.seatsRequired) }}

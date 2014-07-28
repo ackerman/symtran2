@@ -66,7 +66,7 @@ class PersonRepository extends EntityRepository
    * @param type $ptsStatus
    * @return string
    */
-  public static function convertPtsStatusToGcStatus($ptsStatus) {
+  public function convertPtsStatusToGcStatus($ptsStatus) {
 		if ($ptsStatus == "Submitted" || $ptsStatus == "Waiting for Documentation") {
 			$gcStatus = 'pending';
 		} elseif ($ptsStatus == "Approved") {
@@ -97,15 +97,24 @@ class PersonRepository extends EntityRepository
    * @param type $uniqname
    * @return string|boolean 
    */
-  public static function getFullNameByUniqname($uniqname)
+  public function getFullNameByUniqname($uniqname)
 	{
-    $person = Person::findByUniqname($uniqname);
+    $person = $this->findByUniqname($uniqname);
     if ($person)
     {
       return $person->first_name . ' ' . $person->last_name;
     } else 
     {
       return False;
+    }
+	}
+  
+  public function isApproved($person)
+	{
+    if ($person->getStatus() === 'approved') {
+     return TRUE;
+    } else {
+      return FALSE;  
     }
 	}
   

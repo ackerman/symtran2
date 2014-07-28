@@ -11,6 +11,10 @@ body * {
 }
 
 /* Basic Page Formatting ================================================== */
+.ui-controlgroup-horizontal {
+    padding-left: 18px;
+    padding-bottom: 0;
+}
 a { color:#67a0b8;}
 
 h2, h3 { font-weight:normal; }
@@ -102,6 +106,9 @@ th {
      -moz-box-shadow:0 0 20px rgba(97, 12, 13, 0.1) inset;
           box-shadow:0 0 20px rgba(97, 12, 13, 0.1) inset;
 
+}
+.errorMessage ul {
+    list-style: none;
 }
 
 .hasDatepicker {

@@ -29,7 +29,7 @@ class VehicleController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('GinsbergTransportationBundle:Vehicle')->findAll();
+        $entities = $em->getRepository('GinsbergTransportationBundle:Vehicle')->findAllSorted();
 
         return array(
             'entities' => $entities,

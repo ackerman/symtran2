@@ -1,7 +1,16 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
-    <h1>Update reservation {{ entity.id }}</h1>
+    <div class="record_actions">
+    <span class='back button'>
+        <a href="{{ path('reservation') }}">
+            Back
+        </a>
+    </span>
+    <span class='delete button'>{{ form(delete_form) }}</span>
+</div>
+
+<h1>Update reservation {{ entity.id }}</h1>
     
     {% if isReservationPast == true %}
       <p><span style="font-weight: bold; color: #FF0000;">Warning: This reservation occurred in the past. Do you really want to edit it?</span><br />
@@ -34,25 +43,20 @@
       {{ form_row(edit_form.seatsRequired) }}
       {{ form_row(edit_form.person) }}
       {{ form_row(edit_form.program) }}
+      {{ form_row(edit_form.destination) }}
       {{ form_row(edit_form.destinationText) }}
       {{ form_row(edit_form.notes) }}
       {{ form_row(edit_form.isNoShow) }}
+        <div style='display:none;'>
+        {{ form_row(edit_form.created) }}
+        {{ form_row(edit_form.modified) }}
+      </div>
       {{ form_row(edit_form._token) }}
-      {{ form_row(edit_form.created) }}
-      {{ form_row(edit_form.modified) }}
       
       {{ form_row(edit_form.submit, {'label': 'Update' }) }}
       
     {{ form_end(edit_form, {'render_rest': false}) }}
 
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('reservation') }}">
-            Back to the list
-        </a>
-    </li>
-    <li>{{ form(delete_form) }}</li>
-</ul>
 {% endblock %}
 {% block javascripts %}
   {% javascripts 

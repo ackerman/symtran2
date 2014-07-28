@@ -414,6 +414,6 @@ class Person
     }
     
     public function __toString() {
-      return $this->uniqname;
+      return $this->getUniqname();
     }
 }

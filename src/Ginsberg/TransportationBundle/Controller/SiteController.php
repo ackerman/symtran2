@@ -140,45 +140,57 @@ class SiteController extends Controller
 					break;
 				case 500: // contacted PTS, but status retrieval failed
 					$done = true;
-					$this->render('problem', array('name' => $provider->get_first_name(),));
-					//$this->redirect(array('site/problem/'));
+					return $this->render('GinsbergTransportationBundle:Site:problem.html.twig', array(
+            'name' => $provider->get_first_name(),
+          ));
 					break;
 				case 405: // Ginsberg not delegate
 					$done = true;
-					$this->render('ginsberg_not_delegate', array('name' => $provider->get_first_name(),));
-					//$this->redirect(array('site/ginsberg_not_delegate/'));
+					return $this->render('GinsbergTransportationBundle:Site:ginsberg_not_delegate.html.twig', array(
+            'name' => $provider->get_first_name(),
+          ));
 					break;
 				case 404: // Student not in MVR database
 					$done = true;
-					$this->render('not_in_mvr', array('name' => $provider->get_first_name(),));
+					return $this->render('GinsbergTransportationBundle:Site:not_in_mvr.html.twig', array(
+            'name' => $provider->get_first_name(),
+          ));
 					break;
 				case 401: // Unauthorized
 					$done = true;
-					$this->render('problem', array('name' => $provider->get_first_name(),));
-					//$this->redirect(array('site/problem/'));
+					return $this->render('GinsbergTransportationBundle:Site:problem.html.twig', array(
+            'name' => $provider->get_first_name(),
+          ));
 					break;
 				case 400: // Bad request, such as no uniqname
 					$done = true;
-					$this->render('problem', array('name' => $provider->get_first_name(),));
-					//$this->redirect(array('site/problem/'));
-					break;
+					return $this->render('GinsbergTransportationBundle:Site:problem.html.twig', array(
+            'name' => $provider->get_first_name(),
+          ));
+          break;
 			}
 
 			// If we got a 200 code, continue processing. Otherwise, we're done.
 			if (!$done) {
-        $person = $em->getRepository('GinsbergTransportationBundle:Person')->findByUniqname($uniqname);
-				if (is_array($person)) {
-          $person = $person[0];
+        $personRepository = $em->getRepository('GinsbergTransportationBundle:Person');
+				$person = $personRepository->findByUniqname($uniqname);
+        if (is_array($person)) {
+          if (count($person) == 1) {
+            $person = $person[0];
+          }
         }
 				// If the person already set their program manually, don't change it.
 				// Otherwise, set it based on the eligibility group they are in.
         // We know the person has a program set if isTermsAgreed is true, since
         // they had to set a program on the registration form.
-				$program = $em->getRepository('GinsbergTransportationBundle:Program')->findByEligibilityGroup($ldapGroup);
-				if (is_array($program)) {
-          $program = $program[0];
+				$programRepository = $em->getRepository('GinsbergTransportationBundle:Program');
+				$program = $programRepository->findByEligibilityGroup($ldapGroup);
+        if (is_array($program)) {
+          if (count($program) == 1) {
+            $program = $program[0];
+          }
         }
-        $logger->info('User\'s program = ' . $program->getName());
+        //$logger->info('User\'s program = ' . $program->getName() . 'mvr_status: ' . $pts_json->mvr_status);
 				if ($person && $program && !$person->getIsTermsAgreed()) {
 					$person->setProgram($program);
 				}
@@ -206,8 +218,9 @@ class SiteController extends Controller
 						} else {
 							// user approved by PTS but not yet in Ginsberg database
 							$logger->info('actionIndex: user approved by PTS but not yet in Ginsberg database');
-							return $this->redirect('GinsbergTransportationBundle:Site:register');
-							break;
+							
+              return $this->redirect($this->generateUrl('site_start_registration'));
+								break;
 						}
 					case 'Submitted':
 						if ($person) {
@@ -215,19 +228,42 @@ class SiteController extends Controller
 							// Set status to pending and then route to waiting
 							$person->set_status('pending');
 
-							$this->render('waiting_for_pts', array('name' => $person->first_name));
+							return $this->render('GinsbergTransportationBundle:Site:waiting_for_pts.html.twig', array(
+                'name' => $provider->get_first_name(),
+              ));
 							break;
 						} else {
-							$this->redirect(array('site/register'));
+							return $this->redirect($this->generateUrl('site_start_registration'));
+							
 							break;
 						}
 					case 'Not Approved':
 						$logger->info('In actionIndex, pts_status = "Not Approved"');
 						if ($person) {
-							$person->set_status('rejected');
-							$this->render('rejected', array('name' => $person->first_name));
+							$person->setStatus('rejected');
+							return $this->render('GinsbergTransportationBundle:Site:rejected.html.twig', array(
+                'name' => $provider->get_first_name(),
+              ));
 						} else {
-							$this->render('rejected', array('name' => User::get_first_name(),));
+							return $this->render('GinsbergTransportationBundle:Site:rejected.html.twig', array(
+                'name' => $provider->get_first_name(),
+              ));
+						}
+          case 'Expired':
+            if ($person) {
+							$logger->info('In actionIndex, pts_status = ' . $pts_json->mvr_status);
+							// Set status to pending and then route to waiting
+							$person->set_status('expired');
+
+							return $this->render('GinsbergTransportationBundle:Site:expired.html.twig', array(
+                'name' => $provider->get_first_name(),
+              ));
+							break;
+						} else {
+							return $this->render('GinsbergTransportationBundle:Site:expired.html.twig', array(
+                'name' => $provider->get_first_name(),
+              ));
+              break;
 						}
 				}
 
@@ -309,26 +345,40 @@ class SiteController extends Controller
 
     // Check whether user is already in database
     //$user_status = Person::get_status_by_uniqname(User::get_uniqname());
-    $person = $em->getRepository('GinsbergTransportationBundle:Person')->findByUniqname($uniqname);
+    $personRepository = $em->getRepository('GinsbergTransportationBundle:Person');
+    $person = $personRepository->findByUniqname($uniqname);
     if (is_array($person)) {
-      $person = $person[0];
+      if (count($person) == 1) {
+        $person = $person[0];
+      }
     }
     if ($person) {
-      $personService = $this->get('person_service');
-      $person->setStatus($personService->convert_pts_status_to_gc_status($mvr_status));
+      $status = $personRepository->convertPtsStatusToGcStatus($mvr_status);
+      $status = trim($status);
+      $person->setStatus($status);
+      if ($status == 'approved') {
+        $person->setDateApproved(new \DateTime());
+      }
       if ($program && !$person->getProgram()) {
         $person->setProgram($program);
       }
       $logger->info('In registerAction, person->status = ' . $person->getStatus());
     } else {
       $logger->info('No person, so creating new');
-      $person = new Person('register');
-      $person->setFirstName(User::get_first_name());
-      $person->setLastName(User::get_last_name());
+      $person = new Person();
+      $person->setFirstName($provider->get_first_name());
+      $person->setLastName($provider->get_last_name());
+      $person->setUniqname($uniqname);
       if ($program) {
         $person->setProgram($program);
       }
-      $person->getStatus(Person::convert_pts_status_to_gc_status($mvr_status));
+      $status = $personRepository->convertPtsStatusToGcStatus($mvr_status);
+      $status = trim($status);
+      $person->setStatus($status);
+      $logger->info('In SiteController::initiateRegistrationAction(). $status: ' . $status);
+      if ($status == 'approved') {
+        $person->setDateApproved(new \DateTime());
+      }
       if ($mvr_status == 'Not Approved') {
         $this->redirect(array('site/rejected'));
       }
@@ -340,8 +390,8 @@ class SiteController extends Controller
     $registerForm = $this->createRegisterForm($person);
 
     return array(
-        'entity'      => $person,
-        'register_form'   => $registerForm->createView(),
+        'entity' => $person,
+        'register_form' => $registerForm->createView(),
     );
     
   }
@@ -407,7 +457,9 @@ class SiteController extends Controller
     
       } else {
         $logger->info('Somehow got here');
-        $this->render('terms', array('name' => $entity->first_name, 'entity' => $entity));
+        return $this->render('GinsbergTransportationBundle:Site:problem.html.twig', array(
+          'name' => $provider->get_first_name(),
+        ));
       }
       
     }
@@ -425,10 +477,16 @@ class SiteController extends Controller
 	public function actionPending()
 	{
 	  // Make sure the user is actually in pending status
+    $em = $this->getDoctrine()->getManager();
+    $personRepository = $em->getRepository('GinsbergTransportationBundle:Person');
+    $person = $personRepository->find($id);
+    
 	  $user_status = Person::get_status_by_uniqname(User::get_uniqname());
-	  if ($user_status != 'pending'):
-	    $this->redirect(array('/'));
-  	endif;
+	  if ($user_status != 'pending') {
+	    return $this->render('GinsbergTransportationBundle:Site:problem.html.twig', array(
+        'name' => $provider->get_first_name(),
+      ));
+    }
 
 		$this->render('pending',array(
 		  'name'=>User::get_first_name(),

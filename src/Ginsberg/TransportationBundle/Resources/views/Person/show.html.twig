@@ -1,35 +1,26 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
-    <h1>Person</h1>
-    <ul class="record_actions">
-      <li>
+    <div class="record_actions">
+      <span class='back button'>
           <a href="{{ path('person') }}">
-              Back to the list
+              All people
           </a>
-      </li>
-      <li>
+      </span>
+      <span class='edit button'>
           <a href="{{ path('person_edit', { 'id': entity.id }) }}">
               Edit
           </a>
-      </li>
-      <li>{{ form(delete_form) }}</li>
-    </ul>
-
+      </span>
+      <span class='delete button'>{{ form(delete_form) }}</span>
+    </div>
+    
+    <h1>{{ entity.firstName }} {{ entity.lastName }} <span id='approval'  
+                                                             {% if entity.status == 'pending' %} class='pending' {%  endif %}>{{ entity.status }}</span>
+    </h1>
+    
     <table class="record_properties">
         <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ entity.id }}</td>
-            </tr>
-            <tr>
-                <th>First Name</th>
-                <td>{{ entity.firstName }}</td>
-            </tr>
-            <tr>
-                <th>Last Name</th>
-                <td>{{ entity.lastName }}</td>
-            </tr>
             <tr>
                 <th>Uniqname</th>
                 <td>{{ entity.uniqname }}</td>
@@ -37,6 +28,10 @@
             <tr>
                 <th>Program</th>
                 <td><a href="{{ path('program_show', { 'id': entity.program.id }) }}">{{ entity.program }}</a></td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td><a href='mailto:{{ entity.uniqname }}@umich.edu'>{{ entity.uniqname }}@umich.edu</a></td>
             </tr>
             <tr>
                 <th>Phone</th>
@@ -48,24 +43,83 @@
             </tr>
             <tr>
                 <th>Date approved</th>
-                <td>{{ entity.dateApproved is empty ? "" : entity.dateApproved|date('Y-m-d H:i:s') }}</td>
-            </tr>
-            <tr>
-                <th>Terms agreed</th>
-                <td>{{ entity.isTermsAgreed }}</td>
+                <td>{{ entity.dateApproved is empty ? "" : entity.dateApproved|date('g:i a F j Y') }}</td>
             </tr>
             <tr>
                 <th>Has ticket</th>
-                <td>{{ entity.hasUnpaidTicket }}</td>
+                <td>{% if entity.hasUnpaidTicket %}Yes{% else %}No{% endif %}</td>
             </tr>
             <tr>
                 <th>Created</th>
-                <td>{{ entity.created|date('Y-m-d H:i:s') }}</td>
+                <td>{{ entity.created|date('g:i a F j Y') }}</td>
             </tr>
+        </tbody>
+    </table>
+            <h2>Upcoming Reservations</h2>
+   <table class="records_list">
+        <thead>
             <tr>
-                <th>Modified</th>
-                <td>{{ entity.modified|date('Y-m-d H:i:s') }}</td>
+                <th>Start</th>
+                <th>End</th>
+                <th>Vehicle assigned</th>
+                <th>Actions</th>
             </tr>
+        </thead>
+        <tbody>
+        {% for upcoming_trip in upcoming_trips %}
+            <tr>
+                <td>{% if upcoming_trip.start %}{{ upcoming_trip.start|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if upcoming_trip.end %}{{ upcoming_trip.end|date('g:i a F j Y') }}{% endif %}</td>
+                <td><a href="{{ path('vehicle_show', { 'id': upcoming_trip.vehicle.id }) }}">{{ upcoming_trip.vehicle }}</a></td>
+                <td>
+                <ul class="actions">
+                    <li>
+                        <a href="{{ path('reservation_show', { 'id': upcoming_trip.id }) }}">show</a>
+                    </li>
+                    <li>
+                        <a href="{{ path('reservation_edit', { 'id': upcoming_trip.id }) }}">edit</a>
+                    </li>
+                </ul>
+                </td>
+            </tr>
+            {% if upcoming_trip.notes %}
+              <tr><td colspan="4">{{ upcoming_trip.notes }}</td></tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+        
+        <h2>Past Reservations</h2>
+   <table class="records_list">
+        <thead>
+            <tr>
+                <th>Start</th>
+                <th>End</th>
+                <th>Vehicle assigned</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for past_trip in past_trips %}
+            <tr>
+                <td>{% if past_trip.start %}{{ past_trip.start|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if past_trip.end %}{{ past_trip.end|date('g:i a F j Y') }}{% endif %}</td>
+                <td><a href="{{ path('vehicle_show', { 'id': past_trip.vehicle.id }) }}">{{ past_trip.vehicle }}</a></td>
+                <td>
+                <ul class="actions">
+                    <li>
+                        <a href="{{ path('reservation_show', { 'id': past_trip.id }) }}">show</a>
+                    </li>
+                    <li>
+                        <a href="{{ path('reservation_edit', { 'id': past_trip.id }) }}">edit</a>
+                    </li>
+                </ul>
+                </td>
+            </tr>
+            {% if past_trip.notes %}
+              <tr><td colspan="4">{{ past_trip.notes }}</td></tr>
+            {% endif %}
+        {% endfor %}
         </tbody>
     </table>
 {% endblock %}

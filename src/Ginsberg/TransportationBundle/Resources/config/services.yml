@@ -51,4 +51,3 @@ services:
     arguments: ["@ginsberg_installation.installation_repository", "@logger"]
     tags:
       - { name: validator.constraint_validator, alias: blackout }
-  

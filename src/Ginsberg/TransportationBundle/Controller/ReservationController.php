@@ -43,11 +43,12 @@ class ReservationController extends Controller
       // Find today's upcoming trips.
       // Looks for trips where the reservation has an assigned vehicle
       // and the vehicle has not been checked out yet.
-      $upcoming = $em->getRepository('GinsbergTransportationBundle:Reservation')->findUpcomingTrips($date, $dateEnd);
-      $ongoing = $em->getRepository('GinsbergTransportationBundle:Reservation')->findOngoingTrips($now);
-      $checkinsToday = $em->getRepository('GinsbergTransportationBundle:Reservation')->findCheckinsToday($now);
+      $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
+      $upcoming = $reservationRepository->findUpcomingTrips($date, $dateEnd);
+      $ongoing = $reservationRepository->findOngoingTrips($now);
+      $checkinsToday = $reservationRepository->findCheckinsToday($now);
       
-$entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->findAll();
+$entities = $reservationRepository->findAll();
 
       return array(
         'upcoming' => $upcoming,
@@ -69,54 +70,51 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
     public function searchAction(Request $request)
     {
       $logger = $this->get('logger');
-        $logger->info('in searchAction');
-        $entity = new Reservation();
-        $form = $this->createCreateForm($entity);
-        $form->handleRequest($request);
-        //$logger->info('After handleRequest, dateToShow = ' . date('Y-m-d H:i:s', $form->get('dateToShow')->getData()->getTimestamp()));
-        
-        
-        if ($form->isValid()) {
-          $dateToShow = new \DateTime(date('Y-m-d'));
-          // If they clicked the "Today" button, show the index page from the 
-          // indexAction with ongoing trips, etc.
-          if ($form->get('today')->isClicked()) {
-            return $this->redirect($this->generateUrl('reservation'));
-          } elseif (is_object($form->get('dateToShow')->getData())) {
-            $dateToShow = $form->get('dateToShow')->getData();
-          }
-          //$logger->info('In searchAction, form is valid, dateToShow = ' . $dateToShow->format('c'));
-          
-          // We have to clone $dateToShow so $dateEnd and $dateToShow aren't 
-          // pointing at the same value. We probably don't have to worry about
-          // PHP adjusting for daylight savings here, so using $dateEnd->add()
-          // should be okay.
-          $dateEnd = clone($dateToShow);
-          $dateEnd->add(new \DateInterval('P1D'));
-          //$logger->info('After changint $dateEnd, dateToShow = ' . $dateToShow->format('c'));
-          $ongoing = array();
-          $checkinsToday = array();
-          $today = new \DateTime(date('Y-m-d'));
-          
-          $em = $this->getDoctrine()->getManager();
-          $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->findTripsForDate($dateToShow, $dateEnd);
-          
-          $logger->info('count of entities = ' . count($entities));
-          return array(
-            'upcoming' => $entities,
-            'ongoing' => $ongoing,
-            'checkinsToday' => $checkinsToday,
-            'dateToShow' => $dateToShow,
-            'date' => $today,
-            'entities' => array(),
-          );
-          //return $this->redirect($this->generateUrl('person_search'));
-        }
+      $logger->info('in searchAction');
+      $entity = new Reservation();
+      $form = $this->createSearchForm($entity);
+      $form->handleRequest($request);
+      
+      //$logger->info(var_dump($form));
 
+      // The form won't be valid, because it is populated with a blank Reservation
+      // entity. Go ahead and show the search results anyway.
+      
+        $dateToShow = new \DateTime(date('Y-m-d'));
+        // If they clicked the "Today" button, show the index page from the 
+        // indexAction with ongoing trips, etc.
+        if ($form->get('today')->isClicked()) {
+          return $this->redirect($this->generateUrl('reservation'));
+        } elseif (is_object($form->get('dateToShow')->getData())) {
+          $dateToShow = $form->get('dateToShow')->getData();
+        }
+        //$logger->info('In searchAction, form is valid, dateToShow = ' . $dateToShow->format('c'));
+
+        // We have to clone $dateToShow so $dateEnd and $dateToShow aren't 
+        // pointing at the same value. We probably don't have to worry about
+        // PHP adjusting for daylight savings here, so using $dateEnd->add()
+        // should be okay.
+        $dateEnd = clone($dateToShow);
+        $dateEnd->add(new \DateInterval('P1D'));
+        //$logger->info('After changint $dateEnd, dateToShow = ' . $dateToShow->format('c'));
+        $ongoing = array();
+        $checkinsToday = array();
+        $today = new \DateTime(date('Y-m-d'));
+
+        $em = $this->getDoctrine()->getManager();
+        $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->findTripsForDate($dateToShow, $dateEnd);
+
+        $logger->info('count of entities = ' . count($entities));
         return array(
-            'entity' => $entity,
-            'form'   => $form->createView(),
+          'upcoming' => $entities,
+          'ongoing' => $ongoing,
+          'checkinsToday' => $checkinsToday,
+          'dateToShow' => $dateToShow,
+          'date' => $today,
+          'entities' => array(),
         );
+        //return $this->redirect($this->generateUrl('person_search'));
+     
     }
  
     /**
@@ -137,6 +135,7 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
 
         return $form;
     }
+    
     /**
      * Allows user to display reservations for a different date.
      *
@@ -424,56 +423,56 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
     public function editAction($id)
     {
       $logger = $this->get('logger');
-        $em = $this->getDoctrine()->getManager();
-        $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation'); 
-        $entity = $reservationRepository->find($id);
+      $em = $this->getDoctrine()->getManager();
+      $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation'); 
+      $entity = $reservationRepository->find($id);
 
-        if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Reservation entity.');
-        }
+      if (!$entity) {
+          throw $this->createNotFoundException('Unable to find Reservation entity.');
+      }
 
-        // Calculations that need to be made before the Edit form is displayed.
-        $now = new \DateTime();
-        $isReservationPast = ($entity->getEnd() < $now) ? TRUE : FALSE;
-        
-        // Hold on to the original start and end dates and seatsRequired to 
-        // find out if they have changed.
-        $originalStartDate = $entity->getStart();
-        $originalEndDate = $entity->getEnd();
-        $originalSeatsRequired = $entity->getSeatsRequired();
-        $originalUntilDate = '';
-        
-        // Get the entity's vehicle to see if the admin is trying to change 
-        // it. If so, we will later save the new id in $requestedVehicle
-        $originalVehicle = $entity->getVehicle();
-        $vehicleRequested = FALSE;
-        
-        // Is this a repeating reservation? If so, get the last reservation
-        // in the series
-        $series = $entity->getSeries();
-        $isRepeating = ($series) ? True : False;
-        $logger->info("isRepeating = $isRepeating");
-        $lastReservationInSeries = NULL;
-        if ($isRepeating) {
+      // Calculations that need to be made before the Edit form is displayed.
+      $now = new \DateTime();
+      $isReservationPast = ($entity->getEnd() < $now) ? TRUE : FALSE;
 
-          $lastReservationInSeries = $reservationRepository->getLastReservationInSeries($series);
-          //$logger->info(var_dump($lastReservationInSeries));
-          // Calculate the "original" until date based on the date of last 
-          // reservation in the series at Installation's dailyClose time.
-          $originalUntilDate = $lastReservationInSeries->getEnd();
-          list($repeatHour, $repeatMinute) = explode(':', $em->getRepository('GinsbergTransportationBundle:Installation')->find(1)->getDailyClose());
-          $originalUntilDate->setTime($repeatHour, $repeatMinute);
-        }
-        
-        $editForm = $this->createEditForm($entity);
-        $deleteForm = $this->createDeleteForm($id);
+      // Hold on to the original start and end dates and seatsRequired to 
+      // find out if they have changed.
+      $originalStartDate = $entity->getStart();
+      $originalEndDate = $entity->getEnd();
+      $originalSeatsRequired = $entity->getSeatsRequired();
+      $originalUntilDate = '';
 
-        return array(
-            'entity'      => $entity,
-            'isReservationPast' => $isReservationPast,
-            'edit_form'   => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        );
+      // Get the entity's vehicle to see if the admin is trying to change 
+      // it. If so, we will later save the new id in $requestedVehicle
+      $originalVehicle = $entity->getVehicle();
+      $vehicleRequested = FALSE;
+
+      // Is this a repeating reservation? If so, get the last reservation
+      // in the series
+      $series = $entity->getSeries();
+      $isRepeating = ($series) ? True : False;
+      $logger->info("isRepeating = $isRepeating");
+      $lastReservationInSeries = NULL;
+      if ($isRepeating) {
+
+        $lastReservationInSeries = $reservationRepository->getLastReservationInSeries($series);
+        //$logger->info(var_dump($lastReservationInSeries));
+        // Calculate the "original" until date based on the date of last 
+        // reservation in the series at Installation's dailyClose time.
+        $originalUntilDate = $lastReservationInSeries->getEnd();
+        list($repeatHour, $repeatMinute) = explode(':', $em->getRepository('GinsbergTransportationBundle:Installation')->find(1)->getDailyClose());
+        $originalUntilDate->setTime($repeatHour, $repeatMinute);
+      }
+
+      $editForm = $this->createEditForm($entity);
+      $deleteForm = $this->createDeleteForm($id);
+
+      return array(
+          'entity'      => $entity,
+          'isReservationPast' => $isReservationPast,
+          'edit_form'   => $editForm->createView(),
+          'delete_form' => $deleteForm->createView(),
+      );
     }
 
     /**
@@ -845,5 +844,185 @@ $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->find
             ->getForm()
         ;
     }
+   
+  /**
+   * Display form for checking out the Reservation, possibly changing the driver.
+   *
+   * @Route("/checkout", name="reservation_checkout_criteria")
+   * @Method("GET")
+   * @Template("GinsbergTransportationBundle:Reservation:reservation_checkout.html.twig")
+   */
+  public function checkoutCriteriaAction($id)
+  {
+      $em = $this->getDoctrine()->getManager();
+      $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
+      
+      if (!$entity) {
+          throw $this->createNotFoundException('Unable to find Reservation ' . $id);
+      }
+      $form = $this->createCheckoutForm($entity);
+
+      return array(
+          'entity' => $entity,
+          'form'   => $form->createView(),
+      );
+  }
+    
+  /**
+   * Creates a form to allow checking a vehicle out and optionally changing the driver.
+   *
+   * @param Reservation $entity The entity
+   *
+   * @return \Symfony\Component\Form\Form The form
+   */
+  private function createCheckoutForm(Reservation $entity)
+  {
+      $form = $this->createForm(new ReservationType(), $entity, array(
+          'action' => $this->generateUrl('reservation_checkout', array('id' => $entity->getId())),
+          'method' => 'POST',
+      ));
+
+      $form->add('submit', 'submit', array('label' => "Checkout"));
+
+      return $form;
+  }
+  
+  /**
+   * Mark a reservation as "checked out" -- that is, a driver has taken 
+   * possesion of the vehicle. Also make sure the person who picks up the
+	 * vehicle is approved.
+   *
+   * @Route("/checkout/{id}", name="reservation_checkout")
+   * @Method("POST")
+   * @Template()
+   */
+    public function checkoutAction(Request $request, $id)
+    {
+    $logger = $this->get('logger');
+    $logger->info('in checkoutAction. $id = ' . $id);
+    
+    $em = $this->getDoctrine()->getManager(); 
+    $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
+      
+    
+    $form = $this->createCreateForm($entity);
+    $form->handleRequest($request);
+    //$logger->info('After handleRequest, dateToShow = ' . date('Y-m-d H:i:s', $form->get('dateToShow')->getData()->getTimestamp()));
+
+
+    if ($form->isValid()) {
+      $personRepository = $em->getRepository('GinsbergTransportationBundle:Person');
+      
+      if ($personRepository->isApproved($entity->getPerson())) {
+        $entity->setCheckout(new \DateTime());
+      
+        $logger->info('In ReservationController::checkoutAction, person is approved');
+        $em->persist($entity);
+        $em->flush();
+
+        return $this->redirect($this->generateUrl('reservation')); 
+      } else {
+        $logger->info('In ReservationController::checkoutAction, person is NOT approved');
+        
+        return $this->render('GinsbergTransportationBundle:Person:driver_not_approved.html.twig');
+      }
+      
+    }
+	}
+  
+  /**
+   * Mark a reservation as "checked in" -- that is, the driver has returned the vehicle.
+   *
+   * @Route("/checkin/{id}", name="reservation_checkin")
+   * @Method("POST")
+   * @Template()
+   */
+    public function checkinAction(Request $request, $id)
+    {
+      $logger = $this->get('logger');
+      $logger->info('in checkinAction');
+      $em = $this->getDoctrine()->getManager(); 
+      $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
+
+      $form = $this->createCreateForm($entity);
+      $form->handleRequest($request);
+      //$logger->info('After handleRequest, dateToShow = ' . date('Y-m-d H:i:s', $form->get('dateToShow')->getData()->getTimestamp()));
+
+
+      if ($form->isValid()) {
+        $entity->setCheckin(new \DateTime());
+
+        $em->persist($entity);
+        $em->flush();
+
+        return $this->redirect($this->generateUrl('reservation')); 
+      }
+    }
+
+  /**
+   * Display form for checking in the Reservation
+   *
+   * @Route("/checkin", name="reservation_checkin_criteria")
+   * @Method("GET")
+   * @Template("GinsbergTransportationBundle:Reservation:reservation_checkin.html.twig")
+   */
+  public function checkinCriteriaAction($id)
+  {
+    $em = $this->getDoctrine()->getManager();
+      $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
+      
+      if (!$entity) {
+          throw $this->createNotFoundException('Unable to find Reservation ' . $id);
+      }
+      $form = $this->createCheckinForm($entity);
+
+      return array(
+          'entity' => $entity,
+          'form'   => $form->createView(),
+      );
+  }
+    
+  /**
+   * Creates a form to allow checking a vehicle out and optionally changing the driver.
+   *
+   * @param Reservation $entity The entity
+   *
+   * @return \Symfony\Component\Form\Form The form
+   */
+  private function createCheckinForm(Reservation $entity)
+  {
+    $form = $this->createForm(new ReservationType(), $entity, array(
+          'action' => $this->generateUrl('reservation_checkin', array('id' => $entity->getId())),
+          'method' => 'POST',
+      ));
+
+      $form->add('submit', 'submit', array('label' => "Checkin"));
+
+      return $form;
+  }
+
+	// Mark a reservation as "noshow" -- that is, the driver never came to take
+	// possesion of the vehicle, and did not cancel the reservation.
+	// Upon clicking "No Show" the page will refresh and the reservation will no longer be displayed
+	public function actionNoshow($id)
+	{
+		$reservation=$this->loadModel($id);
+		// Set noshow to true.
+		$reservation->noshow = True;
+		// Make car available again
+		if (strtotime($reservation->end) > time()) {
+			if (strtotime($reservation->start) > time()) {
+				$reservation->end = $reservation->start;
+			} else {
+				$reservation->end = date("Y-m-d H:i:s");
+			}
+		}
+
+		$reservation->save();
+		if($reservation->getErrors()):
+			Yii::log(serialize($reservation->getErrors()), "info", "system.debug");
+		endif;
+		$this->redirect(array('reservation/index'));
+	}
     
 }

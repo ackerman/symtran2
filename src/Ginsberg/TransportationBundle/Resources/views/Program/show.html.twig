@@ -1,6 +1,19 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
+<div class="record_actions">
+    <span class="back button">
+        <a href="{{ path('program') }}">
+            Programs
+        </a>
+    </span>
+    <span class="edit button">
+        <a href="{{ path('program_edit', { 'id': entity.id }) }}">
+            Edit
+        </a>
+    </span>
+    <span class="delete button">{{ form(delete_form) }}</span>
+</div>
     <h1>Program</h1>
 
     <table class="record_properties">
@@ -23,18 +36,4 @@
             </tr>
         </tbody>
     </table>
-
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('program') }}">
-            Back to the list
-        </a>
-    </li>
-    <li>
-        <a href="{{ path('program_edit', { 'id': entity.id }) }}">
-            Edit
-        </a>
-    </li>
-    <li>{{ form(delete_form) }}</li>
-</ul>
 {% endblock %}

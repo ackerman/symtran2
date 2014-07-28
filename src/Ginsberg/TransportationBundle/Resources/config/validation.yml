@@ -9,7 +9,7 @@ Ginsberg\TransportationBundle\Entity\Reservation:
   properties:
     start:
       - NotBlank: ~
-      - Ginsberg\TransportationBundle\Validator\Constraints\IsNotBlackedOut: ~   
+      - Ginsberg\TransportationBundle\Validator\Constraints\IsNotBlackedOut: ~
     end:
       - NotBlank: ~
-      - Ginsberg\TransportationBundle\Validator\Constraints\IsNotBlackedOut: ~ 
+      - Ginsberg\TransportationBundle\Validator\Constraints\IsNotBlackedOut: ~

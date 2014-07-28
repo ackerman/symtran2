@@ -56,11 +56,12 @@ form fieldset
 form label
 {
 	font-weight: bold;
-	ffont-size: 0.9em;
+	font-size: 1em;
 	display: block;
 	width:150px;
 	float:left;
 	padding-top:4px;
+  line-height: 1em;
 }
 
 form .row

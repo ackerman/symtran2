@@ -26,28 +26,22 @@
       {{ form_errors(register_form) }}
       {{ form_row(register_form.firstName) }}
       {{ form_row(register_form.lastName) }}
-      {{ form_row(register_form.uniqname) }}
-      {{ form_row(register_form.phone) }}
-      {{ form_row(register_form.status) }}
-      {{ form_row(register_form.dateApproved) }}
-      {{ form_row(register_form.hasUnpaidTicket) }}
       {{ form_row(register_form.program) }}
+      {{ form_row(register_form.phone) }}
+      {{ form_row(register_form.isTermsAgreed, {'label': 'I agree to these terms'}) }}
+      
+      <div style="display: none;">   
+        {{ form_row(register_form.uniqname) }}
+        {{ form_row(register_form.status) }}
+        {{ form_row(register_form.dateApproved) }}
+        {{ form_row(register_form.created) }}
+      </div>
       {{ form_row(register_form._token) }}
-      {{ form_row(register_form.created) }}
-      {{ form_row(register_form.modified) }}
-      {{ form_row(register_form.isTermsAgreed) }}
       
       {{ form_row(register_form.submit, {'label': 'Submit Registration' }) }}
       
-    {{ form_end(register_form) }}
+    {{ form_end(register_form, {'render_rest': false }) }}
 
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('site') }}">
-            Back to the list
-        </a>
-    </li>
-</ul>
 {% endblock %}
 {% block javascripts %}
   {% javascripts 

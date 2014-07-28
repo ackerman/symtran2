@@ -1,0 +1,24 @@
+{% extends 'GinsbergTransportationBundle::public_layout.html.twig' %}
+
+{% block body -%}
+<h1>Hello, {{ name }}</h1>
+
+<h2>Our records indicate that have registered with Parking and Transportation to drive a vehicle,
+but you did not specify &quot;gins-trans&quot; in the Delegate field.</h2>
+<p>Unless you do so, we have no way of knowing whether or not you have been approved by
+Parking and Transportation.</p>
+<p>To correct this, please follow these steps:</p>
+<ol>
+  <li>Go to <a href="https://pts.umich.edu/internal/mvr/">https://pts.umich.edu/internal/mvr</a>.</li>
+  <li>In the Profile tab, in the field <strong>Delegates who can check the status of this driver</strong>, enter <strong>gins-trans</strong>.</li>
+  <li>Click on the <strong>Check/Renew Status</strong> tab and submit a request to have your status checked.</li>
+</ol>
+<p>When you have completed those steps, return to this site
+(<a href="https://ginsberg.umich.edu/transportation/t-rex/">
+https://ginsberg.umich.edu/transportation/t-rex/</a> and attempt
+to use the Ginsberg Transportation System again.</p>
+<p> If you have a problem carrying out these steps, please contact the Ginsberg Center at:<br/><br/>
+<a href="mailto:transpoinfo@umich.edu">transpoinfo@umich.edu</a><br/>
+or call (734) 763-3548. 
+</p>
+{% endblock %}

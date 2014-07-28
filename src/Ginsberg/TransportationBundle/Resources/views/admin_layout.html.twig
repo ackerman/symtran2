@@ -1,7 +1,7 @@
 {# Layout template for the Admin portion of the website #}
 {% extends '::base.html.twig' %}
   {% block stylesheets %}
-    {% stylesheets 'bundles/ginsbergtransportation/css/ie.css'
+    {% stylesheets
       'bundles/ginsbergtransportation/css/jquery.datetimepicker.css'
         
         filter='cssrewrite' %}
@@ -22,8 +22,8 @@
   <li class="first" id="nav-programs"><a href="{{ path('program') }}">Programs</a></li>
   <li class="first" id="nav-destinations"><a href="{{ path('destination') }}">Destinations</a></li>
   <li class="first" id="nav-tickets"><a href="{{ path('ticket') }}">Tickets</a></li>
-  <li class="first" id="nav-installation"><a href="{{ path('installation') }}">Installation</a></li>
   <li class="first" id="nav-reports"><a href="">Reports</a></li>
+  <li class="first" id="nav-installation"><a href="{{ path('installation') }}1/edit">Site On/Off</a></li>
 {% endblock %}
 {% block javascripts %}
     {% javascripts 

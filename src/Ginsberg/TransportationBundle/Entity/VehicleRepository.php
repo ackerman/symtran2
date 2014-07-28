@@ -12,6 +12,18 @@ use Doctrine\ORM\EntityRepository;
  */
 class VehicleRepository extends EntityRepository
 {
+  public function findAllSorted()
+  {
+    $dql = 'SELECT v FROM GinsbergTransportationBundle:Vehicle v ORDER BY v.isActive DESC, v.program ASC';
+    $query = $this->getEntityManager()->createQuery($dql);
+
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
+  }
+  
   public function findActiveVehiclesByProgram($reservation)
   {
     $dql = 'SELECT v FROM GinsbergTransportationBundle:Vehicle v WHERE 
@@ -24,6 +36,8 @@ class VehicleRepository extends EntityRepository
       return null;
     }
   }
+  
+  
   
   public function findActiveVehiclesByCapacity($reservation)
   {

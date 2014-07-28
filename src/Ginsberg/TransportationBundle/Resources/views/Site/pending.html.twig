@@ -1,0 +1,15 @@
+{% extends 'GinsbergTransportationBundle::public_layout.html.twig' %}
+
+{% block body -%}
+<h1>Hello, {{ name }}</h1>
+
+<h2>Thank you for registering. Your application is pending approval by Parking and Transportation.</h2>
+
+<p>Your application was submitted on <?php echo Format::format_date_only($date_created); ?>. 
+    It normally takes two to five days to process applications. Please contact us if the 
+    process has taken longer:<br /><br />
+<a href="mailto:transpoinfo@umich.edu">transpoinfo@umich.edu</a><br />
+(734) 763-3548 <br />
+1024 Hill Street<br />
+Ann Arbor, MI 48104</p>
+{% endblock %}

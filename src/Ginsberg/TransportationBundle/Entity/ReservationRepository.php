@@ -84,12 +84,27 @@ class ReservationRepository extends EntityRepository
     // The SQL DATE() function is not supported in Doctrine due to portability issues,
     // so we have to use Doctrine's createNativeQuery(). That involves
     // creating a Result Set Mapping from the SQL results to the class.
-    // We do that using the ResultSetMappingBuilder().
-    $rsm = new \Doctrine\ORM\Query\ResultSetMappingBuilder($em, 2);
+    // We do that using the ResultSetMappingBuilder(). Unfortunately, the 
+    // ResultSetMappingBuilder doesn't seem to return associated information, so
+    // we will need to do the result set mapping by hand and see if that works.
+    $rsm = new \Doctrine\ORM\Query\ResultSetMapping;
+    $rsm->addEntityResult('Ginsberg\TransportationBundle\Entity\Reservation', 'r');
+    $rsm->addFieldResult('r', 'id', 'id');
+    $rsm->addFieldResult('r', 'start', 'start');
+    $rsm->addFieldResult('r', 'end', 'end');
+    $rsm->addFieldResult('r', 'checkout', 'checkout');
+    $rsm->addFieldResult('r', 'checkin', 'checkin');
+    $rsm->addMetaResult('r', 'person_id', 'person_id');
+    $rsm->addMetaResult('r', 'vehicle_id', 'vehicle_id');
+    //$rsm->addFieldResult('r', 'checkin', 'checkin');
+    //$rsm->addJoinedEntityResult('Ginsberg\TransportationBundle\Entity\Person', 'p', 'r', 'person');
+    //$rsm->addFieldResult('p', 'person_id', 'id');
+    //$rsm->addMetaResult('r', 'person_id', 'person');
+    //$rsm->addMetaResult('r', 'vehicle_id', 'vehicle');
     
-    $rsm->addRootEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Reservation', 'r', array('created' => 'rcreated'));
-    /*$rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Program', 'prog', 'r', 'program', array('id' => 'program_id'));
-    $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Person', 'p', 'r', 'person', array('id' => 'person_id'));
+    //$rsm->addRootEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Reservation', 'r', array('created' => 'rcreated'));
+    //$rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Program', 'prog', 'r', 'program', array('id' => 'program_id'));
+    /*$rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Person', 'p', 'r', 'person', array('id' => 'person_id'));
     //$rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Program', 'person_prog', 'p', 'program', array('program_id' => 'program_id'), array('id' => 'wtf_program'));
     $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Destination', 'd', 'r', 'destination', array('id' => 'destination_id'));
     /*$rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Program', 'dest_prog', 'd', 'program', array('id' => 'program_id'), array('program_id' => 'goodgod_program'));
@@ -99,14 +114,25 @@ class ReservationRepository extends EntityRepository
     //$rsm->addJoinedEntityFromClassMetadata($class, $alias, $parentAlias, $relation, $renamedColumns)
     */
 
-    $nativeSQL = 'SELECT r.id, r.start, r.end, r.checkout, r.checkin, r.program_id from reservation r, vehicle v, person p, program prog WHERE 
+    // This query works with $rsm->addJoinedEntityResult and returns the Person id, but no other fields.
+    /*
+    $nativeSQL = 'SELECT r.id, r.start, r.end, r.checkout, r.checkin, r.vehicle_id, p.id AS person_id FROM vehicle v, reservation r   
+       INNER JOIN person p ON r.person_id = p.id WHERE 
             CURRENT_DATE() LIKE DATE(r.checkin) 
             AND r.checkout is not NULL
             AND r.checkin is not NULL
-            AND r.vehicle_id is not NULL 
-            AND r.person_id = p.id AND r.program_id = prog.id AND r.vehicle_id = v.id';
+            AND r.vehicle_id is not NULL
+            AND r.vehicle_id = v.id';
     $nativeQuery = $em->createNativeQuery($nativeSQL, $rsm);
-
+*/
+    $nativeSQL = 'SELECT r.id, r.start, r.end, r.checkout, r.checkin, r.vehicle_id, r.person_id FROM reservation r 
+          WHERE 
+            CURRENT_DATE() LIKE DATE(r.checkin) 
+            AND r.checkout is not NULL
+            AND r.checkin is not NULL
+            AND r.vehicle_id is not NULL';
+    
+    $nativeQuery = $em->createNativeQuery($nativeSQL, $rsm);
     try {
       return $nativeQuery->getResult();
     } catch (\Doctrine\ORM\NoResultException $ex) {
@@ -135,7 +161,7 @@ class ReservationRepository extends EntityRepository
   public function findUpcomingTripsByPerson($now, $person) {
     $params = array('now' => $now, ':person' => $person);
     $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE
-        r.start >= :now AND r.person = :person ORDER BY r.start ASC';
+        r.start >= :now AND r.person = :person AND r.vehicle IS NOT NULL ORDER BY r.start';
     $query = $this->getEntityManager()->createQuery($dql)->setParameters($params);
     
     try {
@@ -143,6 +169,29 @@ class ReservationRepository extends EntityRepository
     } catch (\Doctrine\ORM\NoResultException $ex) {
       return NULL;
     }			
+  }
+  
+  /**
+   * Returns a Person's past Reservations. 
+   * 
+   * @param Person $person The Person whose past trips we want to find
+   * 
+   * @return array 
+   */
+  public function findPastTripsByPerson($person)
+  {
+    $now = new \DateTime();
+    $em = $this->getEntityManager();
+    $query = $em->createQuery('SELECT r FROM GinsbergTransportationBundle:Reservation r 
+            WHERE r.end < :now AND r.person = :person AND r.vehicle IS NOT NULL ORDER BY r.start')
+            ->setParameters(array('now' => $now, 'person' => $person));
+    
+    try {
+      $pastTripsByPerson = $query->getResult();
+      return $pastTripsByPerson;
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return NULL;
+    }	
   }
   
   /**
@@ -437,26 +486,4 @@ class ReservationRepository extends EntityRepository
     return $futureReservationsInSeries;
 	}
   
-  /**
-   * Returns a Person's past Reservations. 
-   * 
-   * @param Person $person The Person whose past trips we want to find
-   * 
-   * @return array 
-   */
-  public function findPastTripsByPerson($person)
-  {
-    $now = new \DateTime();
-    $em = $this->getEntityManager();
-    $query = $em->createQuery('SELECT r FROM GinsbergTransportationBundle:Reservation r 
-            WHERE r.end < :now AND r.person = :person AND r.vehicle IS NOT NULL ORDER BY r.start')
-            ->setParameters(array('now' => $now, 'person' => $person));
-    
-    try {
-      $pastTripsByPerson = $query->getResult();
-      return $pastTripsByPerson;
-    } catch (\Doctrine\ORM\NoResultException $ex) {
-      return NULL;
-    }	
-  }
 }

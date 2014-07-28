@@ -92,7 +92,7 @@ class UserProvider implements UserProviderInterface
       // for local debug:
       if(!isset( $_SERVER['REMOTE_USER'] ) &&
           $_SERVER[ 'SERVER_NAME' ] === 'localhost') {
-        return 'ericaack';
+        return 'ekbyrnes';
       }
 
       //Yii::log('User not found', 'info','system.debug');
@@ -155,16 +155,16 @@ class UserProvider implements UserProviderInterface
      *
      * @return string The full name of the user
      */
-    public static function get_full_name()
+    public function get_full_name()
     {
       // First check if the user is in the database
-      $name_from_database = Person::get_full_name_by_uniqname(self::get_uniqname());
+      $name_from_database = $this->personRepository->getFullNameByUniqname($this->get_uniqname());
       if ($name_from_database) {
         return $name_from_database;
       }
 
       // If not, retrieve the full name with LDAP.
-      $ldap_entry = self::get_ldap_entry();
+      $ldap_entry = $this->get_ldap_entry();
 
       // Check if the user has shared their full name; if so, return it.
       if( array_key_exists('displayname', $ldap_entry)) {
@@ -184,14 +184,16 @@ class UserProvider implements UserProviderInterface
       // First check if the user is in the database
       $person = $this->personRepository->findByUniqname(self::get_uniqname());
       if (is_array($person)) {
-        $person = $person[0];
+        if (count($person) == 1) {
+          $person = $person[0];
+        }
       }
       if ($person){
         return $person->getFirstName();
       }
 
       // Then guess the first name from the LDAP entry
-      $name_array = explode(" ", self::get_full_name());
+      $name_array = explode(" ", $this->get_full_name());
       return $name_array[0];
     }
 
@@ -201,10 +203,10 @@ class UserProvider implements UserProviderInterface
      *
      * @return string The user's last name
      */
-    public static function get_last_name()
+    public function get_last_name()
     {
       // First check if the user is in the database
-      $person = Person::find_by_uniqname(self::get_uniqname());
+      $person = $this->personRepository->findByUniqname($this->get_uniqname());
       if ($person) {
         return $person->last_name;
       }
