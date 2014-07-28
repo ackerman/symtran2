@@ -97,9 +97,9 @@ class PersonRepository extends EntityRepository
    * @param type $uniqname
    * @return string|boolean 
    */
-  public static function getFullNameByUniqname($uniqname)
+  public function getFullNameByUniqname($uniqname)
 	{
-    $person = Person::findByUniqname($uniqname);
+    $person = $this->findByUniqname($uniqname);
     if ($person)
     {
       return $person->first_name . ' ' . $person->last_name;

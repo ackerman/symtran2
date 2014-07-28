@@ -1,0 +1,23 @@
+{% extends 'GinsbergTransportationBundle::public_layout.html.twig' %}
+
+{% block body -%}
+<h1>Hello, {{ name }}</h1>
+
+<h2>Unfortunately, we could not accept your application to use the Ginsberg
+  transportation system, because you were not approved by Parking and Transporation.</h2>
+
+<p>You should have received an email from PTS stating the reason you were not approved.
+If your application was rejected due to a technicality, such as a
+license number that was entered incorrectly,
+   please go to 
+   <a href="https://pts.umich.edu/internal/mvr/">https://pts.umich.edu/internal/mvr/</a> 
+   and re-apply. We cannot make any exceptions
+   if your application was denied because of your driving record.</p>
+
+<p>If you have questions, please contact the Ginsberg Center:<br><br>
+  <a href="mailto:transpoinfo@umich.edu">transpoinfo@umich.edu</a><br>
+  (734) 763-3548 <br>
+  1024 Hill Street<br>
+  Ann Arbor, MI 48104
+</p>
+{% endblock %}
