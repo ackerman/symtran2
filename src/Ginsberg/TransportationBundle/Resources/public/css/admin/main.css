@@ -178,6 +178,9 @@ table td {
   padding:12px;
 }
 
+table td.note-follows {
+  border-bottom: none;
+}
 
 dl {
   width:30em;

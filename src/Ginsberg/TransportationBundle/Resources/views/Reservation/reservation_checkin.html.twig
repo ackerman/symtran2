@@ -1,7 +1,6 @@
 <div id="reservation_checkin">
     {{ form_start(form, {'attr': {'novalidate': 'novalidate' }}) }}
       {{ form_errors(form) }}
-      
       <div style='display: none;'>
         {{ form_widget(form.person) }}
         {{ form_row(form.start) }}
@@ -13,7 +12,9 @@
         {{ form_row(form.program) }}
         {{ form_row(form.destination) }}
         {{ form_row(form.destinationText) }}
+        {{ form_row(form.notes) }}
         {{ form_row(form.created) }}
+        {{ form_row(form.modified) }}
         {{ form_row(form._token) }}
       </div>
       

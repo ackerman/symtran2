@@ -946,12 +946,12 @@ $entities = $reservationRepository->findAll();
 
       $form = $this->createCreateForm($entity);
       $form->handleRequest($request);
-      //$logger->info('After handleRequest, dateToShow = ' . date('Y-m-d H:i:s', $form->get('dateToShow')->getData()->getTimestamp()));
-
+      
 
       if ($form->isValid()) {
         $entity->setCheckin(new \DateTime());
-
+        $logger->info('in checkinAction, notes = ' . $entity->getNotes());
+      
         $em->persist($entity);
         $em->flush();
 
@@ -960,7 +960,7 @@ $entities = $reservationRepository->findAll();
     }
 
   /**
-   * Display form for checking in the Reservation
+   * Display button for checking in the Reservation
    *
    * @Route("/checkin", name="reservation_checkin_criteria")
    * @Method("GET")

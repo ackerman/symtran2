@@ -94,38 +94,11 @@ class ReservationRepository extends EntityRepository
     $rsm->addFieldResult('r', 'end', 'end');
     $rsm->addFieldResult('r', 'checkout', 'checkout');
     $rsm->addFieldResult('r', 'checkin', 'checkin');
+    $rsm->addFieldResult('r', 'notes', 'notes');
     $rsm->addMetaResult('r', 'person_id', 'person_id');
     $rsm->addMetaResult('r', 'vehicle_id', 'vehicle_id');
-    //$rsm->addFieldResult('r', 'checkin', 'checkin');
-    //$rsm->addJoinedEntityResult('Ginsberg\TransportationBundle\Entity\Person', 'p', 'r', 'person');
-    //$rsm->addFieldResult('p', 'person_id', 'id');
-    //$rsm->addMetaResult('r', 'person_id', 'person');
-    //$rsm->addMetaResult('r', 'vehicle_id', 'vehicle');
     
-    //$rsm->addRootEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Reservation', 'r', array('created' => 'rcreated'));
-    //$rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Program', 'prog', 'r', 'program', array('id' => 'program_id'));
-    /*$rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Person', 'p', 'r', 'person', array('id' => 'person_id'));
-    //$rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Program', 'person_prog', 'p', 'program', array('program_id' => 'program_id'), array('id' => 'wtf_program'));
-    $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Destination', 'd', 'r', 'destination', array('id' => 'destination_id'));
-    /*$rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Program', 'dest_prog', 'd', 'program', array('id' => 'program_id'), array('program_id' => 'goodgod_program'));
-    
-    $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Series', 's', 'r', 'series', array('id' => 'series_id'));
-    $rsm->addJoinedEntityFromClassMetadata('Ginsberg\TransportationBundle\Entity\Ticket', 't', 'r', 'ticket', array('id' => 'ticket_id'));
-    //$rsm->addJoinedEntityFromClassMetadata($class, $alias, $parentAlias, $relation, $renamedColumns)
-    */
-
-    // This query works with $rsm->addJoinedEntityResult and returns the Person id, but no other fields.
-    /*
-    $nativeSQL = 'SELECT r.id, r.start, r.end, r.checkout, r.checkin, r.vehicle_id, p.id AS person_id FROM vehicle v, reservation r   
-       INNER JOIN person p ON r.person_id = p.id WHERE 
-            CURRENT_DATE() LIKE DATE(r.checkin) 
-            AND r.checkout is not NULL
-            AND r.checkin is not NULL
-            AND r.vehicle_id is not NULL
-            AND r.vehicle_id = v.id';
-    $nativeQuery = $em->createNativeQuery($nativeSQL, $rsm);
-*/
-    $nativeSQL = 'SELECT r.id, r.start, r.end, r.checkout, r.checkin, r.vehicle_id, r.person_id FROM reservation r 
+    $nativeSQL = 'SELECT r.id, r.start, r.end, r.checkout, r.checkin, r.notes, r.vehicle_id, r.person_id FROM reservation r 
           WHERE 
             CURRENT_DATE() LIKE DATE(r.checkin) 
             AND r.checkout is not NULL
