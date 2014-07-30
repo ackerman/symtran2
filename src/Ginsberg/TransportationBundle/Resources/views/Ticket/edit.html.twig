@@ -1,16 +1,21 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
-    <h1>Ticket edit</h1>
+  <div class="record_actions">
+    <span class='back button'>
+        <a href="{{ path('ticket') }}">
+            Back
+        </a>
+    </span>
+    <span class='button'>
+      <a href="{{ path('reservation')}}{{ edit_form.reservation.vars.value }}">
+          Owning Reservation
+      </a>
+    </span>
+    <span class='delete button'>{{ form(delete_form) }}</span>
+  </div>
+    <h1>Update Ticket {{ entity.id }}</h1>
 
     {{ form(edit_form) }}
 
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('ticket') }}">
-            Back to the list
-        </a>
-    </li>
-    <li>{{ form(delete_form) }}</li>
-</ul>
 {% endblock %}

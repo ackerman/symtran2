@@ -498,4 +498,12 @@ class Reservation
         return $this->destination;
     }
     
+    /**
+     * Return ID as a string
+     * 
+     * @return string
+     */
+    public function __toString() {
+      return (string) $this->getId();
+    }
 }

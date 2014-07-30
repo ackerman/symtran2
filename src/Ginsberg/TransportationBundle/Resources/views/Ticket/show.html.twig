@@ -1,6 +1,19 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
+  <div class="record_actions">
+    <span class="back button">
+        <a href="{{ path('ticket') }}">
+            Tickets
+        </a>
+    </span>
+    <span class="edit button">
+        <a href="{{ path('ticket_edit', { 'id': entity.id }) }}">
+            Edit
+        </a>
+    </span>
+    <span class="delete button">{{ form(delete_form) }}</span>
+  </div>
     <h1>Ticket</h1>
 
     <table class="record_properties">
@@ -10,8 +23,12 @@
                 <td>{{ entity.id }}</td>
             </tr>
             <tr>
-                <th>Ticket_date</th>
-                <td>{{ entity.ticketdate|date('Y-m-d H:i:s') }}</td>
+                <th>Ticket date</th>
+                <td>{{ entity.ticketDate|date('Y-m-d H:i:s') }}</td>
+            </tr>
+            <tr>
+                <th>Reservation Id</th>
+                <td><a href="{{ path('reservation_show', {'id': entity.reservation.id}) }}">{{ entity.reservation.id }}</a></td>
             </tr>
             <tr>
                 <th>Reason</th>
@@ -26,23 +43,10 @@
                 <td>{{ entity.amount }}</td>
             </tr>
             <tr>
-                <th>Is_paid</th>
-                <td>{{ entity.ispaid }}</td>
+                <th>Paid</th>
+                <td>{{ entity.isPaid }}</td>
             </tr>
         </tbody>
     </table>
 
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('ticket') }}">
-            Back to the list
-        </a>
-    </li>
-    <li>
-        <a href="{{ path('ticket_edit', { 'id': entity.id }) }}">
-            Edit
-        </a>
-    </li>
-    <li>{{ form(delete_form) }}</li>
-</ul>
 {% endblock %}

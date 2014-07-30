@@ -8,16 +8,18 @@
   </head>
   {% block htmlbody %}
     <body>
-      <header class="group">
-        {% block banner %}
-            <h1>Ginsberg Transportation System</h1>
-        {% endblock %}
-        <h2 id="greeting">
-          {% block greeting %}
-            Hi, logged in user. <a href="{{ asset('logout') }}">Log out.</a>
+      <div id="header" class="group">
+        <div id="logo">
+          {% block banner %}
+              <span>Ginsberg Transportation System</span>
           {% endblock %}
-        </h2>
-      </header>
+          <span id="logout">
+            {% block greeting %}
+              Hi, logged in user. <a href="{{ asset('logout') }}">Log out.</a>
+            {% endblock %}
+          </span>
+        </div>
+      </div>
       <nav>
         <ul>
           {% block nav %}

@@ -13,3 +13,8 @@ Ginsberg\TransportationBundle\Entity\Reservation:
     end:
       - NotBlank: ~
       - Ginsberg\TransportationBundle\Validator\Constraints\IsNotBlackedOut: ~
+Ginsberg\TransportationBundle\Entity\Person:
+  properties:
+    phone:
+      - NotBlank: { groups: [registration] }
+      - Length: { min: 10, groups: [registration] }

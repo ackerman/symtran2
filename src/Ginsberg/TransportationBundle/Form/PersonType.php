@@ -42,7 +42,8 @@ class PersonType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Ginsberg\TransportationBundle\Entity\Person'
+            'data_class' => 'Ginsberg\TransportationBundle\Entity\Person',
+            'validation_groups' => array('registration', 'Person', 'Default')
         ));
     }
 

@@ -8,7 +8,7 @@ Ginsberg\TransportationBundle\Entity\Ticket:
             generator:
               strategy: AUTO
     fields:
-        ticket_date:
+        ticketDate:
           type: datetime
         reason:
           type: string
@@ -20,7 +20,7 @@ Ginsberg\TransportationBundle\Entity\Ticket:
           type: decimal
           scale: 2
           precision: 6
-        is_paid:
+        isPaid:
           type: boolean
           nullable: true
     manyToOne:

@@ -19,7 +19,7 @@ class Ticket
     /**
      * @var \DateTime
      */
-    private $ticket_date;
+    private $ticketDate;
 
     /**
      * @var string
@@ -39,7 +39,7 @@ class Ticket
     /**
      * @var boolean
      */
-    private $is_paid;
+    private $isPaid;
 
     /**
      * @var \Ginsberg\TransportationBundle\Entity\Reservation
@@ -58,26 +58,26 @@ class Ticket
     }
 
     /**
-     * Set ticket_date
+     * Set ticketDate
      *
      * @param \DateTime $ticketDate
      * @return Ticket
      */
     public function setTicketDate($ticketDate)
     {
-        $this->ticket_date = $ticketDate;
+        $this->ticketDate = $ticketDate;
 
         return $this;
     }
 
     /**
-     * Get ticket_date
+     * Get ticketDate
      *
      * @return \DateTime 
      */
     public function getTicketDate()
     {
-        return $this->ticket_date;
+        return $this->ticketDate;
     }
 
     /**
@@ -150,26 +150,26 @@ class Ticket
     }
 
     /**
-     * Set is_paid
+     * Set isPaid
      *
      * @param boolean $isPaid
      * @return Ticket
      */
     public function setIsPaid($isPaid)
     {
-        $this->is_paid = $isPaid;
+        $this->isPaid = $isPaid;
 
         return $this;
     }
 
     /**
-     * Get is_paid
+     * Get isPaid
      *
      * @return boolean 
      */
     public function getIsPaid()
     {
-        return $this->is_paid;
+        return $this->isPaid;
     }
 
     /**
@@ -194,4 +194,6 @@ class Ticket
     {
         return $this->reservation;
     }
+    
+
 }

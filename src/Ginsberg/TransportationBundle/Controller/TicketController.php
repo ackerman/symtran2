@@ -63,12 +63,12 @@ class TicketController extends Controller
     }
 
     /**
-    * Creates a form to create a Ticket entity.
-    *
-    * @param Ticket $entity The entity
-    *
-    * @return \Symfony\Component\Form\Form The form
-    */
+     * Creates a form to create a Ticket entity.
+     *
+     * @param Ticket $entity The entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
     private function createCreateForm(Ticket $entity)
     {
         $form = $this->createForm(new TicketType(), $entity, array(
@@ -84,15 +84,19 @@ class TicketController extends Controller
     /**
      * Displays a form to create a new Ticket entity.
      *
-     * @Route("/new", name="ticket_new")
+     * @Route("/new/{reservationId}", name="ticket_new")
      * @Method("GET")
      * @Template()
      */
-    public function newAction()
+    public function newAction($reservationId = '')
     {
         $entity = new Ticket();
+        $resRep = $this->getDoctrine()->getManager()->getRepository('GinsbergTransportationBundle:Reservation');
+        if ($reservationId) {
+          $entity->setReservation($resRep->find($reservationId));
+        }
         $form   = $this->createCreateForm($entity);
-
+        
         return array(
             'entity' => $entity,
             'form'   => $form->createView(),

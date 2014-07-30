@@ -9,7 +9,7 @@ body {
 
 }
 
-header {
+#header {
 	margin: 0;
 	padding: 0;
 	border-top: 5px solid #67a0b8;
@@ -17,7 +17,7 @@ header {
 	padding:15px;
 }
 
-header h1 {
+header  {
   width: 60%;
   float: left;
   text-align: left;

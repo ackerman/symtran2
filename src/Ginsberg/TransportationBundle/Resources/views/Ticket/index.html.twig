@@ -1,17 +1,21 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
-    <h1>Ticket list</h1>
+    <h1>Tickets <span class="button"><a href="{{ path('ticket_new') }}">
+            Add
+        </a></span></h1>
 
     <table class="records_list">
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Ticket_date</th>
+                <th>Reservation Id</th>
+                <th>Driver</th>
+                <th>Ticket Date</th>
                 <th>Reason</th>
                 <th>Location</th>
                 <th>Amount</th>
-                <th>Is_paid</th>
+                <th>Paid</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -19,11 +23,13 @@
         {% for entity in entities %}
             <tr>
                 <td><a href="{{ path('ticket_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
-                <td>{% if entity.ticketdate %}{{ entity.ticketdate|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td><a href="{{ path('reservation_show', { 'id': entity.reservation.id }) }}">{{ entity.reservation.id }}</a></td>
+                <td><a href="{{ path('person_show', { 'id': entity.person.id }) }}">{{ entity.person.firstName }} {{ entity.person.lastName }}</a></td>
+                <td>{% if entity.ticketDate %}{{ entity.ticketDate|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{{ entity.reason }}</td>
                 <td>{{ entity.location }}</td>
                 <td>{{ entity.amount }}</td>
-                <td>{{ entity.ispaid }}</td>
+                <td>{{ entity.isPaid }}</td>
                 <td>
                 <ul>
                     <li>
@@ -39,11 +45,4 @@
         </tbody>
     </table>
 
-        <ul>
-        <li>
-            <a href="{{ path('ticket_new') }}">
-                Create a new entry
-            </a>
-        </li>
-    </ul>
     {% endblock %}

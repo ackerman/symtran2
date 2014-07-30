@@ -15,11 +15,11 @@ class TicketType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('ticket_date')
+            ->add('ticketDate')
             ->add('reason')
             ->add('location')
             ->add('amount')
-            ->add('is_paid')
+            ->add('isPaid')
             ->add('reservation')
         ;
     }

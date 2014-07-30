@@ -172,6 +172,7 @@ class PersonController extends Controller
       $logger->info('Just entered PersonController::createCreateForm()');
        
         $form = $this->createForm(new PersonType(), $entity, array(
+            'validation_groups' => array('Person'),
             'action' => $this->generateUrl('person_create'),
             'method' => 'POST',
         ));
