@@ -7,6 +7,11 @@
             Back
         </a>
     </span>
+    <span class="button">
+      <a href="{{ path('ticket_new') }}/{{ entity.id }}">
+        Create Ticket
+      </a>
+    </span>
     <span class='delete button'>{{ form(delete_form) }}</span>
 </div>
 
@@ -50,11 +55,12 @@
       <div>
         <label for="tickets_for_reservation">Tickets</label>
         {% if tickets %}
-          Go to: 
           {% for ticket in tickets %}
-            <a href="{{ path('ticket_show', {'id': ticket.id }) }}"><span class="error">{{ ticket.id }}</span></a>&nbsp;&nbsp;
+            <span class="error">{{ ticket.id }}</span>&nbsp;&nbsp;
           {% endfor %}
-        {% else %}None{% endif %}
+        {% else %}
+          None
+        {% endif %}
       </div>
       <div style='display:none;'>
         {{ form_row(edit_form.created) }}
