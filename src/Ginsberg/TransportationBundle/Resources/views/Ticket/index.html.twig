@@ -4,7 +4,6 @@
     <h1>Tickets <span class="button"><a href="{{ path('ticket_new') }}">
             Add
         </a></span></h1>
-
     <table class="records_list">
         <thead>
             <tr>
@@ -24,7 +23,7 @@
             <tr>
                 <td><a href="{{ path('ticket_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
                 <td><a href="{{ path('reservation_show', { 'id': entity.reservation.id }) }}">{{ entity.reservation.id }}</a></td>
-                <td><a href="{{ path('person_show', { 'id': entity.person.id }) }}">{{ entity.person.firstName }} {{ entity.person.lastName }}</a></td>
+                <td><a href="{{ path('person_show', { 'id': entity.reservation.person.id }) }}">{{ entity.reservation.person.firstName }} {{ entity.reservation.person.lastName }}</a></td>
                 <td>{% if entity.ticketDate %}{{ entity.ticketDate|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{{ entity.reason }}</td>
                 <td>{{ entity.location }}</td>

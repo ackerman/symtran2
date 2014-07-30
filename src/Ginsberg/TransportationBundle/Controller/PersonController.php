@@ -172,7 +172,7 @@ class PersonController extends Controller
       $logger->info('Just entered PersonController::createCreateForm()');
        
         $form = $this->createForm(new PersonType(), $entity, array(
-            'validation_groups' => array('Person'),
+            'validation_groups' => array('Default'),
             'action' => $this->generateUrl('person_create'),
             'method' => 'POST',
         ));
@@ -219,7 +219,7 @@ class PersonController extends Controller
         $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
         $upcoming = $reservationRepository->findUpcomingTripsByPerson($now, $entity);
         $past = $reservationRepository->findPastTripsByPerson($entity);
-      
+        $tickets = $reservationRepository->findTicketsForReservationByPerson($entity);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Person entity.');
         }
@@ -230,6 +230,7 @@ class PersonController extends Controller
             'entity'      => $entity,
             'upcoming_trips' => $upcoming,
             'past_trips' => $past,
+            'tickets' => $tickets,
             'delete_form' => $deleteForm->createView(),
         );
     }

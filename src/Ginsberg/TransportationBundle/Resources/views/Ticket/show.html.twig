@@ -31,6 +31,10 @@
                 <td><a href="{{ path('reservation_show', {'id': entity.reservation.id}) }}">{{ entity.reservation.id }}</a></td>
             </tr>
             <tr>
+                <th>Driver uniqname</th>
+                <td><a href="{{ path('person_show', {'id': entity.reservation.person.id}) }}">{{ entity.reservation.person }}</a></td>
+            </tr>
+            <tr>
                 <th>Reason</th>
                 <td>{{ entity.reason }}</td>
             </tr>

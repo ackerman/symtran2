@@ -104,6 +104,15 @@
                 <td>{{ entity.isNoShow }}</td>
             </tr>
             <tr>
+                <th>Tickets</th>
+                <td>{% if tickets %}
+                    {% for ticket in tickets %}
+                      <a href="{{ path('ticket_show', {'id': ticket.id }) }}"><span class="error">{{ ticket.id }}</span></a>&nbsp;&nbsp;
+                    {% endfor %}
+                  {% else %}None{% endif %}
+                </td>
+            </tr>
+            <tr>
                 <th>Created</th>
                 <td>{{ entity.created|date('Y-m-d H:i:s') }}</td>
             </tr>

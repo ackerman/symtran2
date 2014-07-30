@@ -168,6 +168,29 @@ class ReservationRepository extends EntityRepository
   }
   
   /**
+   * Returns all Tickets associated with a given Person's Reservations. 
+   * 
+   * @param Person $person The Person whose tickets we want to find
+   * 
+   * @return array 
+   */
+  public function findTicketsForReservationByPerson($person)
+  {
+    $em = $this->getEntityManager();
+    $query = $em->createQuery('SELECT t FROM GinsbergTransportationBundle:Ticket t 
+      WHERE t IN
+        (SELECT r2 FROM GinsbergTransportationBundle:Reservation r2 WHERE r2.person = :person)')
+            ->setParameters(array('person' => $person));
+    
+    try {
+      $tickets = $query->getResult();
+      return $tickets;
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return NULL;
+    }	
+  }
+  
+  /**
 	 * Given a start and end time and a vehicle id, returns true if the vehicle
 	 * is free in the given timeframe.
    * 

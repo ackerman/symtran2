@@ -15,12 +15,29 @@ class TicketType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('ticketDate')
-            ->add('reason')
-            ->add('location')
+            ->add('reservation', NULL, array(
+                'label' => 'Reservation ID',
+                'attr' => array(
+                    'readonly' => 'readonly',
+                )
+            ))
+            ->add('ticketDate', 'datetime', array(
+                'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd hh:mm a',
+                'label' => 'Ticket Date & Time',
+                'attr' => array(
+                    'class' => 'datetime',
+                  )))
+            ->add('reason', NULL, array(
+                'label' => 'Reason/Code',
+            ))
+            ->add('location', NULL, array(
+                'label' => 'Violation Location',
+            ))
             ->add('amount')
-            ->add('isPaid')
-            ->add('reservation')
+            ->add('isPaid', NULL, array(
+                'label' => 'Paid',
+            ))
         ;
     }
     

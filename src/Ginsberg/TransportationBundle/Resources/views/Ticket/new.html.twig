@@ -9,8 +9,33 @@
       </span>
     </div>
 
-    <h1>Add a Ticket</h1>
+    <h1>Create a ticket for Reservation {{ form.reservation.vars.value }}</h1>
+    {{ form_start(form) }}
+      {{ form_errors(form) }}
+      <div>
+        <label for="ticket_reservation_person_uniqname">
+          Driver uniqname
+        </label>
+        <input type="text" id="ticket_reservation_person_uniqname" 
+               name="ticket_reservation_person_uniqname" disabled="disabled" value="{{ form.vars.data.reservation.person }}" />
+      </div>
+      {{ form_row(form.reservation) }}
+      {{ form_row(form.ticketDate) }}
+      {{ form_row(form.reason) }}
+      {{ form_row(form.location) }}
+      {{ form_row(form.amount) }}
+      {{ form_row(form.isPaid) }}
+      {{ form_row(form._token) }}
+      
+      {{ form_row(form.submit, {'label': 'Create' }) }}
+      
+    {{ form_end(form, {'render_rest': false}) }}
 
-    {{ form(form) }}
-
+{% endblock %}
+{% block javascripts %}
+  {% javascripts 
+    '@GinsbergTransportationBundle/Resources/public/js/ticket.js' %}
+    {{ parent() }}
+    <script src="{{ asset_url }}"></script>
+  {% endjavascripts %}
 {% endblock %}

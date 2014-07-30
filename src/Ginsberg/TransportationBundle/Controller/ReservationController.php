@@ -400,7 +400,8 @@ $entities = $reservationRepository->findAll();
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
-
+        $tickets = $em->getRepository('GinsbergTransportationBundle:Ticket')->findByReservation($entity);
+        
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Reservation entity.');
         }
@@ -408,7 +409,8 @@ $entities = $reservationRepository->findAll();
         $deleteForm = $this->createDeleteForm($id);
 
         return array(
-            'entity'      => $entity,
+            'entity' => $entity,
+            'tickets' => $tickets,
             'delete_form' => $deleteForm->createView(),
         );
     }
@@ -426,7 +428,9 @@ $entities = $reservationRepository->findAll();
       $em = $this->getDoctrine()->getManager();
       $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation'); 
       $entity = $reservationRepository->find($id);
-
+      
+      $tickets = $em->getRepository('GinsbergTransportationBundle:Ticket')->findByReservation($entity);
+      
       if (!$entity) {
           throw $this->createNotFoundException('Unable to find Reservation entity.');
       }
@@ -469,6 +473,7 @@ $entities = $reservationRepository->findAll();
 
       return array(
           'entity'      => $entity,
+          'tickets' => $tickets,
           'isReservationPast' => $isReservationPast,
           'edit_form'   => $editForm->createView(),
           'delete_form' => $deleteForm->createView(),

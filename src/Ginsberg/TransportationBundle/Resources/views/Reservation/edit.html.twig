@@ -47,7 +47,16 @@
       {{ form_row(edit_form.destinationText) }}
       {{ form_row(edit_form.notes) }}
       {{ form_row(edit_form.isNoShow) }}
-        <div style='display:none;'>
+      <div>
+        <label for="tickets_for_reservation">Tickets</label>
+        {% if tickets %}
+          Go to: 
+          {% for ticket in tickets %}
+            <a href="{{ path('ticket_show', {'id': ticket.id }) }}"><span class="error">{{ ticket.id }}</span></a>&nbsp;&nbsp;
+          {% endfor %}
+        {% else %}None{% endif %}
+      </div>
+      <div style='display:none;'>
         {{ form_row(edit_form.created) }}
         {{ form_row(edit_form.modified) }}
       </div>

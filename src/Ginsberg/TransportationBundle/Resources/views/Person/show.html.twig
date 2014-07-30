@@ -46,8 +46,14 @@
                 <td>{{ entity.dateApproved is empty ? "" : entity.dateApproved|date('g:i a F j Y') }}</td>
             </tr>
             <tr>
-                <th>Has ticket</th>
-                <td>{% if entity.hasUnpaidTicket %}Yes{% else %}No{% endif %}</td>
+              <th><span class="error">Tickets</span></th>
+                <td>
+                  {% if tickets %}
+                    {% for ticket in tickets %}
+                      <a href="{{ path('ticket_show', {'id': ticket.id }) }}"><span class="error">{{ ticket.id }}</span></a>&nbsp;&nbsp;
+                    {% endfor %}
+                  {% else %}None{% endif %}
+                </td>
             </tr>
             <tr>
                 <th>Created</th>
@@ -96,6 +102,7 @@
                 <th>Start</th>
                 <th>End</th>
                 <th>Vehicle assigned</th>
+                <th>Tickets</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -105,6 +112,12 @@
                 <td>{% if past_trip.start %}{{ past_trip.start|date('g:i a F j Y') }}{% endif %}</td>
                 <td>{% if past_trip.end %}{{ past_trip.end|date('g:i a F j Y') }}{% endif %}</td>
                 <td><a href="{{ path('vehicle_show', { 'id': past_trip.vehicle.id }) }}">{{ past_trip.vehicle }}</a></td>
+                <td>
+                  {% for ticket in tickets %}
+                    <a href="{{ path('ticket_show', { 'id': ticket.id }) }}">{{ ticket.id }}</a>
+                  {% endfor %}
+                  &nbsp;
+                </td>
                 <td>
                 <ul class="actions">
                     <li>

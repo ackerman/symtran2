@@ -18,7 +18,7 @@ class PersonType extends AbstractType
             ->add('firstName')
             ->add('lastName')
             ->add('uniqname')
-            ->add('phone')
+            ->add('phone', NULL, array('required' => FALSE))
             ->add('status', NULL, array('required' => FALSE))
             ->add('dateApproved', 'datetime', array(
                 'required' => FALSE,
