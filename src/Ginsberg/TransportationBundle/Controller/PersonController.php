@@ -212,6 +212,7 @@ class PersonController extends Controller
      */
     public function showAction($id)
     {
+      $logger = $this->get('logger');
         $em = $this->getDoctrine()->getManager();
         
         $now = new \DateTime();
@@ -219,7 +220,9 @@ class PersonController extends Controller
         $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
         $upcoming = $reservationRepository->findUpcomingTripsByPerson($now, $entity);
         $past = $reservationRepository->findPastTripsByPerson($entity);
-        $tickets = $reservationRepository->findTicketsForReservationByPerson($entity);
+        $ticketRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
+        $tickets = $ticketRepository->findTicketsForPerson($entity);
+        var_dump($tickets);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Person entity.');
         }

@@ -38,11 +38,23 @@ form
 {
 }
 
+form h3 {
+  padding: 10px 0;
+}
+form div {
+  padding-bottom: 7px;
+}
+
 form input,
 form textarea,
 form select
 {
-	margin: 0.2em 0 0.5em 0;
+	margin: 0.2em 0 0.7em 0;
+}
+
+form input
+{
+  width: 15em;
 }
 
 form fieldset
@@ -58,9 +70,10 @@ form label
 	font-weight: bold;
 	font-size: 1em;
 	display: block;
-	width:150px;
+	width:180px;
 	float:left;
 	padding-top:4px;
+  padding-right: 4px;
   line-height: 1em;
 }
 

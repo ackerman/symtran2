@@ -50,6 +50,11 @@ class TicketController extends Controller
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
+            $reservation = $form->get('reservation')->getData();
+            $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
+            $person = $reservationRepository->find($reservation)->getPerson();
+            $person->setHasUnpaidTicket(TRUE);
+            $em->persist($person);
             $em->persist($entity);
             $em->flush();
 

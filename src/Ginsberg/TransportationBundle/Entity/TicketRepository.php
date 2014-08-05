@@ -12,4 +12,26 @@ use Doctrine\ORM\EntityRepository;
  */
 class TicketRepository extends EntityRepository
 {
+  /**
+   * Returns all Tickets associated with a given Person's Reservations. 
+   * 
+   * @param Person $person The Person whose tickets we want to find
+   * 
+   * @return array 
+   */
+  public function findTicketsForPerson($person)
+  {
+    $em = $this->getEntityManager();
+    $query = $em->createQuery('SELECT t FROM GinsbergTransportationBundle:Ticket t 
+      WHERE t IN
+        (SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE r.person = :person)')
+            ->setParameters(array('person' => $person));
+    
+    try {
+      $tickets = $query->getResult();
+      return $tickets;
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return NULL;
+    }	
+  }
 }

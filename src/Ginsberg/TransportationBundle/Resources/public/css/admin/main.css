@@ -178,6 +178,12 @@ table td {
   padding:12px;
 }
 
+table.record_properties th, table.record_properties td {
+  background-color: #ffffff;
+  border-bottom: none;
+  padding: 0 0 .5em 0;
+}
+
 table td.note-follows {
   border-bottom: none;
 }
