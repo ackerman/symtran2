@@ -18,7 +18,7 @@ class PersonType extends AbstractType
             ->add('firstName')
             ->add('lastName')
             ->add('uniqname')
-            ->add('phone')
+            ->add('phone', NULL, array('required' => FALSE))
             ->add('status', NULL, array('required' => FALSE))
             ->add('dateApproved', 'datetime', array(
                 'required' => FALSE,
@@ -42,7 +42,8 @@ class PersonType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Ginsberg\TransportationBundle\Entity\Person'
+            'data_class' => 'Ginsberg\TransportationBundle\Entity\Person',
+            'validation_groups' => array('registration', 'Person', 'Default')
         ));
     }
 

@@ -49,7 +49,7 @@ class ReservationType extends AbstractType
               'required' => FALSE,
             ))
             ->add('start', 'datetime', array(
-                'required' => FALSE,
+                'required' => TRUE,
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd hh:mm a',
                 'attr' => array(

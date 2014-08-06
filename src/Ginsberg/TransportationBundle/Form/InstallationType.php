@@ -16,10 +16,11 @@ class InstallationType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('isOpen', 'checkbox', array('label' => 'Open'))
-            ->add('reservationsOpen', NULL, array('label' => 'Open for reservations message'))
-            ->add('carsAvailable', NULL, array('label' => 'Cars available message'))
+            ->add('isOpen', 'checkbox', array('label' => 'Site Open'))
+            ->add('reservationsOpen', NULL, array('label' => 'Date to Open for Reservations'))
+            ->add('carsAvailable', NULL, array('label' => 'Date Cars Become Available'))
             ->add('fallStart', 'datetime', array(
+                'label' => 'Date Cars Picked Up from PTS for Fall Semester',
                 'required' => FALSE,
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd hh:mm a',
@@ -28,6 +29,7 @@ class InstallationType extends AbstractType
                   )
                 ))
             ->add('thanksgivingStart', 'datetime', array(
+                'label' => 'Thanksgiving Starts',
                 'required' => FALSE,
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd hh:mm a',
@@ -36,6 +38,7 @@ class InstallationType extends AbstractType
                   )
                 ))
             ->add('thanksgivingEnd', 'datetime', array(
+                'label' => 'Thanksgiving Ends',
                 'required' => FALSE,
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd hh:mm a',
@@ -44,6 +47,7 @@ class InstallationType extends AbstractType
                   )
                 ))
             ->add('fallEnd', 'datetime', array(
+                'label' => 'Date Cars Returned to PTS for Fall Semester',
                 'required' => FALSE,
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd hh:mm a',
@@ -52,6 +56,7 @@ class InstallationType extends AbstractType
                   )
                 ))
             ->add('winterStart', 'datetime', array(
+                'label' => 'Date Cars Picked Up from PTS for Winter Semester',
                 'required' => FALSE,
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd hh:mm a',
@@ -60,6 +65,7 @@ class InstallationType extends AbstractType
                   )
                 ))
             ->add('mlkStart', 'datetime', array(
+                'label' => 'MLK Starts',
                 'required' => FALSE,
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd hh:mm a',
@@ -68,6 +74,7 @@ class InstallationType extends AbstractType
                   )
                 ))
             ->add('mlkEnd', 'datetime', array(
+                'label' => 'MLK Ends',
                 'required' => FALSE,
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd hh:mm a',
@@ -76,6 +83,7 @@ class InstallationType extends AbstractType
                   )
                 ))
             ->add('springbreakStart', 'datetime', array(
+                'label' => 'Spring Break Starts',
                 'required' => FALSE,
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd hh:mm a',
@@ -84,6 +92,7 @@ class InstallationType extends AbstractType
                   )
                 ))
             ->add('springbreakEnd', 'datetime', array(
+                'label' => 'Spring Break Ends',
                 'required' => FALSE,
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd hh:mm a',
@@ -92,6 +101,7 @@ class InstallationType extends AbstractType
                   )
                 ))
             ->add('winterEnd', 'datetime', array(
+                'label' => 'Date Cars Returned to PTS for Winter Semester',
                 'required' => FALSE,
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd hh:mm a',
@@ -100,6 +110,7 @@ class InstallationType extends AbstractType
                   )
                 ))
             ->add('fallBack', 'datetime', array(
+                'label' => 'Fall Back (Daylight Saving Time Ends)',
                 'required' => FALSE,
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd hh:mm a',
@@ -108,6 +119,7 @@ class InstallationType extends AbstractType
                   )
                 ))
             ->add('springForward', 'datetime', array(
+                'label' => 'Spring Forward (Daylight Saving Time Begins)',
                 'required' => FALSE,
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd hh:mm a',
@@ -115,8 +127,8 @@ class InstallationType extends AbstractType
                     'class' => 'datetime',
                   )
                 ))
-            ->add('dailyOpen', NULL, array('label' => 'Daily open (24-hr time)', 'empty_data' => '08:00'))
-            ->add('dailyClose', NULL, array('label' => 'Daily closing (24-hr time)', 'empty_data' => '20:00'))
+            ->add('dailyOpen', NULL, array('label' => 'Daily Opening (24-hr time)', 'empty_data' => '08:00'))
+            ->add('dailyClose', NULL, array('label' => 'Daily Closing (24-hr time)', 'empty_data' => '20:00'))
         ;
     }
     

@@ -13,8 +13,8 @@
         </a>
     </span>
     <span class="ticket button">
-        <a href="{{ path('reservation_edit', { 'id': entity.id }) }}">
-            Ticket
+        <a href="{{ path('ticket_new') }}/{{ entity.id }}">
+            Create Ticket
         </a>
     </span>
     <span class="delete button">{{ form(delete_form) }}</span>
@@ -102,6 +102,15 @@
             <tr>
                 <th>No Show</th>
                 <td>{{ entity.isNoShow }}</td>
+            </tr>
+            <tr>
+                <th>Tickets</th>
+                <td>{% if tickets %}
+                    {% for ticket in tickets %}
+                      <a href="{{ path('ticket_show', {'id': ticket.id }) }}"><span class="error">{{ ticket.id }}</span></a>&nbsp;&nbsp;
+                    {% endfor %}
+                  {% else %}None{% endif %}
+                </td>
             </tr>
             <tr>
                 <th>Created</th>

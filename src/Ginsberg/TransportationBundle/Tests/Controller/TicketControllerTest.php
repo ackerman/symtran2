@@ -19,7 +19,7 @@ class TicketControllerTest extends WebTestCase
 
         // Fill in the form and submit it
         $form = $crawler->selectButton('Create')->form(array(
-            'ginsberg_transportationbundle_tickettype[field_name]'  => 'Test',
+            'ginsberg_transportationbundle_ticket[field_name]'  => 'Test',
             // ... other fields to fill
         ));
 
@@ -32,8 +32,8 @@ class TicketControllerTest extends WebTestCase
         // Edit the entity
         $crawler = $client->click($crawler->selectLink('Edit')->link());
 
-        $form = $crawler->selectButton('Edit')->form(array(
-            'ginsberg_transportationbundle_tickettype[field_name]'  => 'Foo',
+        $form = $crawler->selectButton('Update')->form(array(
+            'ginsberg_transportationbundle_ticket[field_name]'  => 'Foo',
             // ... other fields to fill
         ));
 

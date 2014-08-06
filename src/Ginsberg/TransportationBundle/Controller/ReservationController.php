@@ -47,11 +47,18 @@ class ReservationController extends Controller
       $upcoming = $reservationRepository->findUpcomingTrips($date, $dateEnd);
       $ongoing = $reservationRepository->findOngoingTrips($now);
       $checkinsToday = $reservationRepository->findCheckinsToday($now);
-      
-$entities = $reservationRepository->findAll();
+      $ticketRepository = $em->getRepository('GinsbergTransportationBundle:Ticket');
+      $reservationsWhereDriverHasTicket = array();
+      foreach ($upcoming as $reservation) {
+        if ($ticketRepository->findTicketsForPerson($reservation->getPerson())) {
+          $reservationsWhereDriverHasTicket[] = $reservation->getPerson();
+        }
+      }
+      $entities = $reservationRepository->findAll();
 
       return array(
         'upcoming' => $upcoming,
+        'reservationsWhereDriverHasTicket' => $reservationsWhereDriverHasTicket,
         'ongoing' => $ongoing,
         'checkinsToday' => $checkinsToday,
         'entities' => $entities,
@@ -400,7 +407,8 @@ $entities = $reservationRepository->findAll();
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
-
+        $tickets = $em->getRepository('GinsbergTransportationBundle:Ticket')->findByReservation($entity);
+        
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Reservation entity.');
         }
@@ -408,7 +416,8 @@ $entities = $reservationRepository->findAll();
         $deleteForm = $this->createDeleteForm($id);
 
         return array(
-            'entity'      => $entity,
+            'entity' => $entity,
+            'tickets' => $tickets,
             'delete_form' => $deleteForm->createView(),
         );
     }
@@ -426,7 +435,9 @@ $entities = $reservationRepository->findAll();
       $em = $this->getDoctrine()->getManager();
       $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation'); 
       $entity = $reservationRepository->find($id);
-
+      
+      $tickets = $em->getRepository('GinsbergTransportationBundle:Ticket')->findByReservation($entity);
+      
       if (!$entity) {
           throw $this->createNotFoundException('Unable to find Reservation entity.');
       }
@@ -469,6 +480,7 @@ $entities = $reservationRepository->findAll();
 
       return array(
           'entity'      => $entity,
+          'tickets' => $tickets,
           'isReservationPast' => $isReservationPast,
           'edit_form'   => $editForm->createView(),
           'delete_form' => $deleteForm->createView(),
@@ -946,12 +958,12 @@ $entities = $reservationRepository->findAll();
 
       $form = $this->createCreateForm($entity);
       $form->handleRequest($request);
-      //$logger->info('After handleRequest, dateToShow = ' . date('Y-m-d H:i:s', $form->get('dateToShow')->getData()->getTimestamp()));
-
+      
 
       if ($form->isValid()) {
         $entity->setCheckin(new \DateTime());
-
+        $logger->info('in checkinAction, notes = ' . $entity->getNotes());
+      
         $em->persist($entity);
         $em->flush();
 
@@ -960,7 +972,7 @@ $entities = $reservationRepository->findAll();
     }
 
   /**
-   * Display form for checking in the Reservation
+   * Display button for checking in the Reservation
    *
    * @Route("/checkin", name="reservation_checkin_criteria")
    * @Method("GET")

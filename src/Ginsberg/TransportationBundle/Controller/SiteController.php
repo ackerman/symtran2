@@ -284,17 +284,20 @@ class SiteController extends Controller
 					));
 					//$this->redirect(array('site/closed'));
 				} else {
-					$now=date("Y-m-d H:i:s");
-					//$ticket = Ticket::has_tickets($uniqname);
+					
+          // Alert user if they have a ticket
+          
+					$tickets = $em->getRepository('GinsbergTransportationBundle:Ticket')->findTicketsForPerson($person);
           // FOR TESTING
-          $ticket = FALSE;
-
+          //$tickets = FALSE;
+          
+          $now=date("Y-m-d H:i:s");
 					// Find upcoming trips for current user
 					$upcomingTripsForPerson = $em->getRepository('GinsbergTransportationBundle:Reservation')->findUpcomingTripsByPerson($now, $person);
 
 					return array(
 						'name'=>$person->getFirstName(),
-						'ticket'=>$ticket,
+						'tickets'=>$tickets,
 						'upcomingTripsForPerson'=>$upcomingTripsForPerson,
 					);
 				}
@@ -339,8 +342,11 @@ class SiteController extends Controller
 
     $program = $em->getRepository('GinsbergTransportationBundle:Program')->findByEligibilityGroup($ldapGroup);
     if (is_array($program)) {
-      $program = $program[0];
+      if (array_key_exists(0, $program)) {
+        $program = $program[0];
+      }
     }
+    
     $logger->info('User\'s program = ' . $program);
 
     // Check whether user is already in database
@@ -409,6 +415,7 @@ class SiteController extends Controller
     $logger = $this->get('logger');
     $logger->info('In createRegisterForm(). Id of entity = ' . $entity->getId());
       $form = $this->createForm(new PersonType(), $entity, array(
+          'validation_groups' => array('registration'),
           'action' => $this->generateUrl('site_register', array('id' => $entity->getId())),
           'method' => 'POST',
       ));
@@ -433,6 +440,7 @@ class SiteController extends Controller
     $entity = $em->getRepository('GinsbergTransportationBundle:Person')->find($id);
     $logger->info('entity->getFirstName() = ' . $entity->getFirstName());
     
+    $provider = $this->get('user_provider');
     if (!$entity) {
       throw $this->createNotFoundException('Unable to find Person in database.');
     }

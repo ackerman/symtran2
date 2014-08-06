@@ -9,18 +9,32 @@
     </span>
     <span>{{ form(delete_form) }}</span>
   </div>
-    <h1>Installation Configuration</h1>
+    <h1>Administer Site</h1>
 
-    {{ form(edit_form) }}
+    {{ form_start(edit_form) }}
 
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('installation') }}">
-            Back to the list
-        </a>
-    </li>
-    <li>{{ form(delete_form) }}</li>
-</ul>
+      {{ form_errors(edit_form) }}
+      <h3>Open or Close Site</h3>
+      {{ form_row(edit_form.isOpen) }}
+      {{ form_row(edit_form.reservationsOpen) }}
+      {{ form_row(edit_form.carsAvailable) }}
+      <h3>Enter Date and Time for Breaks</h3>
+      {{ form_row(edit_form.fallStart) }}
+      {{ form_row(edit_form.thanksgivingStart) }}
+      {{ form_row(edit_form.thanksgivingEnd) }}
+      {{ form_row(edit_form.fallEnd) }}
+      {{ form_row(edit_form.winterStart) }}
+      {{ form_row(edit_form.mlkStart) }}
+      {{ form_row(edit_form.mlkEnd) }}
+      {{ form_row(edit_form.springbreakStart) }}
+      {{ form_row(edit_form.springbreakEnd) }}
+      {{ form_row(edit_form.winterEnd) }}
+      {{ form_row(edit_form.fallBack) }}
+      {{ form_row(edit_form.springForward) }}
+      {{ form_row(edit_form.dailyOpen) }}
+      {{ form_row(edit_form.dailyClose) }}
+    {{ form_end(edit_form, {render_rest: false}) }}
+
 {% endblock %}
 {% block javascripts %}
   {% javascripts 

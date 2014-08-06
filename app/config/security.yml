@@ -10,6 +10,7 @@ security:
           users:
             admin: { password: admin, roles: 'ROLE_ADMIN' }
             super: { password: admin, roles: 'ROLE_SUPER_ADMIN' }
+            ericaack: { password: admin, roles: 'ROLE_SUPER_ADMIN' }
 
   firewalls:
     dev:
@@ -29,7 +30,7 @@ security:
     default:
           anonymous: ~
   access_control:
-    - { path: ^/installation, roles: ROLE_SUPER_ADMIN }
+    - { path: ^/installation, roles: ROLE_ADMIN }
     - { path: ^/reservation, roles: ROLE_ADMIN }
     
   encoders:

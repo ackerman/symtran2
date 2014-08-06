@@ -9,7 +9,7 @@ body {
 
 }
 
-header {
+#header {
 	margin: 0;
 	padding: 0;
 	border-top: 5px solid #67a0b8;
@@ -17,7 +17,7 @@ header {
 	padding:15px;
 }
 
-header h1 {
+header  {
   width: 60%;
   float: left;
   text-align: left;
@@ -178,6 +178,15 @@ table td {
   padding:12px;
 }
 
+table.record_properties th, table.record_properties td {
+  background-color: #ffffff;
+  border-bottom: none;
+  padding: 0 0 .5em 0;
+}
+
+table td.note-follows {
+  border-bottom: none;
+}
 
 dl {
   width:30em;

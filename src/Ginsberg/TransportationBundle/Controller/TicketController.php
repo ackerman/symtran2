@@ -49,11 +49,18 @@ class TicketController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($entity);
-            $em->flush();
+          $em = $this->getDoctrine()->getManager();
+          if (!$form->get('isPaid')) {
+            $reservation = $form->get('reservation')->getData();
+            $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
+            $person = $reservationRepository->find($reservation)->getPerson();
+            $person->setHasUnpaidTicket(TRUE);
+            $em->persist($person);
+          }
+          $em->persist($entity);
+          $em->flush();
 
-            return $this->redirect($this->generateUrl('ticket_show', array('id' => $entity->getId())));
+          return $this->redirect($this->generateUrl('ticket_show', array('id' => $entity->getId())));
         }
 
         return array(
@@ -63,12 +70,12 @@ class TicketController extends Controller
     }
 
     /**
-    * Creates a form to create a Ticket entity.
-    *
-    * @param Ticket $entity The entity
-    *
-    * @return \Symfony\Component\Form\Form The form
-    */
+     * Creates a form to create a Ticket entity.
+     *
+     * @param Ticket $entity The entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
     private function createCreateForm(Ticket $entity)
     {
         $form = $this->createForm(new TicketType(), $entity, array(
@@ -84,15 +91,19 @@ class TicketController extends Controller
     /**
      * Displays a form to create a new Ticket entity.
      *
-     * @Route("/new", name="ticket_new")
+     * @Route("/new/{reservationId}", name="ticket_new")
      * @Method("GET")
      * @Template()
      */
-    public function newAction()
+    public function newAction($reservationId = '')
     {
         $entity = new Ticket();
+        $resRep = $this->getDoctrine()->getManager()->getRepository('GinsbergTransportationBundle:Reservation');
+        if ($reservationId) {
+          $entity->setReservation($resRep->find($reservationId));
+        }
         $form   = $this->createCreateForm($entity);
-
+        
         return array(
             'entity' => $entity,
             'form'   => $form->createView(),

@@ -1,15 +1,41 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
-    <h1>Ticket creation</h1>
+    <div class="record_actions">
+      <span class='back button'>
+          <a href="{{ path('ticket') }}">
+              Tickets
+          </a>
+      </span>
+    </div>
 
-    {{ form(form) }}
+    <h1>Create a ticket for Reservation {{ form.reservation.vars.value }}</h1>
+    {{ form_start(form) }}
+      {{ form_errors(form) }}
+      <div>
+        <label for="ticket_reservation_person_uniqname">
+          Driver uniqname
+        </label>
+        <input type="text" id="ticket_reservation_person_uniqname" 
+               name="ticket_reservation_person_uniqname" disabled="disabled" value="{{ form.vars.data.reservation.person }}" />
+      </div>
+      {{ form_row(form.reservation) }}
+      {{ form_row(form.ticketDate) }}
+      {{ form_row(form.reason) }}
+      {{ form_row(form.location) }}
+      {{ form_row(form.amount) }}
+      {{ form_row(form.isPaid) }}
+      {{ form_row(form._token) }}
+      
+      {{ form_row(form.submit, {'label': 'Create' }) }}
+      
+    {{ form_end(form, {'render_rest': false}) }}
 
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('ticket') }}">
-            Back to the list
-        </a>
-    </li>
-</ul>
+{% endblock %}
+{% block javascripts %}
+  {% javascripts 
+    '@GinsbergTransportationBundle/Resources/public/js/ticket.js' %}
+    {{ parent() }}
+    <script src="{{ asset_url }}"></script>
+  {% endjavascripts %}
 {% endblock %}
