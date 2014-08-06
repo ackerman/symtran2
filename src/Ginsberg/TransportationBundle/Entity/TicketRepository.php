@@ -23,7 +23,7 @@ class TicketRepository extends EntityRepository
   {
     $em = $this->getEntityManager();
     $query = $em->createQuery('SELECT t FROM GinsbergTransportationBundle:Ticket t 
-      WHERE t IN
+      WHERE t.isPaid = 0 AND t.reservation IN
         (SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE r.person = :person)')
             ->setParameters(array('person' => $person));
     

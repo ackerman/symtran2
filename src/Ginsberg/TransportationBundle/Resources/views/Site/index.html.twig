@@ -1,8 +1,8 @@
 {% extends 'GinsbergTransportationBundle::public_layout.html.twig' %}
 {% block body %}
   <h1>Welcome, {{ name }}</h1>
-  {% if ticket == true %}
-    <p style='color: red; font-weight: bold;'>You have an outstanding ticket. You will not be allowed to check out a vehicle until the ticket has been paid.
+  {% if tickets %}
+    <p class="error errorSummary">You have an outstanding ticket. You will not be allowed to check out a vehicle until the ticket has been paid.
     Tickets can be paid at the Ginsberg Center front desk. For more information, contact the Ginsberg Center, 763-3548.</p>
   {% endif %}
     

@@ -93,14 +93,14 @@ th {
 
 .error,
 .errorMessage {
-  color:#8a1f11;
+  color:#ac1f11;
 }
 
 .errorSummary {
   border-radius:15px;
-  border:1px solid #8a1f11;
+  border:1px solid #ac1f11;
   background:#eee;
-  padding:0px 20px 0px 20px;
+  padding:10px 20px 10px 20px;
   margin-bottom:1em;
   -webkit-box-shadow:0 0 20px rgba(97, 12, 13, 0.1) inset;
      -moz-box-shadow:0 0 20px rgba(97, 12, 13, 0.1) inset;

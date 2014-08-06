@@ -31,13 +31,14 @@
         </thead>
         <tbody>
         {% for upcoming_trip in upcoming %}
-            <tr>
+          {% if upcoming_trip.person in reservationsWhereDriverHasTicket %}{% set has_ticket = true %}{% else %}{% set has_ticket = false %}{% endif %}
+            <tr{% if has_ticket == true %} class="error"{% endif %}>
                 <td>{% if upcoming_trip.start %}{{ upcoming_trip.start|date('g:i a F j Y') }}{% endif %}</td>
                 <td>{% if upcoming_trip.end %}{{ upcoming_trip.end|date('g:i a F j Y') }}{% endif %}</td>
                 <td>{% if upcoming_trip.checkout %}{{ upcoming_trip.checkout|date('g:i a F j Y') }}{% endif %}</td>
                 <td>{% if upcoming_trip.checkin %}{{ upcoming_trip.checkin|date('g:i a F j Y') }}{% endif %}</td>
                 <td><a href="{{ path('vehicle_show', { 'id': upcoming_trip.vehicle.id }) }}">{{ upcoming_trip.vehicle }}</a></td>
-                <td><a href="{{ path('person_show', { 'id': upcoming_trip.person.id }) }}">{{ upcoming_trip.person.firstName }} {{ upcoming_trip.person.lastName }}</a></td>
+                <td><a href="{{ path('person_show', { 'id': upcoming_trip.person.id }) }}">{% if has_ticket == true %}<span class="error">{% endif %}{{ upcoming_trip.person.firstName }} {{ upcoming_trip.person.lastName }}{% if has_ticket == true %}</span>{% endif %}</a></td>
                 {% if dateToShow == date %}
                     <td>{{ render(controller('GinsbergTransportationBundle:Reservation:checkoutCriteria', 
                           {'id': upcoming_trip.id})) }}</td>

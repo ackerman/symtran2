@@ -222,7 +222,6 @@ class PersonController extends Controller
         $past = $reservationRepository->findPastTripsByPerson($entity);
         $ticketRepository = $em->getRepository('GinsbergTransportationBundle:Ticket');
         $tickets = $ticketRepository->findTicketsForPerson($entity);
-        var_dump($tickets);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Person entity.');
         }

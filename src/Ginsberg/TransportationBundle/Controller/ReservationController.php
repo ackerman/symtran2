@@ -47,11 +47,18 @@ class ReservationController extends Controller
       $upcoming = $reservationRepository->findUpcomingTrips($date, $dateEnd);
       $ongoing = $reservationRepository->findOngoingTrips($now);
       $checkinsToday = $reservationRepository->findCheckinsToday($now);
-      
-$entities = $reservationRepository->findAll();
+      $ticketRepository = $em->getRepository('GinsbergTransportationBundle:Ticket');
+      $reservationsWhereDriverHasTicket = array();
+      foreach ($upcoming as $reservation) {
+        if ($ticketRepository->findTicketsForPerson($reservation->getPerson())) {
+          $reservationsWhereDriverHasTicket[] = $reservation->getPerson();
+        }
+      }
+      $entities = $reservationRepository->findAll();
 
       return array(
         'upcoming' => $upcoming,
+        'reservationsWhereDriverHasTicket' => $reservationsWhereDriverHasTicket,
         'ongoing' => $ongoing,
         'checkinsToday' => $checkinsToday,
         'entities' => $entities,

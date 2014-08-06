@@ -46,7 +46,7 @@
                 <td>{{ entity.dateApproved is empty ? "" : entity.dateApproved|date('g:i a F j Y') }}</td>
             </tr>
             <tr>
-              <th><span class="error">Tickets</span></th>
+              <th><span{% if tickets %} class="error"{% endif %}>Tickets</span></th>
                 <td>
                   {% if tickets %}
                     {% for ticket in tickets %}

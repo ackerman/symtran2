@@ -49,16 +49,18 @@ class TicketController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+          $em = $this->getDoctrine()->getManager();
+          if (!$form->get('isPaid')) {
             $reservation = $form->get('reservation')->getData();
             $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
             $person = $reservationRepository->find($reservation)->getPerson();
             $person->setHasUnpaidTicket(TRUE);
             $em->persist($person);
-            $em->persist($entity);
-            $em->flush();
+          }
+          $em->persist($entity);
+          $em->flush();
 
-            return $this->redirect($this->generateUrl('ticket_show', array('id' => $entity->getId())));
+          return $this->redirect($this->generateUrl('ticket_show', array('id' => $entity->getId())));
         }
 
         return array(

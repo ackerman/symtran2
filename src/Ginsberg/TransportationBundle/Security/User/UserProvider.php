@@ -92,7 +92,7 @@ class UserProvider implements UserProviderInterface
       // for local debug:
       if(!isset( $_SERVER['REMOTE_USER'] ) &&
           $_SERVER[ 'SERVER_NAME' ] === 'localhost') {
-        return 'hoohouse';
+        return 'ericaack';
       }
 
       //Yii::log('User not found', 'info','system.debug');

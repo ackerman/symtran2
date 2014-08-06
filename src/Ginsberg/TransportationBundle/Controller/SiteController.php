@@ -284,17 +284,20 @@ class SiteController extends Controller
 					));
 					//$this->redirect(array('site/closed'));
 				} else {
-					$now=date("Y-m-d H:i:s");
-					//$ticket = Ticket::has_tickets($uniqname);
+					
+          // Alert user if they have a ticket
+          
+					$tickets = $em->getRepository('GinsbergTransportationBundle:Ticket')->findTicketsForPerson($person);
           // FOR TESTING
-          $ticket = FALSE;
-
+          //$tickets = FALSE;
+          
+          $now=date("Y-m-d H:i:s");
 					// Find upcoming trips for current user
 					$upcomingTripsForPerson = $em->getRepository('GinsbergTransportationBundle:Reservation')->findUpcomingTripsByPerson($now, $person);
 
 					return array(
 						'name'=>$person->getFirstName(),
-						'ticket'=>$ticket,
+						'tickets'=>$tickets,
 						'upcomingTripsForPerson'=>$upcomingTripsForPerson,
 					);
 				}
