@@ -220,7 +220,7 @@ class PersonController extends Controller
         $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
         $upcoming = $reservationRepository->findUpcomingTripsByPerson($now, $entity);
         $past = $reservationRepository->findPastTripsByPerson($entity);
-        $ticketRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
+        $ticketRepository = $em->getRepository('GinsbergTransportationBundle:Ticket');
         $tickets = $ticketRepository->findTicketsForPerson($entity);
         var_dump($tickets);
         if (!$entity) {
