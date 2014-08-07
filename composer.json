@@ -18,7 +18,9 @@
         "sensio/distribution-bundle": "~3.0",
         "sensio/framework-extra-bundle": "~3.0",
         "incenteev/composer-parameter-handler": "~2.0",
-        "gedmo/doctrine-extensions": "dev-master"
+        "gedmo/doctrine-extensions": "dev-master",
+        "apy/datagrid-bundle": "dev-master",
+        "phpoffice/phpexcel": "dev-master"
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3"

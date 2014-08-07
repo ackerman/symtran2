@@ -4,8 +4,70 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "fb86809c8612f144b1db44a06c390c15",
+    "hash": "8d39e485ccca18541895934022d46896",
     "packages": [
+        {
+            "name": "apy/datagrid-bundle",
+            "version": "dev-master",
+            "target-dir": "APY/DataGridBundle",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Abhoryo/APYDataGridBundle.git",
+                "reference": "7d0080c0a7593d8fcb511dc6d1738e5108ae0e13"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Abhoryo/APYDataGridBundle/zipball/7d0080c0a7593d8fcb511dc6d1738e5108ae0e13",
+                "reference": "7d0080c0a7593d8fcb511dc6d1738e5108ae0e13",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2",
+                "symfony/symfony": ">=2.0.0",
+                "twig/twig": ">=1.5.0"
+            },
+            "suggest": {
+                "PHPExcel": "Export the grid (Excel, HTML or PDF)",
+                "ext-intl": "Translate the grid",
+                "ext-mbstring": "Convert your data with the right charset"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "APY\\DataGridBundle": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Stanislav Turza",
+                    "email": "stanislav.turza@gmail.com"
+                },
+                {
+                    "name": "Evan Owens",
+                    "email": "eaowens@gmail.com"
+                },
+                {
+                    "name": "Yoann Petit",
+                    "email": "abhoryo@free.fr"
+                }
+            ],
+            "description": "Symfony2 Datagrid Bundle",
+            "homepage": "https://github.com/Abhoryo/APYDataGridBundle",
+            "keywords": [
+                "datagrid",
+                "symfony"
+            ],
+            "time": "2014-06-30 20:15:23"
+        },
         {
             "name": "doctrine/annotations",
             "version": "v1.2.0",
@@ -951,6 +1013,63 @@
             "time": "2014-06-04 16:30:04"
         },
         {
+            "name": "phpoffice/phpexcel",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PHPOffice/PHPExcel.git",
+                "reference": "e69a5e4d0ffa7fb6f171859e0a04346e580df30b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PHPOffice/PHPExcel/zipball/e69a5e4d0ffa7fb6f171859e0a04346e580df30b",
+                "reference": "e69a5e4d0ffa7fb6f171859e0a04346e580df30b",
+                "shasum": ""
+            },
+            "require": {
+                "ext-xml": "*",
+                "ext-xmlwriter": "*",
+                "php": ">=5.2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "PHPExcel": "Classes/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL"
+            ],
+            "authors": [
+                {
+                    "name": "Maarten Balliauw",
+                    "homepage": "http://blog.maartenballiauw.be"
+                },
+                {
+                    "name": "Mark Baker"
+                },
+                {
+                    "name": "Franck Lefevre",
+                    "homepage": "http://blog.rootslabs.net"
+                },
+                {
+                    "name": "Erik Tilt"
+                }
+            ],
+            "description": "PHPExcel - OpenXML - Read, Create and Write Spreadsheet documents in PHP - Spreadsheet engine",
+            "homepage": "http://phpexcel.codeplex.com",
+            "keywords": [
+                "OpenXML",
+                "excel",
+                "php",
+                "spreadsheet",
+                "xls",
+                "xlsx"
+            ],
+            "time": "2014-03-02 15:22:49"
+        },
+        {
             "name": "psr/log",
             "version": "1.0.0",
             "source": {
@@ -1667,8 +1786,11 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "gedmo/doctrine-extensions": 20
+        "gedmo/doctrine-extensions": 20,
+        "apy/datagrid-bundle": 20,
+        "phpoffice/phpexcel": 20
     },
+    "prefer-stable": false,
     "platform": {
         "php": ">=5.3.3"
     },

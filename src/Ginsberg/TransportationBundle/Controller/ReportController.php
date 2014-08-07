@@ -6,16 +6,19 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use APY\DataGridBundle\Grid\Source\Entity;
+use APY\DataGridBundle\Grid\Export\PHPExcel2007Export;
+use APY\DataGridBundle\Grid\Export\CSVExport;
+
 use Monolog\Logger;
 
 class ReportController extends Controller {
 
   /**
-   * @Route("/report", name="report")
+   * @Route("/reports", name="reports")
    * @Template()
    */
-  public function reportAction() {
+  public function reportsAction() {
     $logger = $this->get('logger');
     // get the service container to pass to the closure
     $container = $this->container;
@@ -51,6 +54,27 @@ class ReportController extends Controller {
     $response->headers->set('Content-Disposition', 'attachment; filename="export.csv"');
 
     return $response;
+  }
+  
+  /**
+   * @Route("/report", name="report")
+   * @Template()
+   */
+  public function reportAction() {
+    $logger = $this->get('logger');
+    // get the service container to pass to the closure
+    $source = new Entity('GinsbergTransportationBundle:Reservation');
+    $grid = $this->get('grid');
+    $grid->setSource($source);
+    $grid->setLimits(189);
+    
+    $title = 'Ginsberg Transportation Export';
+    $fileName = 'Ginsberg_Transportation_Export';
+    $grid->addExport(new CSVExport('CSV Export'));
+    
+    $grid->isReadyForRedirect();
+    return $grid->getGridResponse('GinsbergTransportationBundle:Report:report.html.twig');
+//return $this->render('GinsbergTransportationBundle:Report:report.html.twig', array('grid' => $grid));
   }
   
   
