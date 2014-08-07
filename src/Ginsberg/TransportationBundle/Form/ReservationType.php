@@ -20,7 +20,6 @@ class ReservationType extends AbstractType
               'required' => FALSE,
               'widget' => 'single_text',
               'format' => 'yyyy-MM-dd',
-              'empty_value' => date('Y-m-d'),
               'attr' => array(
                   'class' => 'datetime',
                 )
