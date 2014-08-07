@@ -506,4 +506,34 @@ class Reservation
     public function __toString() {
       return (string) $this->getId();
     }
+    
+  /**
+   * Returns an array representation of a Reservation.
+   * 
+   * @return array
+   */
+  public function toArray() {
+    $reservationArray = array();
+    $reservationArray[] = $this->getStart()->format('Y-m-d');
+    $reservationArray[] = $this->getEnd()->format('Y-m-d');
+    $reservationArray[] = $this->getProgram()->getName();
+    $reservationArray[] = $this->getProgram()->getShortcode();
+    $reservationArray[] = $this->getPerson()->getUniqname();
+    $reservationArray[] = $this->getVehicle()->getType() . ' ' . $this->getVehicle()->getName();
+    ($this->getProgram()->getName() == "Project Community") ? $this->getDestination() : $this->getDestinationText();
+    $reservationArray[] = $this->getIsNoShow();
+    $ticketString = '';
+    foreach($this->getTickets() as $ticket) {
+      if ($ticket->getIsPaid()) {
+        $ticketString .= 'Id: ' . $ticket->getId() . ', $' . $ticket->getAmount() . ' ';
+      } else {
+        $ticketString .= 'Id: ' . $ticket->getId() . ', $' . $ticket->getAmount() . ' (unpaid) '; 
+      }
+    }
+    $reservationArray[] = $ticketString;
+    $reservationArray[] = $this->getId();
+    $reservationArray[] = $this->getNotes();
+    
+    return $reservationArray;
+  }
 }

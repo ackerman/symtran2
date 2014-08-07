@@ -458,5 +458,5 @@ class ReservationRepository extends EntityRepository
     $futureReservationsInSeries = $query->getResult();
     return $futureReservationsInSeries;
 	}
-  
+   
 }
