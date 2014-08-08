@@ -459,4 +459,21 @@ class ReservationRepository extends EntityRepository
     return $futureReservationsInSeries;
 	}
   
+  /**
+   * Returns an array of all past Reservations. 
+   * 
+   * @param datetime $now The time before which to find Reservations
+   */
+  public function findAllPastReservations($now) {
+    $em = $this->getEntityManager();
+    $query = $em->createQuery('SELECT r FROM GinsbergTransportationBundle:Reservation r 
+            WHERE r.end < :now AND r.vehicle IS NOT NULL ORDER BY r.start')
+            ->setParameters(array('now' => $now,));
+    
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
+  }
 }

@@ -3,27 +3,36 @@
 namespace Ginsberg\TransportationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use APY\DataGridBundle\Grid\Mapping as GRID;
 
 /**
  * Reservation
  * 
  * @ORM\Entity(repositoryClass="Ginsberg\TransportationBundle\Entity\ReservationRepository")
  * @ORM\HasLifecycleCallbacks()
+ * 
+ * @GRID\Source(columns="id, start, end, destinationText, destination, isNoShow, tickets")
  */
 class Reservation
 {
     /**
      * @var integer
+     * 
+     * @GRID\Column(title="Id", size="5", type="text")
      */
     private $id;
 
     /**
      * @var \DateTime
+     * 
+     * @GRID\Column(title="Start", size="15", type="datetime")
      */
     private $start;
 
     /**
      * @var \DateTime
+     * 
+     * @GRID\Column(title="End", size="15", type="datetime")
      */
     private $end;
 
@@ -54,21 +63,29 @@ class Reservation
 
     /**
      * @var string
+     * 
+     * @GRID\Column(title="Destination Text", size="15", type="text")
      */
     private $destinationText;
 
     /**
      * @var string
+     * 
+     * @GRID\Column(title="Notes", size="15", type="text")
      */
     private $notes;
 
     /**
      * @var boolean
+     * 
+     * @GRID\Column(title="No Show", type="boolean")
      */
     private $isNoShow;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
+     * 
+     * @GRID\Column(title="Tickets", type="array")
      */
     private $tickets;
 
@@ -506,4 +523,34 @@ class Reservation
     public function __toString() {
       return (string) $this->getId();
     }
+    
+  /**
+   * Returns an array representation of a Reservation.
+   * 
+   * @return array
+   */
+  public function toArray() {
+    $reservationArray = array();
+    $reservationArray[] = $this->getStart()->format('Y-m-d');
+    $reservationArray[] = $this->getEnd()->format('Y-m-d');
+    $reservationArray[] = $this->getProgram()->getName();
+    $reservationArray[] = $this->getProgram()->getShortcode();
+    $reservationArray[] = $this->getPerson()->getUniqname();
+    $reservationArray[] = $this->getVehicle()->getType() . ' ' . $this->getVehicle()->getName();
+    ($this->getProgram()->getName() == "Project Community") ? $this->getDestination() : $this->getDestinationText();
+    $reservationArray[] = $this->getIsNoShow();
+    $ticketString = '';
+    foreach($this->getTickets() as $ticket) {
+      if ($ticket->getIsPaid()) {
+        $ticketString .= 'Id: ' . $ticket->getId() . ', $' . $ticket->getAmount() . ' ';
+      } else {
+        $ticketString .= 'Id: ' . $ticket->getId() . ', $' . $ticket->getAmount() . ' (unpaid) '; 
+      }
+    }
+    $reservationArray[] = $ticketString;
+    $reservationArray[] = $this->getId();
+    $reservationArray[] = $this->getNotes();
+    
+    return $reservationArray;
+  }
 }
