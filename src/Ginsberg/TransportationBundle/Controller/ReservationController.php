@@ -107,13 +107,21 @@ class ReservationController extends Controller
         $ongoing = array();
         $checkinsToday = array();
         $today = new \DateTime(date('Y-m-d'));
-
+        
         $em = $this->getDoctrine()->getManager();
         $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->findTripsForDate($dateToShow, $dateEnd);
-
+        $em = $this->getDoctrine()->getManager();
+        $ticketRepository = $em->getRepository('GinsbergTransportationBundle:Ticket');
+        $reservationsWhereDriverHasTicket = array();
+        foreach ($entities as $reservation) {
+          if ($ticketRepository->findTicketsForPerson($reservation->getPerson())) {
+            $reservationsWhereDriverHasTicket[] = $reservation->getPerson();
+          }
+        }
         $logger->info('count of entities = ' . count($entities));
         return array(
           'upcoming' => $entities,
+          'reservationsWhereDriverHasTicket' => $reservationsWhereDriverHasTicket,
           'ongoing' => $ongoing,
           'checkinsToday' => $checkinsToday,
           'dateToShow' => $dateToShow,
@@ -1035,6 +1043,29 @@ class ReservationController extends Controller
 			Yii::log(serialize($reservation->getErrors()), "info", "system.debug");
 		endif;
 		$this->redirect(array('reservation/index'));
+	}
+  
+  /**
+	 * View reservations for a day in calendar layout.
+	 */
+	public function actionCalendar()
+ 	{
+    $em = $this->getDoctrine()->getManager();
+    $vehicleRepository = $em->getRepository('GinsbergTransportationBundle:Vehicle');
+		$cars = $vehicleRepository->findAllActiveVehiclesSortedByProgram();
+		//var_dump($cars);
+    $date = (empty($_GET['date'])) ? date('Y-m-d', time()) : date('Y-m-d', strtotime($_GET['date']));
+		$this->render('calendar_header', array('date'=>$date, 'cars'=>$cars));
+		$reservation_array=Reservation::model()->reservations_for_car_by_day($date);
+		//$this->render('calendar', array('trips_occurring_on_date'=>$reservation_array, 'date'=>$date));
+		foreach ($reservation_array as $car) {
+				$this->renderPartial('calendar', array('trips_occurring_on_date'=>$car, 'date'=>$date));
+		}
+		$this->renderPartial('calendar_footer', array());
+
+
+
+
 	}
     
 }

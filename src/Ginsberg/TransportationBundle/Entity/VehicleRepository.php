@@ -51,4 +51,21 @@ class VehicleRepository extends EntityRepository
       return null;
     }
   }
+  
+  /**
+   * Return all active vehicles sorted by Program.
+   * 
+   * @return array|null
+   */
+  public function findAllActiveVehiclesSortedByProgram() {
+    $dql = 'SELECT v FROM GinsbergTransportationBundle:Vehicle v WHERE 
+            v.isActive = 1 ORDER BY v.program ASC';
+    $query = $this->getEntityManager()->createQuery($dql);
+
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
+  }
 }
