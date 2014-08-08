@@ -67,15 +67,9 @@
         <div id="calendar_11pm" class="calendar_line"></div>
 
         {% for vehicle in cars %}
-        <div class="calendar_vehicle">
-          {% for car in reservationsArray %}
-            {% for reservation in car %}
-              {% if reservation.vehicle == vehicle %}
-                {{ render(controller('GinsbergTransportationBundle:Reservation:calendarReservation', { 'reservation': reservation})) }}
-              {% endif %}
-            {% endfor %}
-          {% endfor %}
-        </div>
+          <div class="calendar_vehicle">
+            
+          </div>
         {% endfor %}
 
         <div class="calendar_times_div">
@@ -97,9 +91,19 @@
           <div class="calendar_time">10:00 pm</div>
           <div class="calendar_time">11:00 pm</div>
         </div><!-- end div calendar_times_div -->
+        {% for vehicle in cars %}
+          {% for car in reservationsArray %}
+            {% for reservation in car %}
+              {% if reservation.vehicle == vehicle %}
+                {{ render(controller('GinsbergTransportationBundle:Reservation:calendarReservation', { 'reservation': reservation})) }}
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        {% endfor %}
       </div><!-- END div calendar_vehicle_container -->
     </div> <!-- END DIV calendar_trip_container -->
   </div><!-- END DIV calendar_container -->
+  
 {% endblock %}
 {% block javascripts %}
   {{ parent() }}
@@ -108,6 +112,7 @@
     {{ parent() }}
     <script src="{{ asset_url }}"></script>
     <script>moment().format();</script>
+    <script>$(document).ready(function() { $("#calendar_vehicle_container").append($(".calendar_trip")); });</script>
   {% endjavascripts %}
   {% javascripts 
     '@GinsbergTransportationBundle/Resources/public/js/reservation_datetimepicker.js' %}
