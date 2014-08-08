@@ -1,0 +1,62 @@
+{% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
+
+{% block body -%}
+  
+    <h1>All Past Reservations</h1>
+    
+    <h2><a href="{{ path('report_download') }}">Download Report</a></h2>
+    
+    <table class="records_list">
+        <thead>
+            <tr>
+                <th>Start</th>
+                <th>End</th>
+                <th>Program</th>
+                <th>Driver</th>
+                <th>Destination</th>
+                <th>Vehicle</th>
+                <th>No Show</th>
+                <th>Tickets</th>
+                <th>Id</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for reservation in allPastReservations %}
+          {% if reservation.person in reservationsWhereDriverHasTicket %}{% set has_ticket = true %}{% else %}{% set has_ticket = false %}{% endif %}
+            <tr>
+                <td>{% if reservation.start %}{{ reservation.start|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if reservation.end %}{{ reservation.end|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{{ reservation.program.name }}</td>
+                <td>{{ reservation.person.uniqname }}</td>
+                <td>{{ reservation.destination }}</td>
+                <td>{{ reservation.vehicle }}</td>
+                <td>{{ reservation.isNoShow }}</td>
+                
+                <td>
+                  {% for ticket in reservation.tickets %}
+                    {% if ticket %}ID: {{ ticket.id }}&nbsp;
+                      {% if ticket.isPaid == false %}(UNPAID)&nbsp;{% endif %}
+                    {% else %}&nbsp;
+                    {% endif %}
+                  {% endfor %}</td>
+                <td>{{ reservation.id }}</td>
+                <td>
+                    <ul class="actions">
+                        <li>
+                            <a href="{{ path('reservation_show', { 'id': reservation.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('reservation_edit', { 'id': reservation.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+            {% if reservation.notes %}
+              <tr><td colspan="10">{{ reservation.notes }}</td></tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

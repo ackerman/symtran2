@@ -2,23 +2,57 @@
 
 namespace Ginsberg\TransportationBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
+use Ginsberg\TransportationBundle\Entity\Reservation;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use APY\DataGridBundle\Grid\Source\Entity;
 use APY\DataGridBundle\Grid\Export\PHPExcel2007Export;
 use APY\DataGridBundle\Grid\Export\CSVExport;
 
 use Monolog\Logger;
 
+/**
+ * Report controller.
+ *
+ * @Route("/report")
+ */
 class ReportController extends Controller {
 
   /**
-   * @Route("/reports", name="reports")
+   * Lists all past reservations.
+   *
+   * @Route("/", name="report")
+   * @Method("GET")
    * @Template()
    */
-  public function reportsAction() {
+  public function indexAction()
+  {
+    $logger = $this->get('logger');
+    
+    $em = $this->getDoctrine()->getManager();
+
+    // Find all past Reservations, including info on paid and unpaid Tickets.
+    $now = new \DateTime();
+    $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
+    $allPastReservations = $reservationRepository->findAllPastReservations($now);
+    $ticketRepository = $em->getRepository('GinsbergTransportationBundle:Ticket');
+    $reservationsWhereDriverHasTicket = array();
+
+    return array(
+      'allPastReservations' => $allPastReservations,
+      'reservationsWhereDriverHasTicket' => $reservationsWhereDriverHasTicket,
+    );
+  }
+    
+  /**
+   * @Route("/download", name="report_download")
+   * @Template()
+   */
+  public function downloadAction() {
     $logger = $this->get('logger');
     // get the service container to pass to the closure
     $container = $this->container;
@@ -57,10 +91,10 @@ class ReportController extends Controller {
   }
   
   /**
-   * @Route("/report", name="report")
+   * @Route("/grid", name="report_grid")
    * @Template()
    */
-  public function reportAction() {
+  public function gridAction() {
     $logger = $this->get('logger');
     // get the service container to pass to the closure
     $source = new Entity('GinsbergTransportationBundle:Reservation');
