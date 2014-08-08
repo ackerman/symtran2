@@ -15,7 +15,7 @@ services:
       ["@ginsberg_person.person_repository", "@person_service", "@logger"]
   res_utils: 
     class: %ginsberg_transportation.res_utils.class%
-    arguments: ["@request_stack"]
+    arguments: ["@request_stack", "@doctrine.orm.entity_manager","@ginsberg_vehicle.vehicle_repository", "@logger"]
   program_service:
     class: %ginsberg_transportation.program_service.class%
     arguments: 
@@ -28,6 +28,12 @@ services:
     class: Ginsberg\TransportationBundle\Form\Type\PersonType
     tags:
       - { name: form.type, alias: person }
+  ginsberg_vehicle.vehicle_repository:
+    class: Doctrine\ORM\EntityRepository
+    factory_service: doctrine.orm.default_entity_manager
+    factory_method: getRepository
+    arguments:
+      - Ginsberg\TransportationBundle\Entity\Vehicle
   ginsberg_person.person_repository:
     class: Doctrine\ORM\EntityRepository
     factory_service: doctrine.orm.default_entity_manager

@@ -1,13 +1,16 @@
 <div id="reservation_date_to_show">
-    {{ form_start(form, {'attr': {'novalidate': 'novalidate' }}) }}
-      {{ form_widget(form.dateToShow) }}
-      {{ form_row(form._token) }}
+  {{ form_start(form, {'attr': {'novalidate': 'novalidate' }}) }}
+    {{ form_widget(form.dateToShow) }}
+    {{ form_row(form._token) }}
+
+    {{ form_widget(form.submit) }}
+    <span class="button">
+      {{ form_widget(form.calendar) }}
+    </span>
       
-      {{ form_widget(form.submit) }}
-      
-        <span class='button next'>
-          {{ form_widget(form.today) }}
-        </span>
-    {{ form_end(form, {'render_rest': false}) }}
+    <span class='button next'>
+      {{ form_widget(form.today) }}
+    </span>
+  {{ form_end(form, {'render_rest': false}) }}
 
 </div>

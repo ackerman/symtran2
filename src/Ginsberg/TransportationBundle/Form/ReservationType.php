@@ -25,6 +25,7 @@ class ReservationType extends AbstractType
                 )
               ))
             ->add('today', 'submit', array('label' => 'Today'))
+            ->add('calendar', 'submit', array('label' => 'Calendar'))
             ->add('isRepeating', 'checkbox', array(
               'mapped' => FALSE,
               'label' => 'Repeats every week',

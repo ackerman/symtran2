@@ -476,4 +476,32 @@ class ReservationRepository extends EntityRepository
       return null;
     }
   }
+  
+  /**
+   * Returns Reservations for a given Vehicle for a given day. 
+   *
+   * @param Vehicle $vehicle The vehicle 
+   * @param datetime $date The date
+   * 
+   * @return array 
+   */
+  public function findReservationsForVehicleForDate($vehicle, $date)
+  {
+    $dateEnd = clone($date);
+    $dateEnd->add(new \DateInterval('P1D'));
+    $params = array('vehicle' => $vehicle, 'date' => $date, 'date_end' => $dateEnd);
+    $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE 
+            ((r.start <= :date AND r.end >= :date_end) 
+            OR (r.start <= :date AND r.end >= :date AND r.end <= :date_end) 
+            OR (r.start >= :date AND r.start < :date_end AND r.end < :date_end) 
+            OR (r.start >= :date AND r.start < :date_end AND r.end >= :date_end))
+            AND r.vehicle = :vehicle';
+    $query = $this->getEntityManager()->createQuery($dql)->setParameters($params);
+
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
+  }
 }
