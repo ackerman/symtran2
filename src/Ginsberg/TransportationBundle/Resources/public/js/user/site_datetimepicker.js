@@ -72,11 +72,31 @@ jQuery(document).ready(function($) {
     lang: 'en'
   });
   
+  // Automatically set Start to today at 8am
   var startToday = moment().set('hour', 8).set('minute', 0);
   $('#ginsberg_transportationbundle_reservation_start').val(startToday.format('YYYY-MM-DD hh:mm a'));
+  // As soon as the user selects a Start time, set the End time to the same date
+  // and time (unless the user already set the End time.)
   $('#ginsberg_transportationbundle_reservation_start').on("change", function(event) {
-    $('#ginsberg_transportationbundle_reservation_end').val($('#ginsberg_transportationbundle_reservation_start').val());
+    if (!$('#ginsberg_transportationbundle_reservation_end')) {
+      $('#ginsberg_transportationbundle_reservation_end').val($('#ginsberg_transportationbundle_reservation_start').val());
+    }
   })
+  
+  // Warn users who try to make one long reservation instead of many short 
+  // repeating reservations.
+  $("form").submit(function(event) {
+    var start = $("#ginsberg_transportationbundle_reservation_start").val();
+    var end = $("#ginsberg_transportationbundle_reservation_end").val();
+    var startDate = new Date(start);
+    var endDate = new Date(end);
+    if (endDate.getTime() - startDate.getTime() > 1000*60*60*24*7) {
+     var returnValue = confirm("This reservation is over a week long - are you trying to make a repeating reservation? If so, press the Cancel button and create the first reservation in the series, remembering to set the \"Repeats Until\" date.");
+    }
+    if (returnValue == false) {
+      event.preventDefault();
+    }
+  });
 });
 
 

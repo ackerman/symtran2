@@ -7,10 +7,10 @@
     {% set day = dateToShow %}
   {% endif %}
     <h1>Reservations <span class="button"><a href="{{ path('reservation_new') }}">
-            Add
-        </a></span></h1>
+        New Reservation
+      </a></span></h1>
     
-    {{ render(controller('GinsbergTransportationBundle:Reservation:searchCriteria')) }}
+    {{ render(controller('GinsbergTransportationBundle:Reservation:searchCriteria', { 'date': dateToShow })) }}
    
     <h2>Reservations for {% if day == "Today" %}{{ day }}{%else %}{{ day|date('Y-m-d') }}{% endif %}</h2>
     

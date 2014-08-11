@@ -15,7 +15,7 @@
           {% endblock %}
           <span id="logout">
             {% block greeting %}
-              Hi, logged in user. <a href="{{ asset('logout') }}">Log out.</a>
+              Hi, {{ app.user.username }}. <a href="{{ asset('logout') }}">Log out.</a>
             {% endblock %}
           </span>
         </div>

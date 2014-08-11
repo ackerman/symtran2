@@ -6,6 +6,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Ginsberg\TransportationBundle\Entity\Person;
 use Ginsberg\TransportationBundle\Services\PersonService;
 use Doctrine\ORM\EntityRepository;

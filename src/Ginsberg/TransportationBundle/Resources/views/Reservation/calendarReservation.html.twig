@@ -1,0 +1,7 @@
+<div class="calendar_trip" style="top: {{ top }}px; left: {{ left }}px; height: {{ height }}px;">
+  <a href="{{ path('reservation_show', { 'id': reservation.id }) }}">View Reservation</a>
+  <br />
+  {{ reservation.person }}<br />
+  {{ reservation.start|date('n/j g:ia') }} -<br />
+  {{ reservation.end|date('n/j g:ia') }}
+</div>

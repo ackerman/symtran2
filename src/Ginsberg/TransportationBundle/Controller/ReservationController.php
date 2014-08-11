@@ -18,7 +18,6 @@ use Ginsberg\TransportationBundle\Form\ReservationType;
  */
 class ReservationController extends Controller
 {
-
     /**
      * Lists all Reservation entities.
      *
@@ -70,32 +69,48 @@ class ReservationController extends Controller
     /**
      * Returns reservations for the date selected.
      *
-     * @Route("/for_date", name="reservation_search")
-     * @Method("POST")
+     * @Route("/date/{date}", name="reservation_search")
+     * @Method({"POST", "GET"})
      * @Template("GinsbergTransportationBundle:Reservation:index.html.twig")
      */
-    public function searchAction(Request $request)
+    public function searchAction(Request $request, $date = 'today')
     {
       $logger = $this->get('logger');
       $logger->info('in searchAction');
+   
       $entity = new Reservation();
-      $form = $this->createSearchForm($entity);
+      $form = $this->createSearchForm($entity, $request->query->get('date'));
       $form->handleRequest($request);
       
+      $logger->info('In searchAction, got past calendar');
       //$logger->info(var_dump($form));
 
       // The form won't be valid, because it is populated with a blank Reservation
       // entity. Go ahead and show the search results anyway.
+      $logger->info('In ReservationController::searchAction. Initially, date = ' . $date);
+        
+      if ($form->get('dateToShow')->getData()) {
+        $date = $form->get('dateToShow')->getData();
+      } elseif ($date == 'today') {
+        $date = date('Y-m-d');
+      } else {
+        $date = $request->query->get('date');
+      }
       
-        $dateToShow = new \DateTime(date('Y-m-d'));
+        $dateToShow = new \DateTime($date);
+        $logger->info('In ReservationController::searchAction. dateToShow: ' . $dateToShow->format('Y-m-d'));
         // If they clicked the "Today" button, show the index page from the 
         // indexAction with ongoing trips, etc.
-        if ($form->get('today')->isClicked()) {
+        if ($form->get('today')->isClicked() || $date == 'today') {
           return $this->redirect($this->generateUrl('reservation'));
-        } elseif (is_object($form->get('dateToShow')->getData())) {
-          $dateToShow = $form->get('dateToShow')->getData();
+        } elseif ($form->get('calendar')->isClicked()) {
+          $response = $this->forward('GinsbergTransportationBundle:Reservation:calendar', array('dateToShow' => $dateToShow));
+          return $response;
         }
-        //$logger->info('In searchAction, form is valid, dateToShow = ' . $dateToShow->format('c'));
+        elseif (($form->get('dateToShow')->getData())) {
+          $dateToShow = new \DateTime($form->get('dateToShow')->getData());
+        }
+        
 
         // We have to clone $dateToShow so $dateEnd and $dateToShow aren't 
         // pointing at the same value. We probably don't have to worry about
@@ -107,13 +122,21 @@ class ReservationController extends Controller
         $ongoing = array();
         $checkinsToday = array();
         $today = new \DateTime(date('Y-m-d'));
-
+        
         $em = $this->getDoctrine()->getManager();
         $entities = $em->getRepository('GinsbergTransportationBundle:Reservation')->findTripsForDate($dateToShow, $dateEnd);
-
+        $em = $this->getDoctrine()->getManager();
+        $ticketRepository = $em->getRepository('GinsbergTransportationBundle:Ticket');
+        $reservationsWhereDriverHasTicket = array();
+        foreach ($entities as $reservation) {
+          if ($ticketRepository->findTicketsForPerson($reservation->getPerson())) {
+            $reservationsWhereDriverHasTicket[] = $reservation->getPerson();
+          }
+        }
         $logger->info('count of entities = ' . count($entities));
         return array(
           'upcoming' => $entities,
+          'reservationsWhereDriverHasTicket' => $reservationsWhereDriverHasTicket,
           'ongoing' => $ongoing,
           'checkinsToday' => $checkinsToday,
           'dateToShow' => $dateToShow,
@@ -131,11 +154,11 @@ class ReservationController extends Controller
     *
     * @return \Symfony\Component\Form\Form The form
     */
-    private function createSearchForm(Reservation $entity)
+    private function createSearchForm(Reservation $entity, $date = 'today')
     {
         $form = $this->createForm(new ReservationType(), $entity, array(
-            'action' => $this->generateUrl('reservation_search'),
-            'method' => 'POST',
+            'action' => $this->generateUrl('reservation_search', array('dateToShow' => $date)),
+            'method' => 'GET',
         ));
 
         $form->add('submit', 'submit', array('label' => "Go to date"));
@@ -146,17 +169,26 @@ class ReservationController extends Controller
     /**
      * Allows user to display reservations for a different date.
      *
-     * @Route("/search", name="reservation_search_criteria")
+     * @Route("/search/{date}", name="reservation_search_criteria")
      * @Method("GET")
      * @Template("GinsbergTransportationBundle:Reservation:reservation_date_to_show.html.twig")
      */
-    public function searchCriteriaAction()
+    public function searchCriteriaAction($date = 'today')
     {
+      $logger = $this->get('logger');
+      if ($this->getRequest()->query->get('date')) {
+        $date = $this->getRequest->query->get('date');
+      }
+      
+      if ($date == 'today') {
+        $date = date('Y-m-d', time());
+      }
         $entity = new Reservation();
-        $form   = $this->createSearchForm($entity);
+        $form   = $this->createSearchForm($entity, $date);
 
         return array(
             'entity' => $entity,
+            'date' => $date,
             'form'   => $form->createView(),
         );
     }
@@ -313,15 +345,13 @@ class ReservationController extends Controller
               
             }
           }
-          if ($isRepeatingReservation)
-          {
+          if ($isRepeatingReservation) {
             return $this->render('GinsbergTransportationBundle:Reservation:list_created_repeating.html.twig', array(
                 'successes' => count($successfulReservations), 
                 'failures' => count($failedReservations),
                 'entities' => $entity->getSeries()->getReservations()));
           } 
-          else 
-          {
+          else {
             // It's just a single reservation. Redirect to the Show template  
             // with a success or failure Flash message
             $logger->info('This is a single reservation with Id ' . $entity->getId());
@@ -334,8 +364,7 @@ class ReservationController extends Controller
               );
               return $this->redirect($this->generateUrl('reservation_show', array('id' => $entity->getId())));
             }
-            else
-            {
+            else {
               $this->get('session')->getFlashBag()->add(
                   'failure',
                   'Sorry! No vehicle is available at the requested time.'
@@ -410,7 +439,7 @@ class ReservationController extends Controller
         $tickets = $em->getRepository('GinsbergTransportationBundle:Ticket')->findByReservation($entity);
         
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Reservation entity.');
+          throw $this->createNotFoundException('Unable to find Reservation entity.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
@@ -1036,5 +1065,71 @@ class ReservationController extends Controller
 		endif;
 		$this->redirect(array('reservation/index'));
 	}
+  
+  /**
+   * Display all Reservations for a day in calendar layout.
+   *
+   * @Route("/calendar/{dateToShow}", name="reservation_calendar")
+   * @Method("GET")
+   * @Template()
+   */
+	public function calendarAction($dateToShow)
+ 	{
+    $logger = $this->get('logger');
+    $logger->info('In ReservationController::calendarAction.');
+    $em = $this->getDoctrine()->getManager();
+    $vehicleRepository = $em->getRepository('GinsbergTransportationBundle:Vehicle');
+		$cars = $vehicleRepository->findAllActiveVehiclesSortedByProgram();
+		//$date = (empty($_GET['date'])) ? date('Y-m-d', time()) : date('Y-m-d', strtotime($_GET['date']));
+		//$date = ($dateToShow) ? $dateToShow : new \DateTime();
+    $now = new \DateTime();
+    
+    // $container_width starts out big enough to hold the calendar_times_div plus some fudge factor
+    $container_width=95+95+20;
+    foreach ($cars as $car) {
+      $container_width += 136;
+    }
+    //$logger->info('In ReservationController::calendarAction. now = ' . $now->format('Y-m-d'));
+    
+    $reservationsArray = array();
+    foreach($cars as $car) {
+      $reservationsArray[$car->getId()] = $em->getRepository('GinsbergTransportationBundle:Reservation')->findReservationsForVehicleForDate($car, $dateToShow);
+    }
+    
+    return $this->render('GinsbergTransportationBundle:Reservation:calendar.html.twig', 
+        array('container_width' => $container_width, 'dateToShow'=>$dateToShow, 'now' => $now, 'cars'=>$cars, 'reservationsArray' => $reservationsArray));
+		
+    /*
+		//$this->render('calendar', array('trips_occurring_on_date'=>$reservation_array, 'date'=>$date));
+		foreach ($reservationsArray as $carReservations) {
+				$this->renderPartial('calendar', array('trips_occurring_on_date'=>$carReservations, 'date'=>$date));
+		}
+		$this->renderPartial('calendar_footer', array());
+    */
+
+	}
+  
+  /**
+   * Display each Reservation for a given car on a given day in calendar layout.
+   *
+   * @Route("/calendar_reservation", name="reservation_calendar_reservation")
+   * @Method("GET")
+   * @Template()
+   */  
+  public function calendarReservationAction($reservation) 
+  {
+    $resUtils = $this->get('resUtils');
+    // Calculate the size and position of this reservation
+    $left=$resUtils->get_reservation_left_position($reservation);
+    $top=$resUtils->get_reservation_top_position($reservation);
+    $height=$resUtils->get_reservation_height($reservation);
+    $adjusted_height_top_array=$resUtils->get_adjusted_height_and_top($reservation);
+    if (is_array($adjusted_height_top_array)) {
+      $top=$adjusted_height_top_array['top'];
+      $height=$adjusted_height_top_array['height'];
+    }
+    return $this->render('GinsbergTransportationBundle:Reservation:calendarReservation.html.twig', 
+        array('left' => $left, 'height' => $height, 'top' => $top, 'reservation' => $reservation));
+    }
     
 }

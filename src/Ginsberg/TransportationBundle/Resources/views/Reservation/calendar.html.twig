@@ -1,0 +1,121 @@
+{% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
+
+{% block body -%}
+  {% if dateToShow == now %}
+    {% set day = "Today" %}
+  {% else %}
+    {% set day = dateToShow %}
+  {% endif %}
+  <h1>Reservations <span class="button"><a href="{{ path('reservation_new') }}">
+          Add
+      </a></span></h1>
+
+  {{ render(controller('GinsbergTransportationBundle:Reservation:searchCriteria')) }}
+
+  <h2>Reservations for {% if day == "Today" %}{{ day }}{%else %}{{ day|date('Y-m-d') }}{% endif %}</h2>
+
+  <div id="calendar_container">
+    <div id="calendar_header" style="width: {{ container_width }}px;">
+      <div id="calendar_head_time" class="calendar_head_item">Time</div>
+      {% for car in cars %}
+        <div class="calendar_head_item">{{ car.type }} {{ car.name }}</div>
+      {% endfor %}
+    </div> <!-- end div calendar_header -->
+    <div id="calendar_trip_container" style="width: {{ container_width }}px;">
+      <div class="calendar_times_div">
+        <div class="calendar_time calendar_time_first"></div>
+        <div class="calendar_time">8:00 am</div>
+        <div class="calendar_time">9:00 am</div>
+        <div class="calendar_time">10:00 am</div>
+        <div class="calendar_time">11:00 am</div>
+        <div class="calendar_time">12:00 pm</div>
+        <div class="calendar_time">1:00 pm</div>
+        <div class="calendar_time">2:00 pm</div>
+        <div class="calendar_time">3:00 pm</div>
+        <div class="calendar_time">4:00 pm</div>
+        <div class="calendar_time">5:00 pm</div>
+        <div class="calendar_time">6:00 pm</div>
+        <div class="calendar_time">7:00 pm</div>
+        <div class="calendar_time">8:00 pm</div>
+        <div class="calendar_time">9:00 pm</div>
+        <div class="calendar_time">10:00 pm</div>
+        <div class="calendar_time">11:00 pm</div>
+      </div><!-- end div calendar_times_div -->
+      <div id="calendar_vehicle_container">
+        <!--<div id="calendar_1am" class="calendar_line"></div>
+        <div id="calendar_2am" class="calendar_line"></div>
+        <div id="calendar_3am" class="calendar_line"></div>
+        <div id="calendar_4am" class="calendar_line"></div>
+        <div id="calendar_5am" class="calendar_line"></div>
+        <div id="calendar_6am" class="calendar_line"></div>
+        <div id="calendar_7am" class="calendar_line"></div>-->
+        <div id="calendar_8am" class="calendar_line"></div>
+        <div id="calendar_9am" class="calendar_line"></div>
+        <div id="calendar_10am" class="calendar_line"></div>
+        <div id="calendar_11am" class="calendar_line"></div>
+        <div id="calendar_12pm" class="calendar_line"></div>
+        <div id="calendar_1pm" class="calendar_line"></div>
+        <div id="calendar_2pm" class="calendar_line"></div>
+        <div id="calendar_3pm" class="calendar_line"></div>
+        <div id="calendar_4pm" class="calendar_line"></div>
+        <div id="calendar_5pm" class="calendar_line"></div>
+        <div id="calendar_6pm" class="calendar_line"></div>
+        <div id="calendar_7pm" class="calendar_line"></div>
+        <div id="calendar_8pm" class="calendar_line"></div>
+        <div id="calendar_9pm" class="calendar_line"></div>
+        <div id="calendar_10pm" class="calendar_line"></div>
+        <div id="calendar_11pm" class="calendar_line"></div>
+
+        {% for vehicle in cars %}
+          <div class="calendar_vehicle">
+            
+          </div>
+        {% endfor %}
+
+        <div class="calendar_times_div">
+          <div class="calendar_time calendar_time_first"></div>
+          <div class="calendar_time">8:00 am</div>
+          <div class="calendar_time">9:00 am</div>
+          <div class="calendar_time">10:00 am</div>
+          <div class="calendar_time">11:00 am</div>
+          <div class="calendar_time">12:00 pm</div>
+          <div class="calendar_time">1:00 pm</div>
+          <div class="calendar_time">2:00 pm</div>
+          <div class="calendar_time">3:00 pm</div>
+          <div class="calendar_time">4:00 pm</div>
+          <div class="calendar_time">5:00 pm</div>
+          <div class="calendar_time">6:00 pm</div>
+          <div class="calendar_time">7:00 pm</div>
+          <div class="calendar_time">8:00 pm</div>
+          <div class="calendar_time">9:00 pm</div>
+          <div class="calendar_time">10:00 pm</div>
+          <div class="calendar_time">11:00 pm</div>
+        </div><!-- end div calendar_times_div -->
+        {% for vehicle in cars %}
+          {% for car in reservationsArray %}
+            {% for reservation in car %}
+              {% if reservation.vehicle == vehicle %}
+                {{ render(controller('GinsbergTransportationBundle:Reservation:calendarReservation', { 'reservation': reservation})) }}
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        {% endfor %}
+      </div><!-- END div calendar_vehicle_container -->
+    </div> <!-- END DIV calendar_trip_container -->
+  </div><!-- END DIV calendar_container -->
+  
+{% endblock %}
+{% block javascripts %}
+  {{ parent() }}
+  {% javascripts 
+    '@GinsbergTransportationBundle/Resources/public/js/moment.js' %}
+    {{ parent() }}
+    <script src="{{ asset_url }}"></script>
+    <script>moment().format();</script>
+    <script>$(document).ready(function() { $("#calendar_vehicle_container").append($(".calendar_trip")); });</script>
+  {% endjavascripts %}
+  {% javascripts 
+    '@GinsbergTransportationBundle/Resources/public/js/reservation_datetimepicker.js' %}
+    <script src="{{ asset_url }}"></script>
+  {% endjavascripts %}
+{% endblock %}
