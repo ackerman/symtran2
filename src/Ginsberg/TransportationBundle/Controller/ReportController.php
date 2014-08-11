@@ -83,9 +83,11 @@ class ReportController extends Controller {
 
       fclose($handle);
     });
-
+    
+    $filename = 'Ginsberg_Transportation_Report_' . date('Y-m-d_H_i', time()) . '.csv';
+    
     $response->headers->set('Content-Type', 'application/force-download');
-    $response->headers->set('Content-Disposition', 'attachment; filename="export.csv"');
+    $response->headers->set('Content-Disposition', "attachment; filename=$filename");
 
     return $response;
   }
@@ -100,15 +102,23 @@ class ReportController extends Controller {
     $source = new Entity('GinsbergTransportationBundle:Reservation');
     $grid = $this->get('grid');
     $grid->setSource($source);
-    $grid->setLimits(189);
     
-    $title = 'Ginsberg Transportation Export';
-    $fileName = 'Ginsberg_Transportation_Export';
+    // When default limits are used, we were getting errors about nonexistent 
+    // because it was trying to use paging. Setting an arbitrarily high number 
+    // was helping, but the problem seems to have gone away. Hopefully.
+    //$grid->setLimits(100);
+    
+    // We are now using force-download in the header, so these are no longer used
+    //$title = 'Ginsberg Transportation Report';
+    //$fileName = 'Ginsberg_Transportation_Export';
+    
     $grid->addExport(new CSVExport('CSV Export'));
     
     $grid->isReadyForRedirect();
     return $grid->getGridResponse('GinsbergTransportationBundle:Report:report.html.twig');
-//return $this->render('GinsbergTransportationBundle:Report:report.html.twig', array('grid' => $grid));
+    
+    // Left over from attempt to use APY grid bundle, which is what we really should be using here.
+    //return $this->render('GinsbergTransportationBundle:Report:report.html.twig', array('grid' => $grid));
   }
   
   

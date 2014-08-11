@@ -23,6 +23,12 @@ Ginsberg\TransportationBundle\Entity\Vehicle:
         isActive:
           type: boolean
           nullable: true
+        maintenanceStartDate:
+          type: datetime
+          nullable: true
+        maintenanceEndDate:
+          type: datetime
+          nullable: true
     oneToMany:
       reservations:
             targetEntity: Reservation
