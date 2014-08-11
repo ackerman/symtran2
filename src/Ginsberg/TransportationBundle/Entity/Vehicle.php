@@ -40,6 +40,16 @@ class Vehicle
      * @var boolean
      */
     private $isActive;
+    
+    /**
+     * @var \DateTime
+     */
+    private $maintenanceStartDate;
+
+    /**
+     * @var \DateTime
+     */
+    private $maintenanceEndDate;    
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -184,6 +194,52 @@ class Vehicle
         return $this->isActive;
     }
 
+    /**
+     * Set maintenanceStartDate
+     *
+     * @param \DateTime $maintenanceStartDate
+     * @return Vehicle
+     */
+    public function setMaintenanceStartDate($maintenanceStartDate)
+    {
+        $this->maintenanceStartDate = $maintenanceStartDate;
+
+        return $this;
+    }
+
+    /**
+     * Get maintenanceStartDate
+     *
+     * @return \DateTime 
+     */
+    public function getMaintenanceStartDate()
+    {
+        return $this->maintenanceStartDate;
+    }
+
+    /**
+     * Set maintenanceEndDate
+     *
+     * @param \DateTime $maintenanceEndDate
+     * @return Vehicle
+     */
+    public function setMaintenanceEndDate($maintenanceEndDate)
+    {
+        $this->maintenanceEndDate = $maintenanceEndDate;
+
+        return $this;
+    }
+
+    /**
+     * Get maintenanceEndDate
+     *
+     * @return \DateTime 
+     */
+    public function getMaintenanceEndDate()
+    {
+        return $this->maintenanceEndDate;
+    }
+    
     /**
      * Add reservations
      *

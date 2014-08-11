@@ -18,9 +18,25 @@ class VehicleType extends AbstractType
             ->add('name')
             ->add('type')
             ->add('capacity')
+            ->add('program', NULL, array('empty_value' => 'Select a Program'))
             ->add('notes')
             ->add('isActive')
-            ->add('program', NULL, array('empty_value' => 'Select a Program'))
+            ->add('maintenanceStartDate', 'datetime', array(
+                'required' => FALSE,
+                'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd hh:mm a',
+                'attr' => array(
+                    'class' => 'datetime',
+                  )
+                ))
+            ->add('maintenanceEndDate', 'datetime', array(
+                'required' => FALSE,
+                'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd hh:mm a',
+                'attr' => array(
+                    'class' => 'datetime',
+                  )
+                ))
         ;
     }
     

@@ -11,6 +11,29 @@
   </div>
     <h1>Update {{ edit_form.type.vars.value }} {{ edit_form.name.vars.value }}</h1>
 
-    {{ form(edit_form) }}
+    {{ form_start(edit_form) }}
+      {{ form_row(edit_form.name) }}
+      {{ form_row(edit_form.program) }}
+      {{ form_row(edit_form.type) }}
+      {{ form_row(edit_form.capacity) }}
+      {{ form_row(edit_form.notes) }}
+      <h4>Take vehicle out of service for maintenance:</h4>
+      {{ form_row(edit_form.maintenanceStartDate) }}
+      {{ form_row(edit_form.maintenanceEndDate) }}
+      <h4>Take vehicle permanently out of service:<h4>
+      {{ form_row(edit_form.isActive) }}
+      
+      {{ form_row(edit_form._token) }}
+      
+      {{ form_row(edit_form.submit, {'label': 'Save' }) }}
+      
+    {{ form_end(edit_form, {'render_rest': false}) }}
 
+{% endblock %}
+{% block javascripts %}
+  {% javascripts 
+    '@GinsbergTransportationBundle/Resources/public/js/vehicle_datetimepicker.js' %}
+    {{ parent() }}
+    <script src="{{ asset_url }}"></script>
+  {% endjavascripts %}
 {% endblock %}
