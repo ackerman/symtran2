@@ -292,11 +292,10 @@ class ReservationRepository extends EntityRepository
 	* Attempts to find an available vehicle belonging to the model's program that
 	* and assign it to the current reservation.
   * 
-  * @param datetime $start The start time of the reservation
-  * @param datetime $end The end time of the reservation
-  * @param Vehicle $requestedVehicle Vehicle if admin selected one
+  * @param Reservation $entity The Reservation we are assigning a Vehicle to
+  * @param Vehicle $requestedVehicle Optional Vehicle (if admin selected one)
    * 
-	* @return Reservation $entity The reservation with a vehicle assigned if available assigned
+	* @return Reservation $entity The reservation with a vehicle assigned if available
 	*/
 	public function assignReservationToVehicle($entity, $requestedVehicle = FALSE)
   {

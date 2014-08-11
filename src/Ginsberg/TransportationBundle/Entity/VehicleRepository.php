@@ -68,4 +68,34 @@ class VehicleRepository extends EntityRepository
       return null;
     }
   }
+  
+  /**
+   * Take a vehicle out of service, try to reassign affected reservations, and notify any users affected.
+   * 
+   * This is done by making a dummy reservation for the vehicle.
+   * 
+   * @param datetime $maintenanceStartDate Begin time of service
+   * @param datetime $maintenanceEndDate End time of service
+   * 
+   * @return array An array containing two arrays of Reservations, those reassigned and those not reassigned
+   */
+  public function findReservationsForBrokenVehicle($vehicle, \DateTime $maintenanceStartDate, \DateTime $maintenanceEndDate) 
+  {
+    // Find reservations for this vehicle between the start and end dates, sorted by Id ASC
+    $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE 
+            ((r.start <= :maintenanceStartDate AND r.end >= :maintenanceEndDate)
+            OR (r.start <= :maintenanceStartDate AND r.end >= :maintenanceStartDate AND r.end < :maintenanceEndDate)
+            OR (r.start >= :maintenanceStartDate AND r.start < :maintenanceEndDate AND r.end < :maintenanceEndDate)
+            OR (r.start >= :maintenanceStartDate AND r.start < :maintenanceEndDate AND r.end > :maintenanceEndDate))
+            AND r.vehicle = :vehicle ORDER BY r.vehicle_id ASC';
+    $query = $this->getEntityManager()->createQuery($dql)->setParameters(array(':vehicle' => $vehicle, ':maintenanceStartDate' => $maintenanceStartDate, ':maintenanceEndDate' => $maintenanceEndDate));
+
+    $reservationsToChange = array();
+    
+    try {
+      $reservationsToChange = $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
+  }
 }

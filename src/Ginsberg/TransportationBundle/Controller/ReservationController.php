@@ -81,9 +81,6 @@ class ReservationController extends Controller
       $entity = new Reservation();
       $form = $this->createSearchForm($entity, $request->query->get('date'));
       $form->handleRequest($request);
-      
-      $logger->info('In searchAction, got past calendar');
-      //$logger->info(var_dump($form));
 
       // The form won't be valid, because it is populated with a blank Reservation
       // entity. Go ahead and show the search results anyway.
