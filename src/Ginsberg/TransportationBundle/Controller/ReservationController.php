@@ -18,7 +18,6 @@ use Ginsberg\TransportationBundle\Form\ReservationType;
  */
 class ReservationController extends Controller
 {
-
     /**
      * Lists all Reservation entities.
      *
@@ -70,36 +69,46 @@ class ReservationController extends Controller
     /**
      * Returns reservations for the date selected.
      *
-     * @Route("/for_date", name="reservation_search")
-     * @Method("POST")
+     * @Route("/date/{date}", name="reservation_search")
+     * @Method({"POST", "GET"})
      * @Template("GinsbergTransportationBundle:Reservation:index.html.twig")
      */
-    public function searchAction(Request $request)
+    public function searchAction(Request $request, $date = 'today')
     {
       $logger = $this->get('logger');
       $logger->info('in searchAction');
+   
       $entity = new Reservation();
-      $form = $this->createSearchForm($entity);
+      $form = $this->createSearchForm($entity, $request->query->get('date'));
       $form->handleRequest($request);
       
-      if ($form->get('calendar')->isClicked()) {
-        $logger->info('In ReservationController:searchAction. Calendar was clicked');
-        $response = $this->forward('GinsbergTransportationBundle:Reservation:calendar', array('dateToShow' => $form->get('dateToShow')->getData()));
-        return $response;
-      }
       $logger->info('In searchAction, got past calendar');
       //$logger->info(var_dump($form));
 
       // The form won't be valid, because it is populated with a blank Reservation
       // entity. Go ahead and show the search results anyway.
+      $logger->info('In ReservationController::searchAction. Initially, date = ' . $date);
+        
+      if ($form->get('dateToShow')->getData()) {
+        $date = $form->get('dateToShow')->getData();
+      } elseif ($date == 'today') {
+        $date = date('Y-m-d');
+      } else {
+        $date = $request->query->get('date');
+      }
       
-        $dateToShow = new \DateTime(date('Y-m-d'));
+        $dateToShow = new \DateTime($date);
+        $logger->info('In ReservationController::searchAction. dateToShow: ' . $dateToShow->format('Y-m-d'));
         // If they clicked the "Today" button, show the index page from the 
         // indexAction with ongoing trips, etc.
-        if ($form->get('today')->isClicked()) {
+        if ($form->get('today')->isClicked() || $date == 'today') {
           return $this->redirect($this->generateUrl('reservation'));
-        } elseif (is_object($form->get('dateToShow')->getData())) {
-          $dateToShow = $form->get('dateToShow')->getData();
+        } elseif ($form->get('calendar')->isClicked()) {
+          $response = $this->forward('GinsbergTransportationBundle:Reservation:calendar', array('dateToShow' => $dateToShow));
+          return $response;
+        }
+        elseif (($form->get('dateToShow')->getData())) {
+          $dateToShow = new \DateTime($form->get('dateToShow')->getData());
         }
         
 
@@ -145,11 +154,11 @@ class ReservationController extends Controller
     *
     * @return \Symfony\Component\Form\Form The form
     */
-    private function createSearchForm(Reservation $entity)
+    private function createSearchForm(Reservation $entity, $date = 'today')
     {
         $form = $this->createForm(new ReservationType(), $entity, array(
-            'action' => $this->generateUrl('reservation_search'),
-            'method' => 'POST',
+            'action' => $this->generateUrl('reservation_search', array('dateToShow' => $date)),
+            'method' => 'GET',
         ));
 
         $form->add('submit', 'submit', array('label' => "Go to date"));
@@ -160,17 +169,26 @@ class ReservationController extends Controller
     /**
      * Allows user to display reservations for a different date.
      *
-     * @Route("/search", name="reservation_search_criteria")
+     * @Route("/search/{date}", name="reservation_search_criteria")
      * @Method("GET")
      * @Template("GinsbergTransportationBundle:Reservation:reservation_date_to_show.html.twig")
      */
-    public function searchCriteriaAction()
+    public function searchCriteriaAction($date = 'today')
     {
+      $logger = $this->get('logger');
+      if ($this->getRequest()->query->get('date')) {
+        $date = $this->getRequest->query->get('date');
+      }
+      
+      if ($date == 'today') {
+        $date = date('Y-m-d', time());
+      }
         $entity = new Reservation();
-        $form   = $this->createSearchForm($entity);
+        $form   = $this->createSearchForm($entity, $date);
 
         return array(
             'entity' => $entity,
+            'date' => $date,
             'form'   => $form->createView(),
         );
     }
@@ -1051,7 +1069,7 @@ class ReservationController extends Controller
   /**
    * Display all Reservations for a day in calendar layout.
    *
-   * @Route("/calendar", name="reservation_calendar")
+   * @Route("/calendar/{dateToShow}", name="reservation_calendar")
    * @Method("GET")
    * @Template()
    */
@@ -1063,7 +1081,7 @@ class ReservationController extends Controller
     $vehicleRepository = $em->getRepository('GinsbergTransportationBundle:Vehicle');
 		$cars = $vehicleRepository->findAllActiveVehiclesSortedByProgram();
 		//$date = (empty($_GET['date'])) ? date('Y-m-d', time()) : date('Y-m-d', strtotime($_GET['date']));
-		$date = ($dateToShow) ? $dateToShow : new \DateTime();
+		//$date = ($dateToShow) ? $dateToShow : new \DateTime();
     $now = new \DateTime();
     
     // $container_width starts out big enough to hold the calendar_times_div plus some fudge factor
@@ -1075,11 +1093,11 @@ class ReservationController extends Controller
     
     $reservationsArray = array();
     foreach($cars as $car) {
-      $reservationsArray[$car->getId()] = $em->getRepository('GinsbergTransportationBundle:Reservation')->findReservationsForVehicleForDate($car, $date);
+      $reservationsArray[$car->getId()] = $em->getRepository('GinsbergTransportationBundle:Reservation')->findReservationsForVehicleForDate($car, $dateToShow);
     }
     
     return $this->render('GinsbergTransportationBundle:Reservation:calendar.html.twig', 
-        array('container_width' => $container_width, 'dateToShow'=>$date, 'now' => $now, 'cars'=>$cars, 'reservationsArray' => $reservationsArray));
+        array('container_width' => $container_width, 'dateToShow'=>$dateToShow, 'now' => $now, 'cars'=>$cars, 'reservationsArray' => $reservationsArray));
 		
     /*
 		//$this->render('calendar', array('trips_occurring_on_date'=>$reservation_array, 'date'=>$date));

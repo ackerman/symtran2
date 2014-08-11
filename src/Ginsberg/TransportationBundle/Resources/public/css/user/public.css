@@ -41,6 +41,10 @@ dl dd {
 
 legend {
   font-weight:bold;
+  border: 1px solid #000;
+  border-radius: .3125em;
+  background-color: #fff;
+  padding: 6px;
 }
 
 .row {
@@ -89,6 +93,7 @@ th {
   border-radius:15px;
   background:#eee;
   padding:0px 20px 20px 20px;
+  margin-top: 5px;
 }
 
 .error,
@@ -124,5 +129,16 @@ th {
 }
 
 /* Added for Symfony */
-.ui-content {
+input.datetime {
+    width: 12em;
+}
+
+.ui-input-text {
+    width: 12em;
+}
+.ui-btn {
+    width: 12em;
+}
+button.ui-btn {
+    width: 15em;
 }

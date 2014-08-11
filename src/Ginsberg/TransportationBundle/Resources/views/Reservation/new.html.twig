@@ -13,26 +13,29 @@
     
     {{ form_start(form, {'att': {'novalidate': 'novalidate'}}) }}
       {{ form_errors(form) }}
-      {{ form_row(form.isRepeating) }}
-      {{ form_row(form.repeatsUntil) }}
-      {{ form_row(form.start) }}
-      {{ form_row(form.end) }}
-      {{ form_row(form.checkout) }}
-      {{ form_row(form.checkin) }}
-      {{ form_row(form.vehicle) }}
-      {{ form_row(form.seatsRequired) }}
       {{ form_row(form.person) }}
       {{ form_row(form.program) }}
+      {{ form_row(form.start) }}
+      {{ form_row(form.end) }}
+      {{ form_row(form.isRepeating) }}
+      {{ form_row(form.repeatsUntil) }}
+      {{ form_row(form.seatsRequired) }}
+      {{ form_row(form.notes) }}
       {{ form_row(form.destination) }}
       {{ form_row(form.destinationText) }}
-      {{ form_row(form.notes) }}
+    <p><strong>Allow the system to select a vehicle automatically unless you have a 
+            special need to assign a particular vehicle to this reservation.<strong></p>
+      {{ form_row(form.vehicle) }}
+    <p><strong>Do not fill in these fields unless the car has been checked out / checked in:</strong></p>
+      {{ form_row(form.checkout) }}
+      {{ form_row(form.checkin) }}
       {{ form_row(form._token) }}
       <div style='display: none;'>
       {{ form_row(form.created) }}
       {{ form_row(form.modified) }}
       </div>
       
-      {{ form_row(form.submit, {'label': 'Submit' }) }}
+      {{ form_row(form.submit, {'label': 'Create' }) }}
       
     {{ form_end(form, {'render_rest': false}) }}
 

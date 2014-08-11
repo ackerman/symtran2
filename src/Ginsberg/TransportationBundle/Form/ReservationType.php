@@ -15,39 +15,21 @@ class ReservationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('dateToShow', 'datetime', array(
+            ->add('dateToShow', 'text', array(
               'mapped' => FALSE,  
               'required' => FALSE,
-              'widget' => 'single_text',
-              'format' => 'yyyy-MM-dd',
               'attr' => array(
                   'class' => 'datetime',
                 )
               ))
             ->add('today', 'submit', array('label' => 'Today'))
-            ->add('calendar', 'submit', array('label' => 'Calendar'))
-            ->add('isRepeating', 'checkbox', array(
-              'mapped' => FALSE,
-              'label' => 'Repeats every week',
-              'required' => FALSE,
-            ))
-            ->add('repeatsUntil', 'datetime', array(
-              'mapped' => FALSE,
-              'required' => FALSE,
-              'label' => 'Repeats until',
-              'constraints' => array(
-                new \Ginsberg\TransportationBundle\Validator\Constraints\IsNotBlackedOut(),
-              ),
-              'widget' => 'single_text',
-              'format' => 'yyyy-MM-dd 20:00',
-              'attr' => array(
-                'class' => 'datetime',
-              )
-            ))
+            ->add('calendar', 'submit', array('label' => 'Calendar View'))
             ->add('editSeries', 'checkbox', array(
               'mapped' => FALSE,
               'required' => FALSE,
             ))
+            ->add('person', NULL, array('label' => 'Driver Uniqname'))
+            ->add('program', NULL, array('empty_value' => 'Select a Program'))
             ->add('start', 'datetime', array(
                 'required' => TRUE,
                 'widget' => 'single_text',
@@ -64,6 +46,25 @@ class ReservationType extends AbstractType
                     'class' => 'datetime',
                   )
                 ))
+            ->add('isRepeating', 'checkbox', array(
+              'mapped' => FALSE,
+              'label' => 'Repeats every week',
+              'required' => FALSE,
+            ))
+            ->add('repeatsUntil', 'datetime', array(
+              'mapped' => FALSE,
+              'required' => FALSE,
+              'label' => 'Until',
+              'constraints' => array(
+                new \Ginsberg\TransportationBundle\Validator\Constraints\IsNotBlackedOut(),
+              ),
+              'widget' => 'single_text',
+              'format' => 'yyyy-MM-dd 20:00',
+              'attr' => array(
+                'class' => 'datetime',
+              )
+            ))
+            ->add('seatsRequired', NULL, array('label' => 'Seats Required'))
             ->add('checkout', 'datetime', array(
                 'required' => FALSE,
                 'widget' => 'single_text',
@@ -80,10 +81,7 @@ class ReservationType extends AbstractType
                     'class' => 'datetime',
                   )
                 ))
-            ->add('vehicle', NULL, array('required' => FALSE, 'empty_value' => 'Manually Select a Vehicle'))
-            ->add('person')
-            ->add('program', NULL, array('empty_value' => 'Select a Program'))
-            ->add('seatsRequired')
+            ->add('vehicle', NULL, array('required' => FALSE, 'empty_value' => 'Select a Particular Vehicle'))
             ->add('destination', NULL, array('required' => FALSE, 'empty_value' => 'Select a Destination'))
             ->add('destinationText', NULL, array('required' => FALSE))
             ->add('notes', NULL, array('required' => FALSE))

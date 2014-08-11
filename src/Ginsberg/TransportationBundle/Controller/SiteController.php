@@ -572,7 +572,11 @@ class SiteController extends Controller
             'method' => 'POST',
         ));
 
-        $form->add('submit', 'submit', array('label' => 'Create'));
+        $form->add('submit', 'submit', array('label' => 'Create',
+          'attr' => array(
+            'class' => 'site_submit',
+          )
+        ));
         
         //$logger->info('action = ' . $this->generateUrl('site_create'));
         return $form;
