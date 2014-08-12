@@ -48,11 +48,11 @@
             </tr>
             <tr>
                 <th>Maintenance Start Date</th>
-                <td>{{ entity.maintenanceStartDate }}</td>
+                <td>{{ entity.maintenanceStartDate is empty ? '' : entity.maintenanceStartDate|date('Y-m-d H:i') }}</td>
             </tr>
             <tr>
                 <th>Maintenance End Date</th>
-                <td>{{ entity.maintenanceEndDate }}</td>
+                <td>{{ entity.maintenanceEndDate is empty ? '' : entity.maintenanceEndDate|date('Y-m-d H:i') }}</td>
             </tr>
         </tbody>
     </table>

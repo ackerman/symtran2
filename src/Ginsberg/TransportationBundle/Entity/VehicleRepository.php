@@ -74,12 +74,14 @@ class VehicleRepository extends EntityRepository
    * 
    * This is done by making a dummy reservation for the vehicle.
    * 
+   * @param Vehicle $vehicle The broken vehicle
+   * @param Program $maintenanceProgram We don't want Maintenance reservations
    * @param datetime $maintenanceStartDate Begin time of service
    * @param datetime $maintenanceEndDate End time of service
    * 
    * @return array An array containing two arrays of Reservations, those reassigned and those not reassigned
    */
-  public function findReservationsForBrokenVehicle($vehicle, \DateTime $maintenanceStartDate, \DateTime $maintenanceEndDate) 
+  public function findReservationsForBrokenVehicle($vehicle, $maintenanceProgram, \DateTime $maintenanceStartDate, \DateTime $maintenanceEndDate) 
   {
     // Find reservations for this vehicle between the start and end dates, sorted by Id ASC
     $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE 
@@ -87,13 +89,11 @@ class VehicleRepository extends EntityRepository
             OR (r.start <= :maintenanceStartDate AND r.end >= :maintenanceStartDate AND r.end < :maintenanceEndDate)
             OR (r.start >= :maintenanceStartDate AND r.start < :maintenanceEndDate AND r.end < :maintenanceEndDate)
             OR (r.start >= :maintenanceStartDate AND r.start < :maintenanceEndDate AND r.end > :maintenanceEndDate))
-            AND r.vehicle = :vehicle ORDER BY r.vehicle_id ASC';
-    $query = $this->getEntityManager()->createQuery($dql)->setParameters(array(':vehicle' => $vehicle, ':maintenanceStartDate' => $maintenanceStartDate, ':maintenanceEndDate' => $maintenanceEndDate));
+            AND r.vehicle = :vehicle AND r.program <> :maintenanceProgram';
+    $query = $this->getEntityManager()->createQuery($dql)->setParameters(array(':vehicle' => $vehicle, ':maintenanceProgram' => $maintenanceProgram, ':maintenanceStartDate' => $maintenanceStartDate, ':maintenanceEndDate' => $maintenanceEndDate));
 
-    $reservationsToChange = array();
-    
     try {
-      $reservationsToChange = $query->getResult();
+      return $query->getResult();
     } catch (\Doctrine\ORM\NoResultException $ex) {
       return null;
     }

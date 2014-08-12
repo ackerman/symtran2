@@ -68,6 +68,7 @@ swiftmailer:
     username:  "%mailer_user%"
     password:  "%mailer_password%"
     spool:     { type: memory }
+    disable_delivery: false
 
 # Monolog configuration for rotating log (from
 # http://stackoverflow.com/questions/20126530/log-rotating-with-monolog-in-symfony2

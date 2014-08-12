@@ -289,7 +289,7 @@ class ReservationRepository extends EntityRepository
 	}
   
   /**
-	* Attempts to find an available vehicle belonging to the model's program that
+	* Attempts to find an available vehicle belonging to the Reservation's program that
 	* and assign it to the current reservation.
   * 
   * @param Reservation $entity The Reservation we are assigning a Vehicle to

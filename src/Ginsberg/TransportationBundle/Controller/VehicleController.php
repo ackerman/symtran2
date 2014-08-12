@@ -178,12 +178,13 @@ class VehicleController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
+      $logger = $this->get('logger');
         $em = $this->getDoctrine()->getManager();
-        $vehicleRepository = $em->getRepository('Vehicle');
+        $vehicleRepository = $em->getRepository('GinsbergTransportationBundle:Vehicle');
         
         $isOriginallyActive = $vehicleRepository->find($id)->getIsActive();
         
-        $entity = $em->getRepository('GinsbergTransportationBundle:Vehicle')->find($id);
+        $entity = $vehicleRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vehicle entity.');
@@ -194,17 +195,17 @@ class VehicleController extends Controller
         $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
-          
+          $logger->info('In VehicleController::updateAction(). $entity Name: ' . $entity->getName());
           
           if ($entity->getMaintenanceStartDate() && $entity->getMaintenanceEndDate()) {
-            $maintenanceStartDate = clone($entity->getMaintenanceStartDate());
-            $maintenanceEndDate = clone($entity->getMaintenanceEndDate());
-            
-            $reservationsForBrokenVehicle = $vehicleRepository->findReservationsForBrokenVehicle($entity->getId(), $maintenanceStartDate, $maintenanceEndDate);
-            
+            $maintenanceStartDate = $entity->getMaintenanceStartDate();
+            $maintenanceEndDate = $entity->getMaintenanceEndDate();
+            $maintenanceProgram = $em->getRepository('GinsbergTransportationBundle:Program')->findByName('Maintenance');
+            $reservationsForBrokenVehicle = $vehicleRepository->findReservationsForBrokenVehicle($entity, $maintenanceProgram, $maintenanceStartDate, $maintenanceEndDate);
+            $logger->info('In VehicleController::updateAction(). About to call _reassignVehicle() for ' . count($reservationsForBrokenVehicle) . ' vehicles.');
             $reassignmentsAndErrors = $this->_reassignVehicles($entity, $reservationsForBrokenVehicle, $maintenanceStartDate, $maintenanceEndDate);
-            $reservationsReassigned = $reassignmentsAndErrors['reservationsAssigned'];
-            $reservationsNotReassigned = $reassignmentsAndErrors['reservationsNotAssigned'];
+            $reservationsReassigned = $reassignmentsAndErrors['reservationsReassigned'];
+            $reservationsNotReassigned = $reassignmentsAndErrors['reservationsNotReassigned'];
             
             // Notify the drivers whose vehicles we couldn't reassign.
             if ($reservationsNotReassigned) {
@@ -271,52 +272,6 @@ class VehicleController extends Controller
 
         return $this->redirect($this->generateUrl('vehicle'));
     }
-    
-    protected function _notifyOfCancelledReservations($reservationsNotAssigned) {
-      
-    }
-    
-    protected function _reassignVehicles($vehicle, $reservationsToChange, $start, $end) 
-    {
-      // Loop through all the Reservations and remove the Vehicle from each.
-      foreach ($reservationsToChange as $key => $reservation) {
-        $reservation->setVehicle(NULL);
-      }
-      
-      // Make a dummy reservation for the given time so that we don't just 
-      // reassign to the same vehicle
-      $em = $this->getDoctrine()->getManager();
-      $personRepository = $em->getRepository('GinsbergTransportationBundle:Person');
-      $programRepository = $em->getRepository('GinsbergTransportationBundle:Program');
-      $dummyReservation = new \Ginsberg\TransportationBundle\Entity\Reservation();
-      $dummyReservation->setStart($start)->setEnd($end);
-      $dummyReservation->setPerson($personRepository->findByUniqname('ericaack'));
-      $dummyReservation->setSeatsRequired(1);
-      $dummyReservation->setProgram($programRepository->findByName('Maintenance'));
-      $dummyReservation->setDestinationText('Maintenance');
-      $dummyReservation->setNotes('Maintenance: ' . $start->format('Y-m-d H:i') . ' - ' . $end->format('Y-m-d H:i'));
-      $dummyReservation->setVehicle($vehicle);
-      
-      $em->persist($dummyReservation);
-      $em->flush();
-      
-      // Now try to reassign each Vehicle
-      $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
-      
-      $reservationsAssigned = array();
-      $reservationsNotAssigned = array();
-      foreach ($reservationsToChange as $key => $reservationToChange) {
-        if ($reservationRepository->assignReservationToVehicle($reservationToChange)) {
-          array_push($reservationsAssigned, $reservationToChange);
-        } else {
-          array_push($reservationsNotAssigned, $reservationToChange);
-        }
-      }
-      return array(
-          'reservationsReassigned' => $reservationsAssigned,
-          'reservationsNotReassigned' => $reservationsNotAssigned
-      );
-    }
 
     /**
      * Creates a form to delete a Vehicle entity by id.
@@ -334,4 +289,112 @@ class VehicleController extends Controller
             ->getForm()
         ;
     }
+    
+    private function _notifyOfCancelledReservations($reservationsNotReassigned) 
+    {
+      $logger = $this->get('logger');
+      $reportToAdmin = array();
+      $superUsers = 'ginsberg.transportation.superusers@umich.edu';
+      foreach ($reservationsNotReassigned as $reservation) {
+        $driver = $reservation->getPerson();
+        $uniqname = $driver->getUniqname();
+        $start = $reservation->getStart()->format('Y-m-d H:i');
+        $end = $reservation->getEnd()->format('Y-m-d H:i');
+        $fullName = $name . ' ' . $driver->getLastName();
+        $email = $driver->getUniqname() . '@umich.edu';
+        $bcc = $superUsers;
+        $subject = 'URGENT: Ginsberg Transportation Reservation Cancelled';
+      
+        $message = \Swift_Message::newInstance()
+              ->setSubject($subject)
+              ->setFrom('transpoinfo@umich.edu')
+              ->setTo($email)
+              ->setBcc($bcc)
+              ->setBody(
+                $this->renderView('GinsbergTransportationBundle:Vehicle:email_cancelled_reservation.html.twig', array(
+                    'reservation' => $reservation,
+                )), 'text/html'
+              );
+        $this->get('mailer')->send($message);
+        $reportString = "$fullName ($uniqname) start: $start end: $end";
+        $logger->info($reportString);
+        array_push($reportToAdmin, $reportString);
+      }               
+       
+      $reportBody = "The following users had reservations that could not be reassigned when a vehicle was taken out of service: <br />\n";
+      foreach ($reportToAdmin as $user) {
+        $reportBody .= "$user<br />\n";
+      }
+      $logger->info($reportBody);
+      $reportSubject = "Drivers with un-reassigned reservations";
+      $reportMessage = \Swift_Message::newInstance()
+              ->setSubject($reportSubject)
+              ->setFrom('transpoinfo@umich.edu')
+              ->setTo($superUsers)
+              ->setBody($reportBody, 'text/html'
+              );
+        $this->get('mailer')->send($reportMessage);
+    }
+    
+    private function _reassignVehicles($vehicle, $reservationsToChange, $start, $end) 
+    {
+      $logger = $this->get('logger');
+      $logger->info('In VehicleController::_reassignVehicles(). There are ' . count($reservationsToChange) . ' reservations to change.');
+      $em = $this->getDoctrine()->getManager();
+        
+        // Loop through all the Reservations and remove the Vehicle from each.
+        foreach ($reservationsToChange as $reservation) {
+          $logger->info('in VehicleController::_reassignVehicles. Reservation: ' . $reservation->getId());
+          $reservation->setVehicle(NULL);
+          $em->persist($reservation);
+        }
+        
+        $em->flush();
+        // Make a dummy reservation for the given time so that we don't just 
+        // reassign to the same vehicle
+        $personRepository = $em->getRepository('GinsbergTransportationBundle:Person');
+        $person = $personRepository->findByUniqname('ebusta');
+        if (is_array($person)) {
+          $person = $person[0];
+        }
+        $programRepository = $em->getRepository('GinsbergTransportationBundle:Program');
+        $program = $programRepository->findByName('Maintenance');
+        if (is_array($program)) {
+          $program = $program[0];
+        }
+        $dummyReservation = new \Ginsberg\TransportationBundle\Entity\Reservation();
+        $dummyReservation->setStart($start)->setEnd($end);
+        $dummyReservation->setPerson($person);
+        $dummyReservation->setSeatsRequired(1);
+        $dummyReservation->setProgram($program);
+        $dummyReservation->setDestinationText('Maintenance');
+        $dummyReservation->setNotes('Maintenance: ' . $start->format('Y-m-d H:i') . ' - ' . $end->format('Y-m-d H:i'));
+        $dummyReservation->setVehicle($vehicle);
+        $dummyReservation->setCreated(new \DateTime());
+
+        $em->persist($dummyReservation);
+        $em->flush();
+
+        // Now try to reassign each Vehicle
+        $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
+
+        $reservationsReassigned = array();
+        $reservationsNotReassigned = array();
+        foreach ($reservationsToChange as $reservationToChange) {
+          $logger->info('reservationToChange: ' . $reservationToChange->getId());
+          $reservationToChange = $reservationRepository->assignReservationToVehicle($reservationToChange);
+          $em->persist($reservationToChange);
+          if ($reservationToChange->getVehicle() == NULL) {
+            array_push($reservationsNotReassigned, $reservationToChange);
+          } else {
+            array_push($reservationsReassigned, $reservationToChange);
+          }
+          
+          $em->flush();
+        }
+        return array(
+            'reservationsReassigned' => $reservationsReassigned,
+            'reservationsNotReassigned' => $reservationsNotReassigned
+        );
+      }
 }
