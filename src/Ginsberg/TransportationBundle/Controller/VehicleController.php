@@ -181,55 +181,84 @@ class VehicleController extends Controller
       $logger = $this->get('logger');
         $em = $this->getDoctrine()->getManager();
         $vehicleRepository = $em->getRepository('GinsbergTransportationBundle:Vehicle');
-        
-        $isOriginallyActive = $vehicleRepository->find($id)->getIsActive();
+        $originalVehicleState = $vehicleRepository->find($id);
+        $isOriginallyActive = $originalVehicleState->getIsActive();
+        $originalMaintenanceStart = $originalVehicleState->getMaintenanceStartDate();
+        $originalMaintenanceEnd = $originalVehicleState->getMaintenanceEndDate();
         
         $entity = $vehicleRepository->find($id);
-
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vehicle entity.');
         }
-
+        
         $deleteForm = $this->createDeleteForm($id);
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
-          $logger->info('In VehicleController::updateAction(). $entity Name: ' . $entity->getName());
+          $newMaintenanceStart = $entity->getMaintenanceStartDate();
+          $newMaintenanceEnd = $entity->getMaintenanceEndDate();
+          $reassign = FALSE;
+          $logger->info('In VehicleController::updateAction(). $entity Name: ' . $entity->getName() . ' $reassign: ' . $reassign);
           
-          if ($entity->getMaintenanceStartDate() && $entity->getMaintenanceEndDate()) {
-            $maintenanceStartDate = $entity->getMaintenanceStartDate();
-            $maintenanceEndDate = $entity->getMaintenanceEndDate();
-            $maintenanceProgram = $em->getRepository('GinsbergTransportationBundle:Program')->findByName('Maintenance');
-            $reservationsForBrokenVehicle = $vehicleRepository->findReservationsForBrokenVehicle($entity, $maintenanceProgram, $maintenanceStartDate, $maintenanceEndDate);
-            $logger->info('In VehicleController::updateAction(). About to call _reassignVehicle() for ' . count($reservationsForBrokenVehicle) . ' vehicles.');
-            $reassignmentsAndErrors = $this->_reassignVehicles($entity, $reservationsForBrokenVehicle, $maintenanceStartDate, $maintenanceEndDate);
-            $reservationsReassigned = $reassignmentsAndErrors['reservationsReassigned'];
-            $reservationsNotReassigned = $reassignmentsAndErrors['reservationsNotReassigned'];
-            
-            // Notify the drivers whose vehicles we couldn't reassign.
-            if ($reservationsNotReassigned) {
-              $this->_notifyOfCancelledReservation($reservationsNotReassigned);
+          // Check whether there has been a change in maintenance status
+          if ($originalMaintenanceStart != $newMaintenanceStart || $originalMaintenanceEnd != $newMaintenanceEnd) {
+            // We'll need to change the notes field somehow
+            $note = $entity->getNotes();         
+            //Check if vehicle is out for service, either newly or as a continuation
+            if ($newMaintenanceStart) {
+              if ($originalMaintenanceStart && ($newMaintenanceStart < $originalMaintenanceStart || $newMaintenanceEnd > $originalMaintenanceEnd)) {
+                // There is an existing maintenance window that needs to be lengthened
+                $reassign = TRUE;
+                $entity->setNotes($note . ' New maintenance dates: ' . $newMaintenanceStart->format('Y-m-d H:i:s') . ' to ' . $newMaintenanceEnd->format('Y-m-d H:i:s') . '.');
+              } elseif ($originalMaintenanceStart == NULL && $originalMaintenanceEnd == NULL) {
+                // The vehicle is just now being taken out for maintenance
+                $reassign = TRUE;
+                $entity->setNotes($note . ' Out for maintenance: ' . $newMaintenanceStart->format('Y-m-d H:i:s') . ' to ' . $newMaintenanceEnd->format('Y-m-d H:i:s') . '.');
+              } elseif ($originalMaintenanceStart < $newMaintenanceStart || $originalMaintenanceEnd > $newMaintenanceEnd) {
+                // The maintenance window is shorter now. Change notes, but leave $reassign FALSE
+                $entity->setNotes($note . ' New maintenance dates ' . $newMaintenanceStart->format('Y-m-d H:i:s') . ' to ' . $newMaintenanceEnd->format('Y-m-d H:i:s') . '.');
+              }
+            } else {
+              // The vehicle is becoming avalable for reservations again
+              $now = new \DateTime();
+              $entity->setNotes($note . ' Back in service ' . $now->format('Y-m-d H:i:s') . '.');
+            }
+          }
+          $logger->info('In VehicleController::updateAction(). $entity Name: ' . $entity->getName() . ' $reassign: ' . $reassign);
+          
+          if ($reassign == TRUE) {
+            $reservationsForBrokenVehicle = $vehicleRepository->findReservationsForBrokenVehicle($entity, $newMaintenanceStart, $newMaintenanceEnd);
+            if ($reservationsForBrokenVehicle) {
+              $logger->info('In VehicleController::updateAction(). About to call _reassignVehicle() for ' . count($reservationsForBrokenVehicle) . ' vehicles.');
+              $reassignmentsAndErrors = $this->_reassignVehicles($entity, $reservationsForBrokenVehicle, $newMaintenanceStart, $newMaintenanceEnd);
+              $reservationsReassigned = $reassignmentsAndErrors['reservationsReassigned'];
+              $reservationsNotReassigned = $reassignmentsAndErrors['reservationsNotReassigned'];
+
+              // Notify the drivers whose vehicles we couldn't reassign.
+              if ($reservationsNotReassigned) {
+                $this->_notifyOfCancelledReservations($reservationsNotReassigned);
+              }
             }
             
-            $note = $entity->getNotes();
-            $entity->setNotes($note . ' Out for maintenance: ' . $maintenanceStartDate->format('Y-m-d H:i:s') . ' to ' . $maintenanceEndDate->format('Y-m-d H:i:s'));
-          }
+          } 
           
-          // If an active vehicle is being made inactive, reassign all of its reservations
+          // If an active vehicle is being made inactive, reassign all of its future reservations
           if ($isOriginallyActive && $entity->getIsActive() == FALSE) {
+            $now = new \DateTime();
+            $logger->info('In VehicleController::update(). Vehicle ' . $entity->getName() . ' was made inactive.');
+            $entity->setNotes('Inactivated ' . $now->format('Y-m-d H:i'));
             $em->persist($entity);
             $em->flush();
             
-            $start = new \DateTime();
-            $reassignmentsAndErrors = $vehicleRepository->makeVehicleInactive($start);
+            $reassignmentsAndErrors = $vehicleRepository->findReservationsForInactiveVehicle($entity, $now);
             
-            $reservationsReassigned = $reassignmentsAndErrors['reservationsReassigned'];
             $reservationsNotReassigned = $reassignmentsAndErrors['reservationsNotReassigned'];
             
             // Notify the drivers whose vehicles we couldn't reassign.
             if ($reservationsNotReassigned) {
-              $this->_notifyOfCancelledReservation($reservationsNotReassigned);
+              $logger->info('In VehicleController::update(), about to call _notifyOfCancelledReservations() for ' . count($reservationsNotReassigned) . '.');
+              $this->_notifyOfCancelledReservations($reservationsNotReassigned);
             }
             
           }
@@ -298,9 +327,10 @@ class VehicleController extends Controller
       foreach ($reservationsNotReassigned as $reservation) {
         $driver = $reservation->getPerson();
         $uniqname = $driver->getUniqname();
+        $logger->info('In VehicleController::_notifyOfCancelledReservations(). Driver: ' . $uniqname);
         $start = $reservation->getStart()->format('Y-m-d H:i');
         $end = $reservation->getEnd()->format('Y-m-d H:i');
-        $fullName = $name . ' ' . $driver->getLastName();
+        $fullName = $driver->getFirstName() . ' ' . $driver->getLastName();
         $email = $driver->getUniqname() . '@umich.edu';
         $bcc = $superUsers;
         $subject = 'URGENT: Ginsberg Transportation Reservation Cancelled';
@@ -349,30 +379,7 @@ class VehicleController extends Controller
           $em->persist($reservation);
         }
         
-        $em->flush();
-        // Make a dummy reservation for the given time so that we don't just 
-        // reassign to the same vehicle
-        $personRepository = $em->getRepository('GinsbergTransportationBundle:Person');
-        $person = $personRepository->findByUniqname('ebusta');
-        if (is_array($person)) {
-          $person = $person[0];
-        }
-        $programRepository = $em->getRepository('GinsbergTransportationBundle:Program');
-        $program = $programRepository->findByName('Maintenance');
-        if (is_array($program)) {
-          $program = $program[0];
-        }
-        $dummyReservation = new \Ginsberg\TransportationBundle\Entity\Reservation();
-        $dummyReservation->setStart($start)->setEnd($end);
-        $dummyReservation->setPerson($person);
-        $dummyReservation->setSeatsRequired(1);
-        $dummyReservation->setProgram($program);
-        $dummyReservation->setDestinationText('Maintenance');
-        $dummyReservation->setNotes('Maintenance: ' . $start->format('Y-m-d H:i') . ' - ' . $end->format('Y-m-d H:i'));
-        $dummyReservation->setVehicle($vehicle);
-        $dummyReservation->setCreated(new \DateTime());
-
-        $em->persist($dummyReservation);
+        // Save the reservations that had the vehicles removed before attempting to reassign them
         $em->flush();
 
         // Now try to reassign each Vehicle
@@ -390,8 +397,11 @@ class VehicleController extends Controller
             array_push($reservationsReassigned, $reservationToChange);
           }
           
-          $em->flush();
+          
         }
+        
+        $em->flush();
+        
         return array(
             'reservationsReassigned' => $reservationsReassigned,
             'reservationsNotReassigned' => $reservationsNotReassigned

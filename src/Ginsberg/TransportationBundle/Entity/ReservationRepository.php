@@ -179,12 +179,20 @@ class ReservationRepository extends EntityRepository
 	*/
 	public function timeSlotAvailable($start, $end, $vehicle) 
   {
-    //$logger = $this->get('logger');
-    //$logger->info('in _timeSlotAvailable(). Type of vehicle is ' . gettype($vehicle));
-    //$request = $this->requestStack->getCurrentRequest();
-    
-		// find all reservations where the given start time is exactly the same as start
     $em = $this->getEntityManager();
+    // Figure out whether the vehicle is currently in maintenance
+    $checkMaintenance = ($vehicle->getMaintenanceStartDate()) ? TRUE : FALSE;
+    if ($checkMaintenance) {
+      $maintenanceStartDate = $vehicle->getMaintenanceStartDate();
+      $maintenanceEndDate = $vehicle->getMaintenanceEndDate();
+      if (($start <= $maintenanceStartDate && $end >= $maintenanceEndDate)
+            || ($start <= $maintenanceStartDate && $end >= $maintenanceStartDate && $end < $maintenanceEndDate)
+            || ($start >= $maintenanceStartDate && $start < $maintenanceEndDate && $end < $maintenanceEndDate)
+            || ($start >= $maintenanceStartDate && $start < $maintenanceEndDate && $end > $maintenanceEndDate)) {
+        return FALSE;
+      }
+    }
+    // find all reservations where the given start time is exactly the same as start
     $query = $em->createQuery(
         'SELECT COUNT(r.vehicle)
           FROM GinsbergTransportationBundle:Reservation r

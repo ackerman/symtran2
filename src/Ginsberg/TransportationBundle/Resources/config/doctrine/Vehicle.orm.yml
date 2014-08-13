@@ -18,7 +18,7 @@ Ginsberg\TransportationBundle\Entity\Vehicle:
             type: smallint
         notes:
           type: string
-          length: 255
+          length: 1020
           nullable: true
         isActive:
           type: boolean
