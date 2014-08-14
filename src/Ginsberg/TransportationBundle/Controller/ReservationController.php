@@ -154,6 +154,7 @@ class ReservationController extends Controller
     private function createSearchForm(Reservation $entity, $date = 'today')
     {
         $form = $this->createForm(new ReservationType(), $entity, array(
+            'em' => $this->getDoctrine()->getManager(),
             'action' => $this->generateUrl('reservation_search', array('dateToShow' => $date)),
             'method' => 'GET',
         ));
@@ -389,6 +390,7 @@ class ReservationController extends Controller
       $logger = $this->get('logger');
       $logger->info('in ReservationController::createCreateForm');
         $form = $this->createForm(new ReservationType(), $entity, array(
+            'em' => $this->getDoctrine()->getManager(),
             'action' => $this->generateUrl('reservation_create'),
             'method' => 'POST',
         ));
@@ -524,6 +526,7 @@ class ReservationController extends Controller
     {
       $logger = $this->get('logger');
         $form = $this->createForm(new ReservationType(), $entity, array(
+            'em' => $this->getDoctrine()->getManager(),
             'action' => $this->generateUrl('reservation_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));
@@ -916,6 +919,7 @@ class ReservationController extends Controller
   private function createCheckoutForm(Reservation $entity)
   {
       $form = $this->createForm(new ReservationType(), $entity, array(
+          'em' => $this->getDoctrine()->getManager(),
           'action' => $this->generateUrl('reservation_checkout', array('id' => $entity->getId())),
           'method' => 'POST',
       ));
@@ -1030,6 +1034,7 @@ class ReservationController extends Controller
   private function createCheckinForm(Reservation $entity)
   {
     $form = $this->createForm(new ReservationType(), $entity, array(
+          'em' => $this->getDoctrine()->getManager(),
           'action' => $this->generateUrl('reservation_checkin', array('id' => $entity->getId())),
           'method' => 'POST',
       ));

@@ -5,6 +5,7 @@ namespace Ginsberg\TransportationBundle\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Ginsberg\TransportationBundle\Form\DataTransformer\PersonToStringTransformer;
 
 class ReservationType extends AbstractType
 {
@@ -14,6 +15,8 @@ class ReservationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+      $entityManager = $options['em'];
+      $transformer = new PersonToStringTransformer($entityManager);
         $builder
             ->add('dateToShow', 'text', array(
               'mapped' => FALSE,  
@@ -28,7 +31,7 @@ class ReservationType extends AbstractType
               'mapped' => FALSE,
               'required' => FALSE,
             ))
-            ->add('person', NULL, array('label' => 'Driver Uniqname'))
+            ->add($builder->create('person', 'text')->addModelTransformer($transformer))
             ->add('program', NULL, array('empty_value' => 'Select a Program'))
             ->add('start', 'datetime', array(
                 'required' => TRUE,
@@ -98,6 +101,9 @@ class ReservationType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => 'Ginsberg\TransportationBundle\Entity\Reservation',
+        ))->setRequired(array('em'))
+        ->setAllowedTypes(array(
+            'em' => 'Doctrine\Common\Persistence\ObjectManager',
         ));
     }
 
