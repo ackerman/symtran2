@@ -28,11 +28,13 @@ class VehicleController extends Controller
     public function indexAction()
     {
         $em = $this->getDoctrine()->getManager();
-
-        $entities = $em->getRepository('GinsbergTransportationBundle:Vehicle')->findAllSorted();
+        $vehicleRepository = $em->getRepository('GinsbergTransportationBundle:Vehicle');
+        $activeVehicles = $vehicleRepository->findAllActiveSortedByProgram();
+        $inactiveVehicles = $vehicleRepository->findAllInactiveSortedByProgram();
 
         return array(
-            'entities' => $entities,
+            'active' => $activeVehicles,
+            'inactive' => $inactiveVehicles,
         );
     }
     /**
@@ -109,9 +111,11 @@ class VehicleController extends Controller
     public function showAction($id)
     {
         $em = $this->getDoctrine()->getManager();
-
-        $entity = $em->getRepository('GinsbergTransportationBundle:Vehicle')->find($id);
-
+        $vehicleRepository = $em->getRepository('GinsbergTransportationBundle:Vehicle');
+        $entity = $vehicleRepository->find($id);
+        $now = new \DateTime();
+        $upcoming = $vehicleRepository->findUpcomingReservationsByVehicle($entity, $now);
+        $past = $vehicleRepository->findPastReservationsByVehicle($entity, $now);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Vehicle entity.');
         }
@@ -120,6 +124,8 @@ class VehicleController extends Controller
 
         return array(
             'entity'      => $entity,
+            'upcoming' => $upcoming,
+            'past' => $past,
             'delete_form' => $deleteForm->createView(),
         );
     }

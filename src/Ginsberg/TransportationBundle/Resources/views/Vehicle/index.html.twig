@@ -5,6 +5,7 @@
             Add
         </a></span></h1>
     
+    <h2>Active Vehicles</h2>
     <table class="records_list">
         <thead>
             <tr>
@@ -13,30 +14,52 @@
                 <th>Type</th>
                 <th>Capacity</th>
                 <th>Program</th>
-                <th>Notes</th>
-                <th>Active</th>
-                <th>Actions</th>
+                <th>See Trips</th>
+                <th>Edit</th>
             </tr>
         </thead>
         <tbody>
-        {% for entity in entities %}
+        {% for active_vehicle in active %}
             <tr>
-                <td><a href="{{ path('vehicle_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
-                <td>{{ entity.name }}</td>
-                <td>{{ entity.type }}</td>
-                <td>{{ entity.capacity }}</td>
-                <td><a href="{{ path('program_show', { 'id': entity.program.id }) }}">{{ entity.program }}</a></td>
-                <td>{{ entity.notes }}</td>
-                <td>{% if entity.isactive == true %}Yes{% else %}No{% endif %}</td>
+                <td><a href="{{ path('vehicle_show', { 'id': active_vehicle.id }) }}">{{ active_vehicle.id }}</a></td>
+                <td>{{ active_vehicle.name }}</td>
+                <td>{{ active_vehicle.type }}</td>
+                <td>{{ active_vehicle.capacity }}</td>
+                <td><a href="{{ path('program_show', { 'id': active_vehicle.program.id }) }}">{{ active_vehicle.program }}</a></td>
+                <td><a href="{{ path('vehicle_show', { 'id': active_vehicle.id }) }}">View upcoming & past trips</a></td>
+                
                 <td>
-                <ul>
-                    <li>
-                        <a href="{{ path('vehicle_show', { 'id': entity.id }) }}">show</a>
-                    </li>
-                    <li>
-                        <a href="{{ path('vehicle_edit', { 'id': entity.id }) }}">edit</a>
-                    </li>
-                </ul>
+                  <a href="{{ path('vehicle_edit', { 'id': active_vehicle.id }) }}">edit</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+        
+    <h2>Inactive Vehicles</h2>
+    <table class="records_list">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Capacity</th>
+                <th>Program</th>
+                <th>See Trips</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for inactive_vehicle in inactive %}
+            <tr>
+                <td><a href="{{ path('vehicle_show', { 'id': inactive_vehicle.id }) }}">{{ inactive_vehicle.id }}</a></td>
+                <td>{{ inactive_vehicle.name }}</td>
+                <td>{{ inactive_vehicle.type }}</td>
+                <td>{{ inactive_vehicle.capacity }}</td>
+                <td><a href="{{ path('program_show', { 'id': inactive_vehicle.program.id }) }}">{{ inactive_vehicle.program }}</a></td>
+                <td><a href="{{ path('vehicle_show', { 'id': inactive_vehicle.id }) }}">View upcoming & past trips</a></td>
+                <td>
+                  <a href="{{ path('vehicle_edit', { 'id': inactive_vehicle.id }) }}">edit</a>
                 </td>
             </tr>
         {% endfor %}

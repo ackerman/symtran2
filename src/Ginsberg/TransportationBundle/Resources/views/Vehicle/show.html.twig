@@ -56,4 +56,71 @@
             </tr>
         </tbody>
     </table>
+      <h2>Upcoming Trips</h2>
+      <table class="records_list">
+        <thead>
+            <tr>
+                <th>Start</th>
+                <th>End</th>
+                
+                <th>Driver</th>
+                
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for upcoming_trip in upcoming %}
+          
+            <tr>
+                <td>{% if upcoming_trip.start %}{{ upcoming_trip.start|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if upcoming_trip.end %}{{ upcoming_trip.end|date('g:i a F j Y') }}{% endif %}</td>
+                <td><a href="{{ path('person_show', { 'id': upcoming_trip.person.id }) }}">{{ upcoming_trip.person.firstName }} {{ upcoming_trip.person.lastName }}</a></td>
+                <td>
+                    <ul class="actions">
+                        <li>
+                            <a href="{{ path('reservation_show', { 'id': upcoming_trip.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('reservation_edit', { 'id': upcoming_trip.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+        
+    <h2>Past and Ongoing Trips</h2>
+      <table class="records_list">
+        <thead>
+            <tr>
+                <th>Start</th>
+                <th>End</th>
+                
+                <th>Driver</th>
+                
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for past_trip in past %}
+          
+            <tr>
+                <td>{% if past_trip.start %}{{ past_trip.start|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if past_trip.end %}{{ past_trip.end|date('g:i a F j Y') }}{% endif %}</td>
+                <td><a href="{{ path('person_show', { 'id': past_trip.person.id }) }}">{{ past_trip.person.firstName }} {{ past_trip.person.lastName }}</a></td>
+                <td>
+                    <ul class="actions">
+                        <li>
+                            <a href="{{ path('reservation_show', { 'id': past_trip.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('reservation_edit', { 'id': past_trip.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>        
 {% endblock %}
