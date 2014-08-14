@@ -271,17 +271,17 @@ class SiteController extends Controller
 				// User is approved both by PTS and in the Ginsberg db, so let them proceed
 
 				// Is the site open? If not, show closed page. If yes, show the index page.
-				$installation = $em->getRepository('GinsbergTransportationBundle:Installation');
-				//$is_open = $installation::is_open();
+				$site = $em->getRepository('GinsbergTransportationBundle:Installation')->find(1);
+				$isOpen = $site->getIsOpen();
         // For testing
-        $is_open = TRUE;
-        if (!$is_open) {
-					$site = Installation::model()->findByPk(1);
-					$open_for_res = $site->reservations_open;
-					$cars_available = $site->cars_available;
-					$this->render('closed', array(
-						'model'=>$site,
-					));
+        //$is_open = TRUE;
+        if (!$isOpen) {
+					$open_for_res = $site->getReservationsOpen();
+					$cars_available = $site->getCarsAvailable();
+					return $this->render('GinsbergTransportationBundle:Site:closed.html.twig', array(
+            'open_for_reservations' => $open_for_res,
+            'cars_available' => $cars_available,
+          ));
 					//$this->redirect(array('site/closed'));
 				} else {
 					

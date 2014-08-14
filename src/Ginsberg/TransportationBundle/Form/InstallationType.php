@@ -16,7 +16,7 @@ class InstallationType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('isOpen', 'checkbox', array('label' => 'Site Open'))
+            ->add('isOpen', 'checkbox', array('label' => 'Site Open', 'required' => FALSE))
             ->add('reservationsOpen', NULL, array('label' => 'Date to Open for Reservations'))
             ->add('carsAvailable', NULL, array('label' => 'Date Cars Become Available'))
             ->add('fallStart', 'datetime', array(

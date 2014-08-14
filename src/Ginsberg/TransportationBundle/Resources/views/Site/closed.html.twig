@@ -1,0 +1,15 @@
+{% extends 'GinsbergTransportationBundle::public_layout.html.twig' %}
+
+{% block body -%}
+  <h1>The Ginsberg Transportation System is Closed for the Semester</h1>
+
+<p><strong>The system will reopen for you to make reservations {%if open_for_reservations != false %}{{ open_for_reservations }}{% else %}at the beginning of the semester{% endif %}.</strong></p>
+<p><strong>Cars will become available again {% if cars_available != false %}{{ cars_available }}{% else %}approximately a week after the start of the semester{% endif %}.</strong></p>
+
+<p>For more information, contact the Ginsberg Center:<br ><br >
+<a href="mailto:transpoinfo@umich.edu">Email the Transporation Team</a><br >
+or call (734) 763-3548 <br ><br />
+1024 Hill Street<br >
+Ann Arbor, MI 48104
+</p>
+{% endblock %}
