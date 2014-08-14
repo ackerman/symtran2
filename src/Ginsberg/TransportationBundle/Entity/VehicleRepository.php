@@ -100,7 +100,13 @@ class VehicleRepository extends EntityRepository
     $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE 
             r.vehicle = :vehicle
             AND ((r.start >= :start)
-            OR (r.start <= :start AND r.end > :start))';
+            OR (r.start < :start AND r.end > :start))';
     $query = $this->getEntityManager()->createQuery($dql)->setParameters(array(':vehicle' => $vehicle, ':start' => $start));
+    
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
   }
 }

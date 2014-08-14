@@ -231,7 +231,7 @@ class VehicleController extends Controller
             $reservationsForBrokenVehicle = $vehicleRepository->findReservationsForBrokenVehicle($entity, $newMaintenanceStart, $newMaintenanceEnd);
             if ($reservationsForBrokenVehicle) {
               $logger->info('In VehicleController::updateAction(). About to call _reassignVehicle() for ' . count($reservationsForBrokenVehicle) . ' vehicles.');
-              $reassignmentsAndErrors = $this->_reassignVehicles($entity, $reservationsForBrokenVehicle, $newMaintenanceStart, $newMaintenanceEnd);
+              $reassignmentsAndErrors = $this->_reassignVehicles($reservationsForBrokenVehicle);
               $reservationsReassigned = $reassignmentsAndErrors['reservationsReassigned'];
               $reservationsNotReassigned = $reassignmentsAndErrors['reservationsNotReassigned'];
 
@@ -251,8 +251,10 @@ class VehicleController extends Controller
             $em->persist($entity);
             $em->flush();
             
-            $reassignmentsAndErrors = $vehicleRepository->findReservationsForInactiveVehicle($entity, $now);
-            
+            $logger->info('In VehicleController::update(). About to call findReservationsForInactiveVehicle.');
+            $reservationsForInactiveVehicle = $vehicleRepository->findReservationsForInactiveVehicle($entity, $now);
+            $reassignmentsAndErrors = $this->_reassignVehicles($reservationsForInactiveVehicle);
+              
             $reservationsNotReassigned = $reassignmentsAndErrors['reservationsNotReassigned'];
             
             // Notify the drivers whose vehicles we couldn't reassign.
@@ -366,7 +368,7 @@ class VehicleController extends Controller
         $this->get('mailer')->send($reportMessage);
     }
     
-    private function _reassignVehicles($vehicle, $reservationsToChange, $start, $end) 
+    private function _reassignVehicles($reservationsToChange) 
     {
       $logger = $this->get('logger');
       $logger->info('In VehicleController::_reassignVehicles(). There are ' . count($reservationsToChange) . ' reservations to change.');
