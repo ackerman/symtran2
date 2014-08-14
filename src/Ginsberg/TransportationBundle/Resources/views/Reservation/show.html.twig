@@ -18,11 +18,13 @@
         </a>
     </span>
     <span class="delete button">{{ form(delete_form) }}</span>
-    <span class="deleteSeries button">
+    {% if entity.series %}
+      <span class="deleteSeries button">
         <a href="{{ path('reservation_edit', { 'id': entity.id }) }}">
             Delete Series
         </a>
-    </span>
+      </span>
+    {% endif %}
 </div>
     {% for flashMessage in app.session.flashbag.get('success') %}
       <div class="flash-notice save-success">
@@ -85,11 +87,7 @@
             </tr>
             <tr>
                 <th>Destination</th>
-                <td>{{ entity.destination }}</td>
-            </tr>
-            <tr>
-                <th>Destination Text</th>
-                <td>{{ entity.destinationText }}</td>
+                <td>{% if entity.destination %}{{ entity.destination }}{% else %}{{ entity.destinationText }}{% endif %}</td>
             </tr>
             <tr>
                 <th>Series</th>

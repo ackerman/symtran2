@@ -568,6 +568,7 @@ class SiteController extends Controller
       $logger = $this->get('logger');
       $logger->info('in SiteController::createCreateForm');
         $form = $this->createForm(new ReservationType(), $entity, array(
+            'em' => $this->getDoctrine()->getManager(),
             'action' => $this->generateUrl('site_create'),
             'method' => 'POST',
         ));

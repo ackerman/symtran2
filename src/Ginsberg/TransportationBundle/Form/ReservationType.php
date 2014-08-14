@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Ginsberg\TransportationBundle\Form\DataTransformer\PersonToStringTransformer;
+use Symfony\Component\Form\FormInterface;
 
 class ReservationType extends AbstractType
 {
@@ -101,6 +102,14 @@ class ReservationType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => 'Ginsberg\TransportationBundle\Entity\Reservation',
+            'validation_groups' => function(FormInterface $form) {
+              $data = $form->getData();
+              if ($data->getProgram() == 'Project Community') {
+                  return array('Default', 'pc');
+              } else {
+                  return array('Default', 'nonpc');
+              }
+            }
         ))->setRequired(array('em'))
         ->setAllowedTypes(array(
             'em' => 'Doctrine\Common\Persistence\ObjectManager',

@@ -13,6 +13,10 @@ Ginsberg\TransportationBundle\Entity\Reservation:
     end:
       - NotBlank: ~
       - Ginsberg\TransportationBundle\Validator\Constraints\IsNotBlackedOut: ~
+    destination: 
+      - NotBlank: { groups: [pc] }
+    destinationText: 
+      - NotBlank: { groups: [nonpc] }
 Ginsberg\TransportationBundle\Entity\Person:
   properties:
     phone:
