@@ -179,12 +179,20 @@ class ReservationRepository extends EntityRepository
 	*/
 	public function timeSlotAvailable($start, $end, $vehicle) 
   {
-    //$logger = $this->get('logger');
-    //$logger->info('in _timeSlotAvailable(). Type of vehicle is ' . gettype($vehicle));
-    //$request = $this->requestStack->getCurrentRequest();
-    
-		// find all reservations where the given start time is exactly the same as start
     $em = $this->getEntityManager();
+    // Figure out whether the vehicle is currently in maintenance
+    $checkMaintenance = ($vehicle->getMaintenanceStartDate()) ? TRUE : FALSE;
+    if ($checkMaintenance) {
+      $maintenanceStartDate = $vehicle->getMaintenanceStartDate();
+      $maintenanceEndDate = $vehicle->getMaintenanceEndDate();
+      if (($start <= $maintenanceStartDate && $end >= $maintenanceEndDate)
+            || ($start <= $maintenanceStartDate && $end >= $maintenanceStartDate && $end < $maintenanceEndDate)
+            || ($start >= $maintenanceStartDate && $start < $maintenanceEndDate && $end < $maintenanceEndDate)
+            || ($start >= $maintenanceStartDate && $start < $maintenanceEndDate && $end > $maintenanceEndDate)) {
+        return FALSE;
+      }
+    }
+    // find all reservations where the given start time is exactly the same as start
     $query = $em->createQuery(
         'SELECT COUNT(r.vehicle)
           FROM GinsbergTransportationBundle:Reservation r
@@ -289,14 +297,13 @@ class ReservationRepository extends EntityRepository
 	}
   
   /**
-	* Attempts to find an available vehicle belonging to the model's program that
+	* Attempts to find an available vehicle belonging to the Reservation's program that
 	* and assign it to the current reservation.
   * 
-  * @param datetime $start The start time of the reservation
-  * @param datetime $end The end time of the reservation
-  * @param Vehicle $requestedVehicle Vehicle if admin selected one
+  * @param Reservation $entity The Reservation we are assigning a Vehicle to
+  * @param Vehicle $requestedVehicle Optional Vehicle (if admin selected one)
    * 
-	* @return Reservation $entity The reservation with a vehicle assigned if available assigned
+	* @return Reservation $entity The reservation with a vehicle assigned if available
 	*/
 	public function assignReservationToVehicle($entity, $requestedVehicle = FALSE)
   {

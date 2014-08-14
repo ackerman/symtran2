@@ -1,6 +1,19 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
+  <div class="record_actions">
+    <span class="back button">
+        <a href="{{ path('vehicle') }}">
+            Back to the list
+        </a>
+    </span>
+    <span class="edit button">
+        <a href="{{ path('vehicle_edit', { 'id': entity.id }) }}">
+            Edit
+        </a>
+    </span>
+    <span>{{ form(delete_form) }}</span>
+</div>
     <h1>Vehicle</h1>
 
     <table class="record_properties">
@@ -8,6 +21,10 @@
             <tr>
                 <th>Id</th>
                 <td>{{ entity.id }}</td>
+            </tr>
+            <tr>
+              <th>Program</th>
+              <td><a href="{{ path('program_show', { 'id': entity.program.id }) }}">{{ entity.program }}</a></td>
             </tr>
             <tr>
                 <th>Name</th>
@@ -22,10 +39,6 @@
                 <td>{{ entity.capacity }}</td>
             </tr>
             <tr>
-            <th>Program</th>
-              <td><a href="{{ path('program_show', { 'id': entity.program.id }) }}">{{ entity.program }}</a></td>
-            </tr>
-            <tr>
                 <th>Notes</th>
                 <td>{{ entity.notes }}</td>
             </tr>
@@ -33,20 +46,81 @@
                 <th>Is_active</th>
                 <td>{{ entity.isactive }}</td>
             </tr>
+            <tr>
+                <th>Maintenance Start Date</th>
+                <td>{{ entity.maintenanceStartDate is empty ? '' : entity.maintenanceStartDate|date('Y-m-d H:i') }}</td>
+            </tr>
+            <tr>
+                <th>Maintenance End Date</th>
+                <td>{{ entity.maintenanceEndDate is empty ? '' : entity.maintenanceEndDate|date('Y-m-d H:i') }}</td>
+            </tr>
         </tbody>
     </table>
-
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('vehicle') }}">
-            Back to the list
-        </a>
-    </li>
-    <li>
-        <a href="{{ path('vehicle_edit', { 'id': entity.id }) }}">
-            Edit
-        </a>
-    </li>
-    <li>{{ form(delete_form) }}</li>
-</ul>
+      <h2>Upcoming Trips</h2>
+      <table class="records_list">
+        <thead>
+            <tr>
+                <th>Start</th>
+                <th>End</th>
+                
+                <th>Driver</th>
+                
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for upcoming_trip in upcoming %}
+          
+            <tr>
+                <td>{% if upcoming_trip.start %}{{ upcoming_trip.start|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if upcoming_trip.end %}{{ upcoming_trip.end|date('g:i a F j Y') }}{% endif %}</td>
+                <td><a href="{{ path('person_show', { 'id': upcoming_trip.person.id }) }}">{{ upcoming_trip.person.firstName }} {{ upcoming_trip.person.lastName }}</a></td>
+                <td>
+                    <ul class="actions">
+                        <li>
+                            <a href="{{ path('reservation_show', { 'id': upcoming_trip.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('reservation_edit', { 'id': upcoming_trip.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+        
+    <h2>Past and Ongoing Trips</h2>
+      <table class="records_list">
+        <thead>
+            <tr>
+                <th>Start</th>
+                <th>End</th>
+                
+                <th>Driver</th>
+                
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for past_trip in past %}
+          
+            <tr>
+                <td>{% if past_trip.start %}{{ past_trip.start|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if past_trip.end %}{{ past_trip.end|date('g:i a F j Y') }}{% endif %}</td>
+                <td><a href="{{ path('person_show', { 'id': past_trip.person.id }) }}">{{ past_trip.person.firstName }} {{ past_trip.person.lastName }}</a></td>
+                <td>
+                    <ul class="actions">
+                        <li>
+                            <a href="{{ path('reservation_show', { 'id': past_trip.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('reservation_edit', { 'id': past_trip.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>        
 {% endblock %}

@@ -12,9 +12,25 @@ use Doctrine\ORM\EntityRepository;
  */
 class VehicleRepository extends EntityRepository
 {
-  public function findAllSorted()
+  public function findAllActiveSortedByProgram()
   {
-    $dql = 'SELECT v FROM GinsbergTransportationBundle:Vehicle v ORDER BY v.isActive DESC, v.program ASC';
+    $dql = 'SELECT v FROM GinsbergTransportationBundle:Vehicle v 
+            WHERE v.isActive = TRUE
+            ORDER BY v.program ASC';
+    $query = $this->getEntityManager()->createQuery($dql);
+
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
+  }
+  
+  public function findAllInactiveSortedByProgram()
+  {
+    $dql = 'SELECT v FROM GinsbergTransportationBundle:Vehicle v 
+            WHERE v.isActive = FALSE
+            ORDER BY v.program ASC';
     $query = $this->getEntityManager()->createQuery($dql);
 
     try {
@@ -62,6 +78,76 @@ class VehicleRepository extends EntityRepository
             v.isActive = 1 ORDER BY v.program ASC';
     $query = $this->getEntityManager()->createQuery($dql);
 
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
+  }
+  
+  /**
+   * Take a vehicle out of service, try to reassign affected reservations, and notify any users affected.
+   * 
+   * @param Vehicle $vehicle The broken vehicle
+   * @param datetime $maintenanceStartDate Begin time of service
+   * @param datetime $maintenanceEndDate End time of service
+   * 
+   * @return array An array containing two arrays of Reservations, those reassigned and those not reassigned
+   */
+  public function findReservationsForBrokenVehicle($vehicle, $maintenanceStartDate, $maintenanceEndDate) 
+  {
+    // Find reservations for this vehicle between the start and end dates, sorted by Id ASC
+    $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE 
+            r.vehicle = :vehicle
+            AND ((r.start <= :maintenanceStartDate AND r.end >= :maintenanceEndDate)
+            OR (r.start <= :maintenanceStartDate AND r.end >= :maintenanceStartDate AND r.end < :maintenanceEndDate)
+            OR (r.start >= :maintenanceStartDate AND r.start < :maintenanceEndDate AND r.end < :maintenanceEndDate)
+            OR (r.start >= :maintenanceStartDate AND r.start < :maintenanceEndDate AND r.end > :maintenanceEndDate))';
+    $query = $this->getEntityManager()->createQuery($dql)->setParameters(array(':vehicle' => $vehicle, ':maintenanceStartDate' => $maintenanceStartDate, ':maintenanceEndDate' => $maintenanceEndDate));
+
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
+  }
+  
+  public function findReservationsForInactiveVehicle($vehicle, $start) 
+  {
+    $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE 
+            r.vehicle = :vehicle
+            AND ((r.start >= :start)
+            OR (r.start < :start AND r.end > :start))';
+    $query = $this->getEntityManager()->createQuery($dql)->setParameters(array(':vehicle' => $vehicle, ':start' => $start));
+    
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
+  }
+  
+  public function findUpcomingReservationsByVehicle($vehicle, $now) 
+  {
+    $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE 
+            r.vehicle = :vehicle
+            AND ((r.start >= :now) OR (r.end > :now)) ORDER BY r.start ASC, r.program ASC';
+    $query = $this->getEntityManager()->createQuery($dql)->setParameters(array(':vehicle' => $vehicle, ':now' => $now));
+    
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
+  }
+  
+  public function findPastReservationsByVehicle($vehicle, $now) 
+  {
+    $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE 
+            r.vehicle = :vehicle
+            AND r.end < :now ORDER BY r.start ASC, r.program ASC';
+    $query = $this->getEntityManager()->createQuery($dql)->setParameters(array(':vehicle' => $vehicle, ':now' => $now));
+    
     try {
       return $query->getResult();
     } catch (\Doctrine\ORM\NoResultException $ex) {

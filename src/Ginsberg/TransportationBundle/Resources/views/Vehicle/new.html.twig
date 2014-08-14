@@ -1,15 +1,39 @@
 {% extends 'GinsbergTransportationBundle::admin_layout.html.twig' %}
 
 {% block body -%}
-    <h1>Vehicle creation</h1>
-
-    {{ form(form) }}
-
-        <ul class="record_actions">
-    <li>
+  <div class="record_actions">
+    <span class="back button">
         <a href="{{ path('vehicle') }}">
-            Back to the list
+            Back
         </a>
-    </li>
-</ul>
+    </span>
+  </div>
+    <h1>Add a Vehicle</h1>
+
+    {{ form_start(form) }}
+      {{ form_errors(form) }}
+      {{ form_row(form.name) }}
+      {{ form_row(form.program) }}
+      {{ form_row(form.type) }}
+      {{ form_row(form.capacity) }}
+      {{ form_row(form.notes) }}
+      <h4>Take vehicle out of service for maintenance:</h4>
+      {{ form_row(form.maintenanceStartDate) }}
+      {{ form_row(form.maintenanceEndDate) }}
+      <h4>Take vehicle permanantly out of service:</h4>
+      {{ form_row(form.isActive) }}
+      {{ form_row(form._token) }}
+      
+      {{ form_row(form.submit, {'label': 'Create' }) }}
+      
+    {{ form_end(form, {'render_rest': false}) }}
+
+        
+{% endblock %}
+{% block javascripts %}
+  {% javascripts 
+    '@GinsbergTransportationBundle/Resources/public/js/vehicle_datetimepicker.js' %}
+    {{ parent() }}
+    <script src="{{ asset_url }}"></script>
+  {% endjavascripts %}
 {% endblock %}
