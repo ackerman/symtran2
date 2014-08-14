@@ -26,8 +26,12 @@
       <div style='display: none;'>
       {{ form_row(form.person) }}
       </div>
-    {{ form_row(form.destination) }}
-      {{ form_row(form.destinationText) }}
+      <div id="destination">
+        {{ form_row(form.destination) }}
+      </div>
+      <div id="destination-text">
+        {{ form_row(form.destinationText) }}
+      </div>
       {{ form_row(form.notes) }}
     <fieldset>
         <legend>Does this reservation repeat?</legend>
@@ -56,7 +60,8 @@
     {% javascripts
       '@GinsbergTransportationBundle/Resources/public/js/datetimepicker/jquery.datetimepicker_modified.js'
       'bundles/ginsbergtransportation/js/user/site_datetimepicker.js'
-%}
+      'bundles/ginsbergtransportation/js/create_edit_reservation.js'
+    %}
         <script src="{{ asset_url }}"></script>
-     {% endjavascripts %}
+    {% endjavascripts %}
 {% endblock %}

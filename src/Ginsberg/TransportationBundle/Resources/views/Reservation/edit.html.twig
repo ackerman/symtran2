@@ -38,30 +38,37 @@
 
     
       {{ form_errors(edit_form) }}
-      {{ form_row(edit_form.isRepeating) }}
-      {{ form_row(edit_form.repeatsUntil) }}
-      {{ form_row(edit_form.start) }}
-      {{ form_row(edit_form.end) }}
-      {{ form_row(edit_form.checkout) }}
-      {{ form_row(edit_form.checkin) }}
-      {{ form_row(edit_form.vehicle) }}
-      {{ form_row(edit_form.seatsRequired) }}
       {{ form_row(edit_form.person) }}
       {{ form_row(edit_form.program) }}
-      {{ form_row(edit_form.destination) }}
-      {{ form_row(edit_form.destinationText) }}
+      {{ form_row(edit_form.start) }}
+      {{ form_row(edit_form.end) }}
+      {{ form_row(edit_form.seatsRequired) }}
+      {{ form_row(edit_form.isRepeating) }}
+      {{ form_row(edit_form.repeatsUntil) }}
+      <div id="destination">
+        {{ form_row(edit_form.destination) }}
+      </div>
+      <div id="destination-text">
+        {{ form_row(edit_form.destinationText) }}
+      </div>
       {{ form_row(edit_form.notes) }}
-      {{ form_row(edit_form.isNoShow) }}
+      <h4>Do not select a particular vehicle unless you have a special need:</h4>
+      {{ form_row(edit_form.vehicle) }}
       <div>
         <label for="tickets_for_reservation">Tickets</label>
         {% if tickets %}
           {% for ticket in tickets %}
-            <span class="error">{{ ticket.id }}</span>&nbsp;&nbsp;
+            <span class="error">Id: {{ ticket.id }}</span>&nbsp;&nbsp;
           {% endfor %}
         {% else %}
           None
         {% endif %}
       </div>
+      <h4>Do not set unless vehicle has been checked out / checked in:</h4>
+      {{ form_row(edit_form.checkout) }}
+      {{ form_row(edit_form.checkin) }}
+      {{ form_row(edit_form.isNoShow) }}
+
       <div style='display:none;'>
         {{ form_row(edit_form.created) }}
         {{ form_row(edit_form.modified) }}
@@ -75,7 +82,8 @@
 {% endblock %}
 {% block javascripts %}
   {% javascripts 
-    '@GinsbergTransportationBundle/Resources/public/js/reservation_datetimepicker.js' %}
+    '@GinsbergTransportationBundle/Resources/public/js/reservation_datetimepicker.js'
+    '@GinsbergTransportationBundle/Resources/public/js/create_edit_reservation.js'  %}
     {{ parent() }}
     <script src="{{ asset_url }}"></script>
   {% endjavascripts %}

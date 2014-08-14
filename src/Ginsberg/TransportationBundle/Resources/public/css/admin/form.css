@@ -111,7 +111,8 @@ form div.error textarea,
 form div.error select,
 form input.error,
 form textarea.error,
-form select.error
+form select.error,
+form div ul li
 {
 	background: #FEE;
 	border-color: #C00;
@@ -138,7 +139,8 @@ form .errorSummary
 	font-size: 0.9em;
 }
 
-form .errorMessage
+form .errorMessage,
+form div ul li
 {
 	color: red;
 	font-size: 0.9em;
