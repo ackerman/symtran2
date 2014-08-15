@@ -19,6 +19,7 @@
 		<a href="{{ path('site') }}" class="ui-btn-left" data-icon="home" data-iconpos="notext"
                data-direction="reverse">Home</a>
 	</div><!-- header -->
+  {% if nav != false %}
 <div data-role="controlgroup" data-type="horizontal">
   <a href="{{ path('site') }}" data-role="button" data-theme="b">Home</a>
 
@@ -26,6 +27,7 @@
 
   <a href="{{ path('site_past') }}" data-role="button">Past reservations</a>
 </div>
+{% endif %}
 	<div  data-role="content">
   {% block body %}{% endblock %}
 	</div>
