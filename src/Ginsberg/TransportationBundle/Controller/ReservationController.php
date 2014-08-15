@@ -1044,6 +1044,90 @@ class ReservationController extends Controller
       return $form;
   }
 
+  /**
+   * Mark a reservation as "noshow" -- that is, the driver never came to take
+	 * possesion of the vehicle, and did not cancel the reservation.
+   * 
+	 * Upon clicking "No Show" the page will refresh and the reservation will no 
+   * longer be displayed.
+   *
+   * @Route("/noshow/{id}", name="reservation_noshow")
+   * @Method("POST")
+   * @Template()
+   */
+    public function noShowAction(Request $request, $id)
+    {
+      $logger = $this->get('logger');
+      $logger->info('in ReservationController::noShowAction');
+      $em = $this->getDoctrine()->getManager(); 
+      $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
+
+      $form = $this->createNoShowForm($entity);
+      $form->handleRequest($request);
+      
+
+      if ($form->isValid()) {
+        // Set noshow to true.
+        $entity->setIsNoShow(TRUE);
+        // Make car available again
+        $now = new \DateTime();
+        if ($entity->getEnd() > $now) {
+          if ($entity->getStart() > $now) {
+            $entity->setEnd($entity->getStart());
+          } else {
+            $entity->setEnd($now);
+          }
+        }
+        $em->persist($entity);
+        $em->flush();
+
+        return $this->redirect($this->generateUrl('reservation')); 
+      }
+    }
+
+  /**
+   * Display button for marking a Reservation as no show
+   *
+   * @Route("/noshow", name="reservation_noshow_criteria")
+   * @Method("GET")
+   * @Template("GinsbergTransportationBundle:Reservation:reservation_noshow.html.twig")
+   */
+  public function noShowCriteriaAction($id)
+  {
+    $em = $this->getDoctrine()->getManager();
+      $entity = $em->getRepository('GinsbergTransportationBundle:Reservation')->find($id);
+      
+      if (!$entity) {
+          throw $this->createNotFoundException('Unable to find Reservation ' . $id);
+      }
+      $form = $this->createNoShowForm($entity);
+
+      return array(
+          'entity' => $entity,
+          'form'   => $form->createView(),
+      );
+  }
+    
+  /**
+   * Creates a form to mark a Reservation as "no show".
+   *
+   * @param Reservation $entity The entity
+   *
+   * @return \Symfony\Component\Form\Form The form
+   */
+  private function createNoShowForm(Reservation $entity)
+  {
+    $form = $this->createForm(new ReservationType(), $entity, array(
+          'em' => $this->getDoctrine()->getManager(),
+          'action' => $this->generateUrl('reservation_noshow', array('id' => $entity->getId())),
+          'method' => 'POST',
+      ));
+
+      $form->add('submit', 'submit', array('label' => "No Show"));
+
+      return $form;
+  }
+
 	// Mark a reservation as "noshow" -- that is, the driver never came to take
 	// possesion of the vehicle, and did not cancel the reservation.
 	// Upon clicking "No Show" the page will refresh and the reservation will no longer be displayed

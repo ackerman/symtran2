@@ -41,9 +41,13 @@
                 <td><a href="{{ path('person_show', { 'id': upcoming_trip.person.id }) }}">{% if has_ticket == true %}<span class="error">{% endif %}{{ upcoming_trip.person.firstName }} {{ upcoming_trip.person.lastName }}{% if has_ticket == true %}</span>{% endif %}</a></td>
                 {% if dateToShow == date %}
                     <td>{{ render(controller('GinsbergTransportationBundle:Reservation:checkoutCriteria', 
-                          {'id': upcoming_trip.id})) }}</td>
+                          {'id': upcoming_trip.id})) }} 
+                        {{ render(controller('GinsbergTransportationBundle:Reservation:noShowCriteria', 
+                          {'id': upcoming_trip.id})) }}
+                    </td>
                    
                 {% endif %}
+                
                 <td>
                     <ul class="actions">
                         <li>
