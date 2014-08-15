@@ -10,11 +10,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Ginsberg\TransportationBundle\Entity\Reservation;
 use Ginsberg\TransportationBundle\Entity\Person;
 use Ginsberg\TransportationBundle\Entity\Series;
-use Ginsberg\TransportationBundle\Entity\Program;
-use Ginsberg\TransportationBundle\Security\User\UserProvider;
 use Ginsberg\TransportationBundle\Form\ReservationType;
 use Ginsberg\TransportationBundle\Form\PersonType;
-use Ginsberg\TransportationBundle\Services\PersonService;
 
 /**
  * Controller for public-facing area of Transportation website
@@ -23,68 +20,6 @@ use Ginsberg\TransportationBundle\Services\PersonService;
  */
 class SiteController extends Controller
 {
-	/**
-	 * Declares class-based actions.
-	 */
-	public function actions()
-	{
-		return array(
-			// captcha action renders the CAPTCHA image displayed on the contact page
-			'captcha'=>array(
-				'class'=>'CCaptchaAction',
-				'backColor'=>0xFFFFFF,
-			),
-			// page action renders "static" pages stored under 'protected/views/site/pages'
-			// They can be accessed via: index.php?r=site/page&view=FileName
-			'page'=>array(
-				'class'=>'CViewAction',
-			),
-		);
-	}
-
-
-	/**
-	 * @return array action filters
-	 */
-	public function filters()
-	{
-		return array(
-			'accessControl', // perform access control for CRUD operations
-		);
-	}
-
-
-	/**
-	 * Specifies the access control rules.
-	 *
-	 * This method is used by the 'accessControl' filter.
-	 * This method handles access, but actual routing is handled by actionIndex
-	 * @return array access control rules
-	 */
-	public function accessRules()
-	{
-		return array(
-			array('allow',
-			  // allow all authenticated users to perform basic actions
-			  // Actual routing is handled by index.
-			  // TODO move routing to a filter -- but
-				'actions'=>array('index', 'create', 'register', 'pending', 'rejected', 'view',
-												 'past', 'delete', 'closed', 'ineligible', 'not_in_mvr',
-												 'problem', 'ginsberg_not_delegate'),
-      	'expression'=>'User::is_authenticated()',
-			),
-
-			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('create', 'view', 'past', 'closed'),
-    		'expression'=>'User::is_approved()',
-			),
-
-			array('deny',  // deny all users
-				'users'=>array('*'),
-			),
-		);
-	}
-
 	/**
 	 * Route users to appropriate action, and display index to users who meet all conditions
 	 *
