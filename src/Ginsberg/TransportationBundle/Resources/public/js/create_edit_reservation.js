@@ -56,4 +56,39 @@ $(document).ready(function() {
     $('#destination-text').removeClass('hide');
   }
   
+   // Warn users who try to make one long reservation instead of many short 
+  // repeating reservations.
+  $("form").submit(function(event) {
+    var start = $("#ginsberg_transportationbundle_reservation_start").val();
+    var end = $("#ginsberg_transportationbundle_reservation_end").val();
+    var isRepeating = $("#ginsberg_transportationbundle_reservation_isRepeating").val();
+    var repeatsUntil = $("#ginsberg_transportationbundle_reservation_repeatsUntil").val();
+    var startDate = new Date(start);
+    var endDate = new Date(end);
+    var returnValue;
+    if (endDate.getTime() <= startDate.getTime()) {
+        alert("The End date must come after the Start date.");
+        event.preventDefault();
+    }
+    if (startDate.getTime() < new Date().getTime()) {
+        alert("The reservation cannot be in the past.");
+        event.preventDefault();
+    }
+    if ($("#ginsberg_transportationbundle_reservation_isRepeating").is(':checked') && $("#ginsberg_transportationbundle_reservation_repeatsUntil").val() == '') {
+        alert("If this is a repeating reservation, you must provide an \"Until\" date. Otherwise, please uncheck the \"Repeats every week\" checkbox.");
+        event.preventDefault();
+    };
+    if (!$("#ginsberg_transportationbundle_reservation_isRepeating").is(':checked') && !$("#ginsberg_transportationbundle_reservation_repeatsUntil").val() == '') {
+        alert("If this is a repeating reservation, please check the \"Repeats every week\" checkbox. Otherwise, please delete the date from the \"Until\" field.");
+        event.preventDefault();
+    };
+    
+    if (endDate.getTime() - startDate.getTime() > 1000*60*60*24*10) {
+     returnValue = confirm("This reservation is over 10 days long - are you trying to make a repeating reservation? If so, press the Cancel button and create the first reservation in the series, remembering to check the \"Repeats every week\" checkbox and to set the \"Until\" date.");
+    }
+    if (returnValue == false) {
+      event.preventDefault();
+    }
+  });
+  
 });
