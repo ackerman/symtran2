@@ -57,3 +57,8 @@ services:
     arguments: ["@ginsberg_installation.installation_repository", "@logger"]
     tags:
       - { name: validator.constraint_validator, alias: blackout }
+  validator.unique.DriverIsApprovedValidator:
+    class: Ginsberg\TransportationBundle\Validator\Constraints\DriverIsApprovedValidator
+    arguments: ["@ginsberg_person.person_repository", "@logger"]
+    tags:
+      - { name: validator.constraint_validator, alias: approvedToDrive }

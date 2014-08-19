@@ -178,3 +178,12 @@ div.wide.form .buttons, div.wide.form .hint, div.wide.form .errorMessage
 	clear: left;
 	padding-left: 110px;
 }
+
+form ul {
+    margin-left: 190px;
+    width: 220px;
+}
+
+form li {
+    padding: 2px 5px;
+}

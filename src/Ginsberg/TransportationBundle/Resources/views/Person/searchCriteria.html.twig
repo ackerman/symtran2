@@ -8,9 +8,9 @@
       {{ form_row(form.program) }}
       {{ form_row(form._token) }}
       
-      {{ form_row(form.submit, {'label': 'Search' }) }}
+      {{ form_widget(form.submit, {'label': 'Search' }) }}
       
-        <span class='button'><a href="{{ path('person') }}">Clear Search Results</a>
+        &nbsp;<span class='button'><a href="{{ path('person') }}">Clear Search Results</a>
       
     {{ form_end(form, {'render_rest': false}) }}
 
