@@ -251,7 +251,10 @@ button {
   border:1px solid #1f5a6e;
   box-shadow:inset 0 0 7px #1f5a6e;
 }
-
+tr button, tr input {
+  margin-bottom: 0;
+  margin-left: 5px;
+}
 .edit a {
   background:#fff url(images/icons/edit-16-white.png) no-repeat 8px center;
 }

@@ -10,11 +10,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Ginsberg\TransportationBundle\Entity\Reservation;
 use Ginsberg\TransportationBundle\Entity\Person;
 use Ginsberg\TransportationBundle\Entity\Series;
-use Ginsberg\TransportationBundle\Entity\Program;
-use Ginsberg\TransportationBundle\Security\User\UserProvider;
 use Ginsberg\TransportationBundle\Form\ReservationType;
 use Ginsberg\TransportationBundle\Form\PersonType;
-use Ginsberg\TransportationBundle\Services\PersonService;
 
 /**
  * Controller for public-facing area of Transportation website
@@ -23,68 +20,6 @@ use Ginsberg\TransportationBundle\Services\PersonService;
  */
 class SiteController extends Controller
 {
-	/**
-	 * Declares class-based actions.
-	 */
-	public function actions()
-	{
-		return array(
-			// captcha action renders the CAPTCHA image displayed on the contact page
-			'captcha'=>array(
-				'class'=>'CCaptchaAction',
-				'backColor'=>0xFFFFFF,
-			),
-			// page action renders "static" pages stored under 'protected/views/site/pages'
-			// They can be accessed via: index.php?r=site/page&view=FileName
-			'page'=>array(
-				'class'=>'CViewAction',
-			),
-		);
-	}
-
-
-	/**
-	 * @return array action filters
-	 */
-	public function filters()
-	{
-		return array(
-			'accessControl', // perform access control for CRUD operations
-		);
-	}
-
-
-	/**
-	 * Specifies the access control rules.
-	 *
-	 * This method is used by the 'accessControl' filter.
-	 * This method handles access, but actual routing is handled by actionIndex
-	 * @return array access control rules
-	 */
-	public function accessRules()
-	{
-		return array(
-			array('allow',
-			  // allow all authenticated users to perform basic actions
-			  // Actual routing is handled by index.
-			  // TODO move routing to a filter -- but
-				'actions'=>array('index', 'create', 'register', 'pending', 'rejected', 'view',
-												 'past', 'delete', 'closed', 'ineligible', 'not_in_mvr',
-												 'problem', 'ginsberg_not_delegate'),
-      	'expression'=>'User::is_authenticated()',
-			),
-
-			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('create', 'view', 'past', 'closed'),
-    		'expression'=>'User::is_approved()',
-			),
-
-			array('deny',  // deny all users
-				'users'=>array('*'),
-			),
-		);
-	}
-
 	/**
 	 * Route users to appropriate action, and display index to users who meet all conditions
 	 *
@@ -116,7 +51,8 @@ class SiteController extends Controller
 		// 'ginsberg transpo eligible'), send them to the 'ineligible' view.
 		if ($ldapGroup == FALSE) {
 			return $this->render('GinsbergTransportationBundle:Site:ineligible.html.twig', array(
-				'name' => $provider->get_first_name(),
+				'nav' => FALSE,
+          'name' => $provider->get_first_name(),
 			));
 		} else {
 			// Then, we need to figure out if the user should see the
@@ -141,33 +77,33 @@ class SiteController extends Controller
 				case 500: // contacted PTS, but status retrieval failed
 					$done = true;
 					return $this->render('GinsbergTransportationBundle:Site:problem.html.twig', array(
+            'nav' => FALSE,
             'name' => $provider->get_first_name(),
           ));
-					break;
 				case 405: // Ginsberg not delegate
 					$done = true;
 					return $this->render('GinsbergTransportationBundle:Site:ginsberg_not_delegate.html.twig', array(
+            'nav' => FALSE,
             'name' => $provider->get_first_name(),
           ));
-					break;
 				case 404: // Student not in MVR database
 					$done = true;
 					return $this->render('GinsbergTransportationBundle:Site:not_in_mvr.html.twig', array(
+            'nav' => FALSE,
             'name' => $provider->get_first_name(),
           ));
-					break;
 				case 401: // Unauthorized
 					$done = true;
 					return $this->render('GinsbergTransportationBundle:Site:problem.html.twig', array(
+            'nav' => FALSE,
             'name' => $provider->get_first_name(),
           ));
-					break;
 				case 400: // Bad request, such as no uniqname
 					$done = true;
 					return $this->render('GinsbergTransportationBundle:Site:problem.html.twig', array(
+            'nav' => FALSE,
             'name' => $provider->get_first_name(),
           ));
-          break;
 			}
 
 			// If we got a 200 code, continue processing. Otherwise, we're done.
@@ -213,14 +149,12 @@ class SiteController extends Controller
 								return $this->redirect($this->generateUrl('site_start_registration'));
 								//$person = Person::find_by_uniqname($uniqname);
 								//$this->render('register', array('name' => User::get_first_name(), 'model' => $person));
-								break;
 							}
 						} else {
 							// user approved by PTS but not yet in Ginsberg database
 							$logger->info('actionIndex: user approved by PTS but not yet in Ginsberg database');
 							
               return $this->redirect($this->generateUrl('site_start_registration'));
-								break;
 						}
 					case 'Submitted':
 						if ($person) {
@@ -230,12 +164,10 @@ class SiteController extends Controller
 
 							return $this->render('GinsbergTransportationBundle:Site:waiting_for_pts.html.twig', array(
                 'name' => $provider->get_first_name(),
+                'nav' => FALSE,
               ));
-							break;
 						} else {
 							return $this->redirect($this->generateUrl('site_start_registration'));
-							
-							break;
 						}
 					case 'Not Approved':
 						$logger->info('In actionIndex, pts_status = "Not Approved"');
@@ -243,10 +175,12 @@ class SiteController extends Controller
 							$person->setStatus('rejected');
 							return $this->render('GinsbergTransportationBundle:Site:rejected.html.twig', array(
                 'name' => $provider->get_first_name(),
+                'nav' => FALSE,
               ));
 						} else {
 							return $this->render('GinsbergTransportationBundle:Site:rejected.html.twig', array(
                 'name' => $provider->get_first_name(),
+                'nav' => FALSE,
               ));
 						}
           case 'Expired':
@@ -257,13 +191,13 @@ class SiteController extends Controller
 
 							return $this->render('GinsbergTransportationBundle:Site:expired.html.twig', array(
                 'name' => $provider->get_first_name(),
+                'nav' => FALSE,
               ));
-							break;
 						} else {
 							return $this->render('GinsbergTransportationBundle:Site:expired.html.twig', array(
                 'name' => $provider->get_first_name(),
+                'nav' => FALSE,
               ));
-              break;
 						}
 				}
 
@@ -281,6 +215,7 @@ class SiteController extends Controller
 					return $this->render('GinsbergTransportationBundle:Site:closed.html.twig', array(
             'open_for_reservations' => $open_for_res,
             'cars_available' => $cars_available,
+            'nav' => FALSE,
           ));
 					//$this->redirect(array('site/closed'));
 				} else {
@@ -296,6 +231,7 @@ class SiteController extends Controller
 					$upcomingTripsForPerson = $em->getRepository('GinsbergTransportationBundle:Reservation')->findUpcomingTripsByPerson($now, $person);
 
 					return array(
+            'nav' => TRUE,
 						'name'=>$person->getFirstName(),
 						'tickets'=>$tickets,
 						'upcomingTripsForPerson'=>$upcomingTripsForPerson,
@@ -325,10 +261,11 @@ class SiteController extends Controller
 
 		// If the user is not eligible, (that is, they are not in a subgroup of the group
 		// 'ginsberg transpo eligible'), send them to the 'ineligible' view.
-		$logger->info('about to check $ldapGroup early in  initiateRegistrationAction');
+		$logger->info('In SiteController::initiateRegistrationAction(). $ldapGroup: ' . $ldapGroup);
     if ($ldapGroup == FALSE) {
 			return $this->render('GinsbergTransportationBundle:Site:ineligible.html.twig', array(
-				'name' => $provider->get_first_name(),
+				'nav' => FALSE,
+        'name' => $provider->get_first_name(),
 			));
 		}
     
@@ -385,9 +322,6 @@ class SiteController extends Controller
       if ($status == 'approved') {
         $person->setDateApproved(new \DateTime());
       }
-      if ($mvr_status == 'Not Approved') {
-        $this->redirect(array('site/rejected'));
-      }
       $em->persist($person);
       $em->flush();
     }
@@ -396,6 +330,7 @@ class SiteController extends Controller
     $registerForm = $this->createRegisterForm($person);
 
     return array(
+        'nav' => FALSE,
         'entity' => $person,
         'register_form' => $registerForm->createView(),
     );
@@ -467,12 +402,14 @@ class SiteController extends Controller
         $logger->info('Somehow got here');
         return $this->render('GinsbergTransportationBundle:Site:problem.html.twig', array(
           'name' => $provider->get_first_name(),
+          'nav' => FALSE,
         ));
       }
       
     }
     
     return array(
+      'nav' => FALSE,
       'entity' => $entity,
       'register_form' => $registerForm->createView(),
     );
@@ -493,67 +430,15 @@ class SiteController extends Controller
 	  if ($user_status != 'pending') {
 	    return $this->render('GinsbergTransportationBundle:Site:problem.html.twig', array(
         'name' => $provider->get_first_name(),
+        'nav' => FALSE,
       ));
     }
 
 		$this->render('pending',array(
 		  'name'=>User::get_first_name(),
 		  'date_created'=>Person::find_by_uniqname(User::get_uniqname())->date_created,
-
+      'nav' => FALSE,
 		));
-	}
-
-
-	/**
-	 * View for rejected users
-	*/
-	public function actionRejected()
-	{
-	  $person = Person::find_by_uniqname(User::get_uniqname());
-
-	  // Make sure the user has actually been rejected.
-	  $user_status = Person::get_status_by_uniqname(User::get_uniqname());
-	  if ($user_status != 'rejected'):
-	    $this->redirect(array('/'));
-  	endif;
-
-		$this->render('rejected',array(
-		  'name'=>User::get_first_name(),
-		  'reason'=>$person->private_reason,
-		));
-	}
-
-	/**
-	 * View when site is closed
-	 */
-	public function actionClosed()
-	{
-		$this->render('closed',array());
-	}
-
-	/**
-	 * This is the action to handle external exceptions.
-	 */
-	public function actionError()
-	{
-    if($error=Yii::app()->errorHandler->error)
-    {
-    	if(Yii::app()->request->isAjaxRequest)
-    		echo $error['message'];
-    	else
-        $this->render('error', $error);
-    }
-	}
-
-
-	/**
-    * Returns the timestamp of the given date + one week
-    * Aka: adds a week to a date
-    * 2pm Monday June 22 returns 2pm Monday June 29.
-	  */
-	private function add_a_week($timestamp)
-	{
-	  return Assert(False);
 	}
 
   /**
@@ -622,6 +507,7 @@ class SiteController extends Controller
       return array(
           'entity' => $entity,
           'form'   => $form->createView(),
+          'nav' => TRUE,
       );
     }
 
@@ -790,6 +676,7 @@ class SiteController extends Controller
       // Reservation(s) created, now direct to appropriate view
       if ($isRepeatingReservation) {
         return $this->render('GinsbergTransportationBundle:Site:list_created_repeating.html.twig', array(
+            'nav' => TRUE,
             'successes' => count($successfulReservations), 
             'failures' => count($failedReservations),
             'entities' => $entity->getSeries()->getReservations()));
@@ -816,42 +703,10 @@ class SiteController extends Controller
     } // End $form->isValid()
 
     return array(
+        'nav' => TRUE,
         'entity' => $entity,
         'form'   => $form->createView(),
     );
-	}
-
-	/*
-	 * Handle ineligible users
-	 */
-	public function actionIneligible()
-	{
-		// Make sure the user is actually ineligible
-		// Originally I had this checking the Person's status, but I don't think we want to use a set status to track elegibility
-		if (!User::is_eligible()) {
-			$this->render('ineligible', array(
-				'name' => User::get_first_name(),
-			));
-		}
-	}
-
-
-
-
-	/**
-	 * Delete a future reservation. Delete button is only displayed in view.php if
-	 * reservation is in the future.
-	 * Actually, couldn't get Delete button to redirect properly at the end of this function.
-	 * The index page would display, but the URL would still be .../delete/78, so if
-	 * someone refreshed the page, they would get a blank screen (since reservation 78 wouldn't exit anymore).
-	 * So for now, commented Delete link out of view.php, and this function never gets called.
-	 */
-	public function actionDelete($id) {
-		$model = $this->loadReservation($id);
-		$model->delete();
-		$this->redirect(array('/site/index/'));
-		//$this->redirect(Yii::app()->homeUrl);
-		//Yii::app()->request->redirect(Yii::app()->createUrl(array('/site/index')));
 	}
 
 	/**
@@ -875,6 +730,7 @@ class SiteController extends Controller
 
         return array(
             'entity'      => $entity,
+            'nav' => TRUE,
             //'delete_form' => $deleteForm->createView(),
         );
     }
@@ -901,66 +757,7 @@ class SiteController extends Controller
 
  		return array(
         'pastTripsForPerson' => $pastTripsForPerson,
+        'nav' => TRUE,
     );
  	}
-
-
-
-	/**
-	 * Returns the data model based on the primary key given in the GET variable.
-	 * If the data model is not found, an HTTP exception will be raised.
-	 * @param integer the ID of the model to be loaded
-	 */
-	public function loadReservation($id)
-	{
-		$model=Reservation::model()->findByPk((int)$id);
-
-		// Make sure the reservation exists
-		if($model===null)
-			throw new CHttpException(404,'The requested page does not exist.');
-
-		// Make sure the reservation belongs to the current user TODO
-		//if ($model->driver_uniqname != User::get_uniqname())
-		//  throw new CHttpException(500,'This reservation does not belong to you.');
-
-		return $model;
-	}
-
-
-	/**
-	 * Displays the login page
-	 */
-	public function actionLogin()
-	{
-		$model=new LoginForm;
-
-		// if it is ajax validation request
-		if(isset($_POST['ajax']) && $_POST['ajax']==='login-form')
-		{
-			echo CActiveForm::validate($model);
-			Yii::app()->end();
-		}
-
-		// collect user input data
-		if(isset($_POST['LoginForm']))
-		{
-			$model->attributes=$_POST['LoginForm'];
-			// validate user input and redirect to the previous page if valid
-			if($model->validate() && $model->login())
-				$this->redirect(Yii::app()->user->returnUrl);
-		}
-		// display the login form
-		$this->render('login',array('model'=>$model));
-	}
-
-	/**
-	 * Logs out the current user and redirect to homepage.
-	 */
-	public function actionLogout()
-	{
-		Yii::app()->user->logout();
-		$this->redirect(Yii::app()->homeUrl);
-	}
 }
-
-

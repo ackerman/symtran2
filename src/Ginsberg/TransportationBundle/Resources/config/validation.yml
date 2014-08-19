@@ -21,4 +21,6 @@ Ginsberg\TransportationBundle\Entity\Person:
   properties:
     phone:
       - NotBlank: { groups: [registration] }
-      - Length: { min: 10, groups: [registration] }
+      - Length: { min: 10, max: 18, groups: [registration] }
+    isTermsAgreed:
+      - 'True': { groups: [registration] }

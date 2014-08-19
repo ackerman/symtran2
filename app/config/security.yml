@@ -30,8 +30,14 @@ security:
     default:
           anonymous: ~
   access_control:
-    - { path: ^/installation, roles: ROLE_ADMIN }
+    - { path: ^/person, roles: ROLE_ADMIN }
     - { path: ^/reservation, roles: ROLE_ADMIN }
+    - { path: ^/vehicle, roles: ROLE_ADMIN }
+    - { path: ^/program, roles: ROLE_ADMIN }
+    - { path: ^/destination, roles: ROLE_ADMIN }
+    - { path: ^/ticket, roles: ROLE_ADMIN }
+    - { path: ^/report, roles: ROLE_ADMIN }
+    - { path: ^/installation, roles: ROLE_ADMIN }
     
   encoders:
     Symfony\Component\Security\Core\User\User: plaintext
