@@ -1,7 +1,6 @@
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Hack to make sure no one can select a different reservation from the one 
+ * associated with this ticket.
  */
 $(document).ready(function() {
   $('#ginsberg_transportationbundle_ticket_reservation option:not(:selected)', this).remove();

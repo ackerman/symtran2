@@ -290,7 +290,7 @@ class ReservationController extends Controller
             list($repeatHour, $repeatMinute) = explode(':', $em->getRepository('GinsbergTransportationBundle:Installation')->find(1)->getDailyClose());
             $logger->info('repeatHour = ' . $repeatHour . ', repeatMinute = ' . $repeatMinute);
             $repeatsUntil->setTime($repeatHour, $repeatMinute);
-            $logger->info('After setting time, repeatsUntil is ' . date('Y-m-d H:i:s', $repeatsUntil->getTimestamp()));
+            $logger->info('After setting time, repeatsUntil is ' . $repeatsUntil->format('Y-m-d H:i:s'));
             
             // Get the datetime one week from the base reservation (the
             // reservation that we are calculating the repetitions from).
