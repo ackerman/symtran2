@@ -1,0 +1,17 @@
+{# Layout template for the Admin portion of the website #}
+{% extends '::base.html.twig' %}
+  {% block stylesheets %}
+    {% stylesheets
+      'bundles/ginsbergtransportation/css/jquery.datetimepicker.css'
+        
+        filter='cssrewrite' %}
+      <link rel="stylesheet" href="{{ asset_url }}" />
+    {% endstylesheets %}
+    {% stylesheets 'bundles/ginsbergtransportation/css/admin/form.css'
+        'bundles/ginsbergtransportation/css/admin/print.css' 
+        'bundles/ginsbergtransportation/css/admin/screen.css' 
+        'bundles/ginsbergtransportation/css/admin/main.css'
+        filter='cssrewrite' %}
+      <link rel="stylesheet" href="{{ asset_url }}" />
+    {% endstylesheets %}
+  {% endblock %}   

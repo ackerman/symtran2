@@ -1,0 +1,13 @@
+{% extends 'GinsbergTransportationBundle::error_layout.html.twig' %}
+
+{% block body %}
+        <h1>An Error Occurred</h1>
+        <h2>The server returned a "{{ status_code }} {{ status_text }}".</h2>
+
+        <div>
+            Something is broken. Please e-mail us at transpoinfo@umich.edu or 
+            call us at 734-763-3548 and let us know the error code and 
+            what you were doing when this error occurred. We will fix it as soon
+            as possible. Sorry for any inconvenience caused.
+        </div>
+   {% endblock %}

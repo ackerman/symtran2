@@ -1,9 +1,9 @@
-<div id="reservation_checkout">
+<span id="reservation_checkout">
     {{ form_start(form, {'attr': {'novalidate': 'novalidate' }}) }}
       {{ form_errors(form) }}
       {{ form_widget(form.person) }}
       
-      <div style='display: none;'>
+      <span style='display: none;'>
         {{ form_row(form.start) }}
         {{ form_row(form.end) }}
         {{ form_row(form.checkout) }}
@@ -17,10 +17,10 @@
         {{ form_row(form.created) }}
         {{ form_row(form.modified) }}
         {{ form_row(form._token) }}
-      </div>
+      </span>
       
       {{ form_widget(form.submit, {'label': 'Checkout' }) }}
       
     {{ form_end(form, {'render_rest': false}) }}
 
-</div>
+</span>

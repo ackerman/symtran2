@@ -34,8 +34,9 @@
  * @license http://www.yiiframework.com/license/
  */
 
-form
-{
+#reservation_noshow form, #reservation_checkout form {
+  display: inline;
+  margin-bottom: 0;
 }
 
 form h3 {

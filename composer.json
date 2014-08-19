@@ -23,7 +23,8 @@
         "phpoffice/phpexcel": "dev-master"
     },
     "require-dev": {
-        "sensio/generator-bundle": "~2.3"
+        "sensio/generator-bundle": "~2.3",
+        "webfactory/exceptions-bundle": "@stable"
     },
     "scripts": {
         "post-root-package-install": [

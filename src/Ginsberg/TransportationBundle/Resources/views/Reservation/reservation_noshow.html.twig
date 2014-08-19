@@ -1,7 +1,7 @@
-<div id="reservation_noshow">
-    {{ form_start(form, {'attr': {'novalidate': 'novalidate' }}) }}
+<span id="reservation_noshow">
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate' }, 'style': 'display: inline;'}) }}
       {{ form_errors(form) }}
-      <div style='display: none;'>
+      <span style='display: none;'>
         {{ form_widget(form.person) }}
         {{ form_row(form.start) }}
         {{ form_row(form.end) }}
@@ -16,10 +16,10 @@
         {{ form_row(form.created) }}
         {{ form_row(form.modified) }}
         {{ form_row(form._token) }}
-      </div>
+      </span>
       
       {{ form_widget(form.submit, {'label': 'No Show' }) }}
       
     {{ form_end(form, {'render_rest': false}) }}
 
-</div>
+</span>
