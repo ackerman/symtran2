@@ -22,11 +22,10 @@
 </ol>
 
     {{ form_start(register_form) }}
-<p class="note">Fields with <span class="required">*</span> are required.</p>
       {{ form_errors(register_form) }}
       {{ form_row(register_form.firstName) }}
       {{ form_row(register_form.lastName) }}
-      {{ form_row(register_form.program) }}
+      {{ form_row(register_form.program, {'label': 'The program you usually drive with'}) }}
       {{ form_row(register_form.phone) }}
       {{ form_row(register_form.isTermsAgreed, {'label': 'I agree to these terms'}) }}
       

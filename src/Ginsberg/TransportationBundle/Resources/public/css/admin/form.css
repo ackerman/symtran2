@@ -140,11 +140,16 @@ form .errorSummary
 	font-size: 0.9em;
 }
 
+form div ul {
+  width: 250px;
+  margin-left: 200px;
+}
 form .errorMessage,
 form div ul li
 {
 	color: red;
 	font-size: 0.9em;
+  padding: 2px 5px;
 }
 
 form .errorSummary p
@@ -177,4 +182,8 @@ div.wide.form .buttons, div.wide.form .hint, div.wide.form .errorMessage
 {
 	clear: left;
 	padding-left: 110px;
+}
+
+label.required:before {
+    content: "* ";
 }
