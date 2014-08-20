@@ -97,7 +97,7 @@ th {
 }
 
 .error,
-.errorMessage {
+.errorMessage, form li {
   color:#ac1f11;
 }
 
@@ -131,14 +131,22 @@ th {
 /* Added for Symfony */
 input.datetime {
     width: 12em;
+    background-color: #FFFFFF;
 }
 
 .ui-input-text {
     width: 12em;
+    background-color: #FFFFFF;
 }
 .ui-btn {
     width: 12em;
+    background-color: #FFFFFF;
 }
 button.ui-btn {
     width: 15em;
 }
+
+form .required:before {
+    content: "* ";
+}
+
