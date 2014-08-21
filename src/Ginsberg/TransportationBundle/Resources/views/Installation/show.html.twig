@@ -2,7 +2,19 @@
 
 {% block body -%}
     <h1>Installation</h1>
-
+<div class="record_actions">
+    <span class="back button">
+        <a href="{{ path('installation') }}">
+            Back to Installations
+        </a>
+    </span> 
+    <span class="edit button">
+        <a href="{{ path('installation_edit', { 'id': entity.id }) }}">
+            Edit
+        </a>
+    </span>
+    <span>{{ form(delete_form) }}</span>
+</div>
     <table class="record_properties">
         <tbody>
             <tr>
@@ -14,87 +26,74 @@
                 <td>{{ entity.name }}</td>
             </tr>
             <tr>
-                <th>Isopen</th>
-                <td>{{ entity.isOpen }}</td>
+                <th>Site Open</th>
+                <td>{% if entity.isOpen == true %}Yes{% else %}No{% endif %}</td>
             </tr>
             <tr>
-                <th>Reservationsopen</th>
+                <th>Date to Open for Reservations</th>
                 <td>{{ entity.reservationsOpen }}</td>
             </tr>
             <tr>
-                <th>Carsavailable</th>
+                <th>Date Cars Become Available</th>
                 <td>{{ entity.carsAvailable }}</td>
             </tr>
             <tr>
-                <th>Fallstart</th>
-                <td>{{ entity.fallStart|date('Y-m-d H:i:s') }}</td>
+                <th>Date Cars Picked Up from PTS for Fall Semester</th>
+                <td>{{ entity.fallStart|date('Y-m-d g:i A') }}</td>
             </tr>
             <tr>
-                <th>Thanksgivingstart</th>
-                <td>{{ entity.thanksgivingStart|date('Y-m-d H:i:s') }}</td>
+                <th>Thanksgiving Starts</th>
+                <td>{{ entity.thanksgivingStart|date('Y-m-d g:i A') }}</td>
             </tr>
             <tr>
-                <th>Thanksgivingend</th>
-                <td>{{ entity.thanksgivingEnd|date('Y-m-d H:i:s') }}</td>
+                <th>Thanksgiving Ends</th>
+                <td>{{ entity.thanksgivingEnd|date('Y-m-d g:i A') }}</td>
             </tr>
             <tr>
-                <th>Fallend</th>
-                <td>{{ entity.fallEnd|date('Y-m-d H:i:s') }}</td>
+                <th>Date Cars Returned to PTS for Fall Semester</th>
+                <td>{{ entity.fallEnd|date('Y-m-d g:i A') }}</td>
             </tr>
             <tr>
-                <th>Winterstart</th>
-                <td>{{ entity.winterStart|date('Y-m-d H:i:s') }}</td>
+                <th>Date Cars Picked Up from PTS for Winter Semester</th>
+                <td>{{ entity.winterStart|date('Y-m-d g:i A') }}</td>
             </tr>
             <tr>
-                <th>Mlkstart</th>
-                <td>{{ entity.mlkStart|date('Y-m-d H:i:s') }}</td>
+                <th>MLK Starts</th>
+                <td>{{ entity.mlkStart|date('Y-m-d g:i A') }}</td>
             </tr>
             <tr>
-                <th>Mlkend</th>
-                <td>{{ entity.mlkEnd|date('Y-m-d H:i:s') }}</td>
+                <th>MLK Ends</th>
+                <td>{{ entity.mlkEnd|date('Y-m-d g:i A') }}</td>
             </tr>
             <tr>
-                <th>Springbreakstart</th>
-                <td>{{ entity.springbreakStart|date('Y-m-d H:i:s') }}</td>
+                <th>Springbreak Starts</th>
+                <td>{{ entity.springbreakStart|date('Y-m-d g:i A') }}</td>
             </tr>
             <tr>
-                <th>Springbreakend</th>
-                <td>{{ entity.springbreakEnd|date('Y-m-d H:i:s') }}</td>
+                <th>Springbreak Ends</th>
+                <td>{{ entity.springbreakEnd|date('Y-m-d g:i A') }}</td>
             </tr>
             <tr>
-                <th>Winterend</th>
-                <td>{{ entity.winterEnd|date('Y-m-d H:i:s') }}</td>
+                <th>Date Cars Returned to PTS for Winter Semester</th>
+                <td>{{ entity.winterEnd|date('Y-m-d g:i A') }}</td>
             </tr>
             <tr>
-                <th>Fallback</th>
-                <td>{{ entity.fallBack|date('Y-m-d H:i:s') }}</td>
+                <th>Fall Back (Daylight Saving Time Ends)</th>
+                <td>{{ entity.fallBack|date('Y-m-d g:i A') }}</td>
             </tr>
             <tr>
-                <th>Springforward</th>
-                <td>{{ entity.springForward|date('Y-m-d H:i:s') }}</td>
+                <th>Spring Forward (Dalylight Saving Time Begins</th>
+                <td>{{ entity.springForward|date('Y-m-d g:i A') }}</td>
             </tr>
             <tr>
-                <th>Dailyopen</th>
+                <th>Daily Opening (24-hr time)</th>
                 <td>{{ entity.dailyOpen }}</td>
             </tr>
             <tr>
-                <th>Dailyclose</th>
+                <th>Daily Closing (24-hr time)</th>
                 <td>{{ entity.dailyClose }}</td>
             </tr>
         </tbody>
     </table>
 
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('installation') }}">
-            Back to the list
-        </a>
-    </li>
-    <li>
-        <a href="{{ path('installation_edit', { 'id': entity.id }) }}">
-            Edit
-        </a>
-    </li>
-    <li>{{ form(delete_form) }}</li>
-</ul>
 {% endblock %}

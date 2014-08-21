@@ -18,7 +18,7 @@ class ReservationType extends AbstractType
     {
       $entityManager = $options['em'];
       $transformer = new PersonToStringTransformer($entityManager);
-        $builder
+      $builder
             ->add('dateToShow', 'text', array(
               'mapped' => FALSE,  
               'required' => FALSE,
@@ -31,6 +31,7 @@ class ReservationType extends AbstractType
             ->add('editSeries', 'checkbox', array(
               'mapped' => FALSE,
               'required' => FALSE,
+                'data' => TRUE,
             ))
             ->add($builder->create('person', 'text')->addModelTransformer($transformer))
             ->add('program', NULL, array('empty_value' => 'Select a Program'))
