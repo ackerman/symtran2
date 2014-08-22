@@ -9,43 +9,33 @@
   {% endset %}
   <h1>Reservations Created</h1> 
   <h2>(Successful: {{ successes }} , Failed: {{ failures }})</h2>
-    <ul>
-      <li>
+  <div class="record_actions">
+    <span class='back button'>
         <a href="{{ path('reservation') }}">
-            Return to Reservations
+            Back to Reservations
         </a>
-      </li>
-    </ul> 
+    </span>
+  </div>
     <table class="records_list">
         <thead>
             <tr>
-                <th>Id</th>
                 <th>Start</th>
                 <th>End</th>
-                <th>Checkout</th>
-                <th>Checkin</th>
                 <th>Vehicle</th>
                 <th>Seats required</th>
                 <th>Person</th>
                 <th>Program</th>
                 <th>Destination</th>
-                <th>Destination text</th>
                 <th>Series</th>
-                <th>Notes</th>
-                <th>No Show</th>
                 <th>Created</th>
-                <th>Modified</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
         {% for entity in entities %}
             <tr>
-                <td><a href="{{ path('reservation_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
-                <td>{% if entity.start %}{{ entity.start|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if entity.end %}{{ entity.end|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if entity.checkout %}{{ entity.checkout|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if entity.checkin %}{{ entity.checkin|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.start %}{{ entity.start|date('g:i a F j Y') }}{% endif %}</td>
+                <td>{% if entity.end %}{{ entity.end|date('g:i a F j Y') }}{% endif %}</td>
                 <td>
                   {% if entity.vehicle == false %}
                     {{ no_vehicle_text }}
@@ -56,13 +46,13 @@
                 <td>{{ entity.seatsRequired }}</td>
                 <td>{{ entity.person }}</td>
                 <td>{{ entity.program }}</td>
-                <td>{{ entity.destination }}</td>
-                <td>{{ entity.destinationText }}</td>
+                {% if entity.destination %}
+                  <td>{{ entity.destination }}</td>
+                {% else %}
+                  <td>{{ entity.destinationText }}</td>
+                {% endif %}
                 <td>{{ entity.series }}</td>
-                <td>{{ entity.notes }}</td>
-                <td>{{ entity.isNoShow }}</td>
                 <td>{% if entity.created %}{{ entity.created|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if entity.modified %}{{ entity.modified|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>
                 <ul>
                     <li>
