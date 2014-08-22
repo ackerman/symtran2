@@ -16,8 +16,8 @@
       
    {% for past_trip in pastTripsForPerson %}
       <tr>
-          <td>{% if past_trip.start %}{{ past_trip.start|date('Y-m-d H:i:s') }}{% endif %}</td>
-          <td>{% if past_trip.end %}{{ past_trip.end|date('Y-m-d H:i:s') }}{% endif %}</td>
+          <td>{% if past_trip.start %}{{ past_trip.start|date('g:i a F j Y') }}{% endif %}</td>
+          <td>{% if past_trip.end %}{{ past_trip.end|date('g:i a F j Y') }}{% endif %}</td>
           <td>{% if past_trip.destination %}{{ past_trip.destination }}{% else %}{{ past_trip.destinationText }}{% endif %}</td>
           <td><a href="{{ path('site_show', { 'id': past_trip.id }) }}" data-role="button" data-icon="arrow-r" data-iconpos="notext">{{ past_trip.id }}</a></td>
       </tr>

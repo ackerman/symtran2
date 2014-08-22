@@ -30,7 +30,9 @@ jQuery(document).ready(function($) {
     roundTime: 'round',
     format: 'Y-m-d g:i a',
     scrollInput: false,
-    lang: 'en'
+    lang: 'en',
+    validateOnBlur: false,
+    defaultSelect: false
   });
   $('#ginsberg_transportationbundle_installation_thanksgivingStart').datetimepicker({
     timepicker: true,
@@ -43,7 +45,8 @@ jQuery(document).ready(function($) {
     roundTime: 'round',
     format: 'Y-m-d g:i a',
     scrollInput: false,
-    lang: 'en'
+    lang: 'en',
+    validateOnBlur: false
   });
   $('#ginsberg_transportationbundle_installation_thanksgivingEnd').datetimepicker({
     timepicker: true,
@@ -56,7 +59,8 @@ jQuery(document).ready(function($) {
     roundTime: 'round',
     format: 'Y-m-d g:i a',
     scrollInput: false,
-    lang: 'en'
+    lang: 'en',
+    validateOnBlur: false
   });
   $('#ginsberg_transportationbundle_installation_fallEnd').datetimepicker({
     timepicker: true,
@@ -69,7 +73,8 @@ jQuery(document).ready(function($) {
     roundTime: 'round',
     format: 'Y-m-d g:i a',
     scrollInput: false,
-    lang: 'en'
+    lang: 'en',
+    validateOnBlur: false
   });
   $('#ginsberg_transportationbundle_installation_winterStart').datetimepicker({
     timepicker: true,
@@ -82,7 +87,8 @@ jQuery(document).ready(function($) {
     roundTime: 'round',
     format: 'Y-m-d g:i a',
     scrollInput: false,
-    lang: 'en'
+    lang: 'en',
+    validateOnBlur: false
   });
   $('#ginsberg_transportationbundle_installation_mlkStart').datetimepicker({
     timepicker: true,
@@ -94,7 +100,8 @@ jQuery(document).ready(function($) {
     roundTime: 'round',
     format: 'Y-m-d g:i a',
     scrollInput: false,
-    lang: 'en'
+    lang: 'en',
+    validateOnBlur: false
   });
   $('#ginsberg_transportationbundle_installation_mlkEnd').datetimepicker({
     timepicker: true,
@@ -107,7 +114,8 @@ jQuery(document).ready(function($) {
     roundTime: 'round',
     format: 'Y-m-d g:i a',
     scrollInput: false,
-    lang: 'en'
+    lang: 'en',
+    validateOnBlur: false
   });
   $('#ginsberg_transportationbundle_installation_springbreakStart').datetimepicker({
     timepicker: true,
@@ -120,7 +128,8 @@ jQuery(document).ready(function($) {
     roundTime: 'round',
     format: 'Y-m-d g:i a',
     scrollInput: false,
-    lang: 'en'
+    lang: 'en',
+    validateOnBlur: false
   });
   $('#ginsberg_transportationbundle_installation_springbreakEnd').datetimepicker({
     timepicker: true,
@@ -133,7 +142,8 @@ jQuery(document).ready(function($) {
     roundTime: 'round',
     format: 'Y-m-d g:i a',
     scrollInput: false,
-    lang: 'en'
+    lang: 'en',
+    validateOnBlur: false
   });
   $('#ginsberg_transportationbundle_installation_winterEnd').datetimepicker({
     timepicker: true,
@@ -146,7 +156,8 @@ jQuery(document).ready(function($) {
     roundTime: 'round',
     format: 'Y-m-d g:i a',
     scrollInput: false,
-    lang: 'en'
+    lang: 'en',
+    validateOnBlur: false
   });
   $('#ginsberg_transportationbundle_installation_fallBack').datetimepicker({
     timepicker: true,
@@ -159,7 +170,8 @@ jQuery(document).ready(function($) {
     roundTime: 'round',
     format: 'Y-m-d g:i a',
     scrollInput: false,
-    lang: 'en'
+    lang: 'en',
+    validateOnBlur: false
   });
   $('#ginsberg_transportationbundle_installation_springForward').datetimepicker({
     timepicker: true,
@@ -172,7 +184,8 @@ jQuery(document).ready(function($) {
     roundTime: 'round',
     format: 'Y-m-d g:i a',
     scrollInput: false,
-    lang: 'en'
+    lang: 'en',
+    validateOnBlur: false
   });
 });
 

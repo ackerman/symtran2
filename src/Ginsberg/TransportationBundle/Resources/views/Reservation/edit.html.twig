@@ -43,14 +43,14 @@
       {{ form_row(edit_form.start) }}
       {{ form_row(edit_form.end) }}
       {{ form_row(edit_form.seatsRequired) }}
-      {{ form_row(edit_form.isRepeating) }}
-      {{ form_row(edit_form.repeatsUntil) }}
-      <div id="destination">
+      <div id="destination" class="required">
         {{ form_row(edit_form.destination) }}
       </div>
-      <div id="destination-text">
+      <div id="destination-text" class="required">
         {{ form_row(edit_form.destinationText) }}
       </div>
+      {{ form_row(edit_form.isRepeating) }}
+      {{ form_row(edit_form.repeatsUntil) }}
       {{ form_row(edit_form.notes) }}
       <h4>Do not select a particular vehicle unless you have a special need:</h4>
       {{ form_row(edit_form.vehicle) }}
