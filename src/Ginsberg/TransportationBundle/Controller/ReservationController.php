@@ -479,7 +479,6 @@ class ReservationController extends Controller
       if ($isRepeating) {
 
         $lastReservationInSeries = $reservationRepository->getLastReservationInSeries($series);
-        //$logger->info(var_dump($lastReservationInSeries));
         // Calculate the "original" until date based on the date of last 
         // reservation in the series at Installation's dailyClose time.
         $originalUntilDate = $lastReservationInSeries->getEnd();
@@ -529,7 +528,6 @@ class ReservationController extends Controller
           $em = $this->getDoctrine()->getManager();
           
           $lastReservationInSeries = $em->getRepository('GinsbergTransportationBundle:Reservation')->getLastReservationInSeries($series);
-          //$logger->info(var_dump($lastReservationInSeries));
           // Calculate the "original" until date based on the date of last 
           // reservation in the series at Installation's dailyClose time.
           $originalUntilDate = $lastReservationInSeries->getEnd();
@@ -590,7 +588,6 @@ class ReservationController extends Controller
       if ($isRepeating) {
 
         $lastReservationInSeries = $reservationRepository->getLastReservationInSeries($series);
-        //$logger->info(var_dump($lastReservationInSeries));
         // Calculate the "original" until date based on the date of last 
         // reservation in the series at Installation's dailyClose time.
         $originalUntilDate = $lastReservationInSeries->getEnd();
