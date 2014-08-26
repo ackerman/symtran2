@@ -29,8 +29,6 @@ class ReservationRepository extends EntityRepository
   */
   public function findUpcomingTrips($date, $date_end)
   {
-    $date = new \DateTime($date);
-    $date_end = new \DateTime($date_end);
     $params = array('date' => $date, 'date_end' => $date_end);
     $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE 
             ((r.start <= :date AND r.end >= :date_end) 
@@ -52,11 +50,9 @@ class ReservationRepository extends EntityRepository
   /**
   * Return all reservations currently under way (checked out but not checked in).
   * 
-  * @param date $now Not actually used
-   * 
-   * @return array Array of ongoing trips
+  *  @return array Array of ongoing trips
   */ 
-  public function findOngoingTrips($now)
+  public function findOngoingTrips()
   {
     $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE 
             ((r.checkout is not NULL AND r.checkin is NULL)) AND r.vehicle is not NULL';
@@ -72,11 +68,9 @@ class ReservationRepository extends EntityRepository
   /**
    * Return all reservations that were checked in today
    * 
-   * @param date $now Not actually used
-   * 
    * @return array Array of reservations checked in today
    */
-  public function findCheckinsToday($now) 
+  public function findCheckinsToday() 
   {
     $em = $this->getEntityManager();
     
@@ -85,7 +79,7 @@ class ReservationRepository extends EntityRepository
     // creating a Result Set Mapping from the SQL results to the class.
     // We do that using the ResultSetMappingBuilder(). Unfortunately, the 
     // ResultSetMappingBuilder doesn't seem to return associated information, so
-    // we will need to do the result set mapping by hand and see if that works.
+    // we will need to do the result set mapping by hand.
     $rsm = new RSMAP;
     $rsm->addEntityResult('Ginsberg\TransportationBundle\Entity\Reservation', 'r');
     $rsm->addFieldResult('r', 'id', 'id');
