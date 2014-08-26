@@ -5,16 +5,10 @@ namespace Ginsberg\TransportationBundle\Security\User;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Ginsberg\TransportationBundle\Entity\Person;
-use Ginsberg\TransportationBundle\Services\PersonService;
-use Doctrine\ORM\EntityRepository;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException; 
 
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Return a user object for the given uniqname so that Symfony can authenticate the user.
  */
 class UserProvider implements UserProviderInterface
 {

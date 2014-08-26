@@ -28,6 +28,7 @@ class ReservationController extends Controller
     public function indexAction()
     {
       $logger = $this->get('logger');
+      
       // Set local variables needed for fetching different
       // kinds of trips (upcoming trips, ongoing trips, and checkins today)
       $now = date("Y-m-d H:i:s");
@@ -76,7 +77,7 @@ class ReservationController extends Controller
     public function searchAction(Request $request, $date = 'today')
     {
       $logger = $this->get('logger');
-      $logger->info('in searchAction');
+      $logger->info('In ReservationController::searchAction().');
    
       $entity = new Reservation();
       $form = $this->createSearchForm($entity, $request->query->get('date'));
@@ -1045,11 +1046,10 @@ class ReservationController extends Controller
   }
 
   /**
-   * Mark a reservation as "noshow" -- that is, the driver never came to take
-	 * possesion of the vehicle, and did not cancel the reservation.
+   * Mark a reservation as "noshow" -- that is, the driver never came to take possesion of the vehicle, and did not cancel the reservation. 
    * 
 	 * Upon clicking "No Show" the page will refresh and the reservation will no 
-   * longer be displayed.
+   * longer be displayed. The Reservation will have isNoShow set to True.
    *
    * @Route("/noshow/{id}", name="reservation_noshow")
    * @Method("POST")
@@ -1128,30 +1128,6 @@ class ReservationController extends Controller
       return $form;
   }
 
-	// Mark a reservation as "noshow" -- that is, the driver never came to take
-	// possesion of the vehicle, and did not cancel the reservation.
-	// Upon clicking "No Show" the page will refresh and the reservation will no longer be displayed
-	public function actionNoshow($id)
-	{
-		$reservation=$this->loadModel($id);
-		// Set noshow to true.
-		$reservation->noshow = True;
-		// Make car available again
-		if (strtotime($reservation->end) > time()) {
-			if (strtotime($reservation->start) > time()) {
-				$reservation->end = $reservation->start;
-			} else {
-				$reservation->end = date("Y-m-d H:i:s");
-			}
-		}
-
-		$reservation->save();
-		if($reservation->getErrors()):
-			Yii::log(serialize($reservation->getErrors()), "info", "system.debug");
-		endif;
-		$this->redirect(array('reservation/index'));
-	}
-  
   /**
    * Display all Reservations for a day in calendar layout.
    *

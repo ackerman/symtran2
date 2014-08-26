@@ -2,8 +2,6 @@
 
 namespace Ginsberg\TransportationBundle\Services;
 
-use Doctrine\ORM\EntityRepository;
-use Monolog\Logger;
 use Ginsberg\TransportationBundle\Entity\PersonRepository;
 
 /* 
@@ -34,11 +32,9 @@ class PersonService
   public function getFullNameByUniqname($uniqname)
 	{
     $person = $this->personRepository->findByUniqname($uniqname);
-    if ($person)
-    {
+    if ($person) {
       return $person->getFirstName() . ' ' . $person->getLastName();
-    } else 
-    {
+    } else {
       return False;
     }
 	}
@@ -46,7 +42,6 @@ class PersonService
   public function getStatusByUniqname($uniqname) 
   {
     $person = $this->personRepository->findByUniqname($uniqname);
-    $this->logger->info('person = ' . var_dump($person));
     return $person->getStatus();
   }
   

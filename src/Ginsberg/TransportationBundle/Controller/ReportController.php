@@ -2,17 +2,14 @@
 
 namespace Ginsberg\TransportationBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Ginsberg\TransportationBundle\Entity\Reservation;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use APY\DataGridBundle\Grid\Source\Entity;
 use APY\DataGridBundle\Grid\Export\PHPExcel2007Export;
 use APY\DataGridBundle\Grid\Export\CSVExport;
-
 use Monolog\Logger;
 
 /**

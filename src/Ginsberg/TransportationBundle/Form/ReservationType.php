@@ -34,6 +34,7 @@ class ReservationType extends AbstractType
                 'data' => TRUE,
             ))
             ->add($builder->create('person', 'text', array(
+              'label' => 'Driver Uniqname',
               'constraints' => array(new \Ginsberg\TransportationBundle\Validator\Constraints\DriverIsApproved()))
                 )->addModelTransformer($transformer))
             ->add('program', NULL, array('empty_value' => 'Select a Program'))
