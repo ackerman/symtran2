@@ -33,9 +33,7 @@ class ReservationType extends AbstractType
               'required' => FALSE,
                 'data' => TRUE,
             ))
-            ->add($builder->create('person', 'text', array(
-              'constraints' => array(new \Ginsberg\TransportationBundle\Validator\Constraints\DriverIsApproved()))
-                )->addModelTransformer($transformer))
+            ->add($builder->create('person', 'text')->addModelTransformer($transformer))
             ->add('program', NULL, array('empty_value' => 'Select a Program'))
             ->add('start', 'datetime', array(
                 'required' => TRUE,
