@@ -28,14 +28,15 @@ class ReservationController extends Controller
     public function indexAction()
     {
       $logger = $this->get('logger');
+      
       // Set local variables needed for fetching different
       // kinds of trips (upcoming trips, ongoing trips, and checkins today)
-      $now = date("Y-m-d H:i:s");
-      $date =  strtotime(date("Y-m-d"));
-      $dateEnd = mktime(0,0,0, date("m", $date), date("d", $date)+1, date("Y", $date));
-      $dateEnd = date('Y-m-d H:i:s', $dateEnd);
-      $date = date('Y-m-d', $date);
-      $logger->info("now  = $now, dateEnd = $dateEnd, date = $date");
+      $now = new \DateTime();
+      $date = new \Datetime($now->format('Y-m-d'));
+      $dateEnd = new \DateTime($now->format('Y-m-d'));
+      $dateEnd->add(new \DateInterval('P1D'));
+      
+      $logger->info("In ReservationController::indexAction. now: " . $now->format('Y-m-d H:i:s') . ' dateEnd: ' . $dateEnd->format('Y-m-d H:i:s') . ' date: ' . $date->format('Y-m-d H:i:s'));
       
       $em = $this->getDoctrine()->getManager();
       
@@ -44,7 +45,7 @@ class ReservationController extends Controller
       // and the vehicle has not been checked out yet.
       $reservationRepository = $em->getRepository('GinsbergTransportationBundle:Reservation');
       $upcoming = $reservationRepository->findUpcomingTrips($date, $dateEnd);
-      $ongoing = $reservationRepository->findOngoingTrips($now);
+      $ongoing = $reservationRepository->findOngoingTrips();
       $checkinsToday = $reservationRepository->findCheckinsToday($now);
       $ticketRepository = $em->getRepository('GinsbergTransportationBundle:Ticket');
       $reservationsWhereDriverHasTicket = array();
@@ -76,7 +77,7 @@ class ReservationController extends Controller
     public function searchAction(Request $request, $date = 'today')
     {
       $logger = $this->get('logger');
-      $logger->info('in searchAction');
+      $logger->info('In ReservationController::searchAction().');
    
       $entity = new Reservation();
       $form = $this->createSearchForm($entity, $request->query->get('date'));
@@ -165,7 +166,7 @@ class ReservationController extends Controller
     }
     
     /**
-     * Allows user to display reservations for a different date.
+     * Allows the user to display reservations for a different date.
      *
      * @Route("/search/{date}", name="reservation_search_criteria")
      * @Method("GET")
@@ -209,7 +210,7 @@ class ReservationController extends Controller
 
         if ($form->isValid()) {
           // We'll use the Entity Manager in severall places, so get it now
-          $logger->info('Form is valid');
+          $logger->info('In ReservationController::createAction(). Form is valid.');
           $em = $this->getDoctrine()->getManager();
           
           
@@ -220,28 +221,19 @@ class ReservationController extends Controller
           
           // Is this a repeating reservation?
           $isRepeatingReservation = $form->get('isRepeating')->getData();
-          $logger->info("isRepeatingReservation = $isRepeatingReservation");
-          if ($isRepeatingReservation) 
-          {
-            
-          }
-          $logger->info("repeatingReservation = $isRepeatingReservation"); 
           
           // Did the admin select a particular vehicle in the Create form?
           $vehicleRequested = $entity->getVehicle();
 
-          // TODO: figure out how to handle special PC requirements for Destination
-          
           // Even if the admin requested a particular vehicle, we don't want 
           // $entity->vehicle set yet, because we haven't checked it for 
-          // availablity yet. The vehcle_id of the requested vehicle is 
-          // stored in $vehicleRequested.
+          // availablity yet. The requested vehicle is stored in $vehicleRequested.
           if ($vehicleRequested) {
             $entity->setVehicle(NULL);
           }
           
-          // If this is a repeating reservation, create the Series and get the
-          // series id to set in the Reservation entity.
+          // If this is a repeating reservation, create the Series and set the
+          // Reservation entity's series property to it.
           if ($isRepeatingReservation)
           {
             $seriesEntity = new Series();
@@ -256,9 +248,6 @@ class ReservationController extends Controller
           $logger->info('Just persisted reservation entity prior to assigning vehicle');
           $em->flush(); 
          
-          $logger->info('vehicleRequested is of type ' . gettype($vehicleRequested));
-          //$vehicle = $em->getRepository('Vehicle')->find($);
-
           $resRep = $em->getRepository('GinsbergTransportationBundle:Reservation');
           $entity = $resRep->assignReservationToVehicle($entity, $vehicleRequested);
 
@@ -323,12 +312,9 @@ class ReservationController extends Controller
               $em->persist($reservation);              
               
               $reservation = $em->getRepository('GinsbergTransportationBundle:Reservation')->assignReservationToVehicle($reservation, $vehicleRequested);
-              if (!$reservation->getVehicle())
-              {
+              if (!$reservation->getVehicle()) {
                 $failedReservations[] = $reservation;
-              }
-              else
-              {
+              } else {
                 $successfulReservations[] = $reservation;
               }
               
@@ -348,8 +334,7 @@ class ReservationController extends Controller
                 'successes' => count($successfulReservations), 
                 'failures' => count($failedReservations),
                 'entities' => $entity->getSeries()->getReservations()));
-          } 
-          else {
+          } else {
             // It's just a single reservation. Redirect to the Show template  
             // with a success or failure Flash message
             $logger->info('This is a single reservation with Id ' . $entity->getId());
@@ -361,8 +346,7 @@ class ReservationController extends Controller
                   "Success! Reservation $id with vehicle $vehicleName has been created."
               );
               return $this->redirect($this->generateUrl('reservation_show', array('id' => $entity->getId())));
-            }
-            else {
+            } else {
               $this->get('session')->getFlashBag()->add(
                   'failure',
                   'Sorry! No vehicle is available at the requested time.'
@@ -495,7 +479,6 @@ class ReservationController extends Controller
       if ($isRepeating) {
 
         $lastReservationInSeries = $reservationRepository->getLastReservationInSeries($series);
-        //$logger->info(var_dump($lastReservationInSeries));
         // Calculate the "original" until date based on the date of last 
         // reservation in the series at Installation's dailyClose time.
         $originalUntilDate = $lastReservationInSeries->getEnd();
@@ -545,7 +528,6 @@ class ReservationController extends Controller
           $em = $this->getDoctrine()->getManager();
           
           $lastReservationInSeries = $em->getRepository('GinsbergTransportationBundle:Reservation')->getLastReservationInSeries($series);
-          //$logger->info(var_dump($lastReservationInSeries));
           // Calculate the "original" until date based on the date of last 
           // reservation in the series at Installation's dailyClose time.
           $originalUntilDate = $lastReservationInSeries->getEnd();
@@ -606,7 +588,6 @@ class ReservationController extends Controller
       if ($isRepeating) {
 
         $lastReservationInSeries = $reservationRepository->getLastReservationInSeries($series);
-        //$logger->info(var_dump($lastReservationInSeries));
         // Calculate the "original" until date based on the date of last 
         // reservation in the series at Installation's dailyClose time.
         $originalUntilDate = $lastReservationInSeries->getEnd();
@@ -1045,11 +1026,10 @@ class ReservationController extends Controller
   }
 
   /**
-   * Mark a reservation as "noshow" -- that is, the driver never came to take
-	 * possesion of the vehicle, and did not cancel the reservation.
+   * Mark a reservation as "noshow" -- that is, the driver never came to take possesion of the vehicle, and did not cancel the reservation. 
    * 
 	 * Upon clicking "No Show" the page will refresh and the reservation will no 
-   * longer be displayed.
+   * longer be displayed. The Reservation will have isNoShow set to True.
    *
    * @Route("/noshow/{id}", name="reservation_noshow")
    * @Method("POST")
@@ -1128,30 +1108,6 @@ class ReservationController extends Controller
       return $form;
   }
 
-	// Mark a reservation as "noshow" -- that is, the driver never came to take
-	// possesion of the vehicle, and did not cancel the reservation.
-	// Upon clicking "No Show" the page will refresh and the reservation will no longer be displayed
-	public function actionNoshow($id)
-	{
-		$reservation=$this->loadModel($id);
-		// Set noshow to true.
-		$reservation->noshow = True;
-		// Make car available again
-		if (strtotime($reservation->end) > time()) {
-			if (strtotime($reservation->start) > time()) {
-				$reservation->end = $reservation->start;
-			} else {
-				$reservation->end = date("Y-m-d H:i:s");
-			}
-		}
-
-		$reservation->save();
-		if($reservation->getErrors()):
-			Yii::log(serialize($reservation->getErrors()), "info", "system.debug");
-		endif;
-		$this->redirect(array('reservation/index'));
-	}
-  
   /**
    * Display all Reservations for a day in calendar layout.
    *

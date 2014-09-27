@@ -16,7 +16,6 @@
 </div>
 
 <h1>Update reservation {{ entity.id }}</h1>
-    
     {% if isReservationPast == true %}
       <p><span style="font-weight: bold; color: #FF0000;">Warning: This reservation occurred in the past. Do you really want to edit it?</span><br />
       <span style="color: #ff0000;">You will not be able to change the start or end dates or the seats required field.</span></p>
@@ -25,10 +24,12 @@
     {{ form_start(edit_form) }}
       {# If this is one reservation in a series, see whether they want to edit
       all future items or just this one #}
-      {% if edit_form.isRepeating.vars.value == true %}
+      {% if edit_form.vars.value.series != false %}
         {% if isReservationPast == false %}
+      
+            
           <div class="row">
-            <span style="font-weight: bold;">Edit all future reservations in this series?</span><br />
+              <p><strong>Edit all future reservations in this series?</strong></p>
             {{ form_label(edit_form.editSeries) }}
             {{ form_errors(edit_form.editSeries) }}
             {{ form_widget(edit_form.editSeries) }}

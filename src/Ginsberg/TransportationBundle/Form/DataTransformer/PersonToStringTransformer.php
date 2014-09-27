@@ -22,7 +22,7 @@
       }
 
       /**
-       * Transforms an object (person) to a string (number).
+       * Transforms an object (person) to a string (uniqname).
        *
        * @param  Person|null $person
        * @return string The Person's uniqname

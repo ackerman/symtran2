@@ -4,7 +4,6 @@ namespace Ginsberg\TransportationBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\ResultSetMapping as RSMAP;
-use Monolog\Logger;
 
 /**
  * ReservationRepository
@@ -30,8 +29,6 @@ class ReservationRepository extends EntityRepository
   */
   public function findUpcomingTrips($date, $date_end)
   {
-    $date = new \DateTime($date);
-    $date_end = new \DateTime($date_end);
     $params = array('date' => $date, 'date_end' => $date_end);
     $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE 
             ((r.start <= :date AND r.end >= :date_end) 
@@ -53,11 +50,9 @@ class ReservationRepository extends EntityRepository
   /**
   * Return all reservations currently under way (checked out but not checked in).
   * 
-  * @param date $now Not actually used
-   * 
-   * @return array Array of ongoing trips
+  *  @return array Array of ongoing trips
   */ 
-  public function findOngoingTrips($now)
+  public function findOngoingTrips()
   {
     $dql = 'SELECT r FROM GinsbergTransportationBundle:Reservation r WHERE 
             ((r.checkout is not NULL AND r.checkin is NULL)) AND r.vehicle is not NULL';
@@ -73,11 +68,9 @@ class ReservationRepository extends EntityRepository
   /**
    * Return all reservations that were checked in today
    * 
-   * @param date $now Not actually used
-   * 
    * @return array Array of reservations checked in today
    */
-  public function findCheckinsToday($now) 
+  public function findCheckinsToday() 
   {
     $em = $this->getEntityManager();
     
@@ -86,8 +79,8 @@ class ReservationRepository extends EntityRepository
     // creating a Result Set Mapping from the SQL results to the class.
     // We do that using the ResultSetMappingBuilder(). Unfortunately, the 
     // ResultSetMappingBuilder doesn't seem to return associated information, so
-    // we will need to do the result set mapping by hand and see if that works.
-    $rsm = new \Doctrine\ORM\Query\ResultSetMapping;
+    // we will need to do the result set mapping by hand.
+    $rsm = new RSMAP;
     $rsm->addEntityResult('Ginsberg\TransportationBundle\Entity\Reservation', 'r');
     $rsm->addFieldResult('r', 'id', 'id');
     $rsm->addFieldResult('r', 'start', 'start');
@@ -160,8 +153,7 @@ class ReservationRepository extends EntityRepository
             ->setParameters(array('now' => $now, 'person' => $person));
     
     try {
-      $pastTripsByPerson = $query->getResult();
-      return $pastTripsByPerson;
+      return $query->getResult();;
     } catch (\Doctrine\ORM\NoResultException $ex) {
       return NULL;
     }	
@@ -202,7 +194,6 @@ class ReservationRepository extends EntityRepository
     $startEqualOverlap = $query->getSingleScalarResult();
 
 		// find all reservations where the given end time is exactly the same as end
-    //$repository = $this->getEntityRepository('GinsbergTransportationBundle:Reservation');
 		
     $query = $em->createQuery(
       'SELECT COUNT(r.vehicle)
@@ -211,14 +202,7 @@ class ReservationRepository extends EntityRepository
       ->setParameters(array(':end' => $end, ':vehicle' => $vehicle));
     
     $endEqualOverlap = $query->getSingleScalarResult();
-/*
-    $end_equal_overlap = Reservation::model()->count(
-			'end = :end AND vehicle_id = :vehicle_id',
-			array(
-						':end' => $end,
-						':vehicle_id' => $vehicle_id,)
-		);
-*/
+
 	  // find all reservations where the given start time is between start and end.
     //         3pm ------------ 5pm (given $start and $end)
     // 2pm ------------ 4pm (existing reservation, will be found)
@@ -232,15 +216,6 @@ class ReservationRepository extends EntityRepository
       ->setParameters(array(':start' => $start, ':vehicle' => $vehicle));
     
     $startOverlap = $query->getSingleScalarResult();
-/*
-    $start_overlap = Reservation::model()->count(
-      'start < :start AND end > :start AND vehicle_id = :vehicle_id',
-      array(
-        ':start' => $start,
-        ':vehicle_id' => $vehicle_id,
-      )
-    );
- */
 
     // find all reservations where the given end time is between start and end.
     // 2pm ----------- 4pm (given $start and end)
@@ -252,15 +227,6 @@ class ReservationRepository extends EntityRepository
       ->setParameters(array(':end' => $end, ':vehicle' => $vehicle));
     
     $endOverlap = $query->getSingleScalarResult();
-/*
-    $end_overlap = Reservation::model()->count(
-      'start < :end AND end > :end AND vehicle_id = :vehicle_id',
-      array(
-        ':end' => $end,
-        ':vehicle_id' => $vehicle_id,
-      )
-    );
-*/
 
     // find all reservations where the given start and end time completely
     // cover a reservation, like so:
@@ -273,22 +239,8 @@ class ReservationRepository extends EntityRepository
       ->setParameters(array(':start' => $start, ':end' => $end, ':vehicle' => $vehicle));
     
     $fullOverlap = $query->getSingleScalarResult();
-/*
-    $full_overlap = Reservation::model()->count(
-      'start > :start AND end < :end AND vehicle_id = :vehicle_id',
-      array(
-        ':start' => $start,
-        ':end' => $end,
-        ':vehicle_id' => $vehicle_id,
-      )
-    );
-*/
-    // var_dump("vehicle " . $vehicle_id);   // debug
-    // var_dump($start_overlap);   // debug
-    // var_dump($end_overlap);     // debug
-    // var_dump($full_overlap);    // debug
-		//$logger->info("In Reservation::time_slot_available, start_equal_overlap = $startEqualOverlap, start_overlap = $startOverlap, end_equal_overlap = $endEqualOverlap, end_overlap = $endOverlap, full_overlap = $fullOverlap, vehicle_id =  " . $vehicle->getId());
-    if ( (bool) $startEqualOverlap or (bool) $startOverlap or (bool) $endEqualOverlap or (bool) $endOverlap or (bool) $fullOverlap )
+    
+		if ( (bool) $startEqualOverlap or (bool) $startOverlap or (bool) $endEqualOverlap or (bool) $endOverlap or (bool) $fullOverlap )
     {
       return FALSE;
     } else {
@@ -297,7 +249,7 @@ class ReservationRepository extends EntityRepository
 	}
   
   /**
-	* Attempts to find an available vehicle belonging to the Reservation's program that
+	* Attempts to find an available vehicle belonging to the Reservation's program
 	* and assign it to the current reservation.
   * 
   * @param Reservation $entity The Reservation we are assigning a Vehicle to
@@ -308,43 +260,33 @@ class ReservationRepository extends EntityRepository
 	public function assignReservationToVehicle($entity, $requestedVehicle = FALSE)
   {
     $em = $this->getEntityManager();
-    //$logger = $this->get('logger');
-		// If a particular car has been requested from the admin Reservation screen,
+    // If a particular car has been requested from the admin Reservation screen,
 		// see if that particular vehicle is available
     if ($requestedVehicle) 
     {
-      //$logger->info('requestedVehicle must exist');
       // Is the vehicle active and big enough?
       if ($requestedVehicle->getIsActive() && $requestedVehicle->getCapacity() >= $entity->getSeatsRequired())
       {
-        //$logger->info('requestedVehicle active and big enough');
         if ($this->timeSlotAvailable($entity->getStart(), $entity->getEnd(), $requestedVehicle)){
 					$entity->setVehicle($requestedVehicle);
           return $entity;
-				} else 
-        {
+				} else  {
           $entity->setVehicle(NULL);
           return $entity;
         }
       }
-    } else
-    { // No particular vehicle was requested
+    } else { // No particular vehicle was requested
       
       // Find vehicles that are active, in the right program, and have the 
       // required capacity.
-			// If reservation is for AR, only let them use AR vehicles
-			// If reservation is for PC, only let them use PC vehicles
-			// If contract or staff, they can use any vehicle
+			// -If reservation is for AR, only let them use AR vehicles
+			// -If reservation is for PC, only let them use PC vehicles
+			// -If contract or staff, they can use any vehicle
       $vehicles = array();
       $prog = $entity->getProgram();
-      if ($prog->getName() == 'Project Community' || $prog->getName() == 'America Reads')
-      {
-        //$logger->info('prog = ' . $prog->getName());
-        
+      if ($prog->getName() == 'Project Community' || $prog->getName() == 'America Reads') {
         $vehicles = $em->getRepository('GinsbergTransportationBundle:Vehicle')->findActiveVehiclesByProgram($entity);
-      } else
-      {
-        //$logger->info('Thinks not PC or AR. prog name = ' . $prog->getName());
+      } else {
         $vehicles = $em->getRepository('GinsbergTransportationBundle:Vehicle')->findActiveVehiclesByCapacity($entity);
         //$vehicles = \Ginsberg\TransportationBundle\Entity\Vehicle::findActiveVehiclesByCapacity($entity);
       }
@@ -353,7 +295,6 @@ class ReservationRepository extends EntityRepository
 			// (this works fine for 10 cars but might not scale to 100 due to the number
 			// of queries required.)
 			foreach ($vehicles as $vehicle) {
-				//$logger->info("Calling time_slot_available for vehicle: " . $vehicle->getName());
 				if($this->timeSlotAvailable($entity->getStart(), $entity->getEnd(), $vehicle)){
 					$entity->setVehicle($vehicle);
 					return $entity;
@@ -364,10 +305,8 @@ class ReservationRepository extends EntityRepository
       
       // No vehicle available; mark the problem.
 			$entity->setVehicle(NULL);
-			//$logger->info('In ReservationRepository::assignReservationToVehicle. Assignment failed, no vehicle available.');
 			return $entity;
-    }
-		
+    }	
   }
   
   /**
@@ -387,8 +326,11 @@ class ReservationRepository extends EntityRepository
           WHERE r.series = :series AND r.start = (SELECT MAX(r1.start) from GinsbergTransportationBundle:Reservation r1 where r1.series = :series)')
         ->setParameter('series', $series);
     
-    $lastReservation = $query->getOneOrNullResult();
-    return $lastReservation;
+    try {
+      return $query->getOneOrNullResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
 	}
   
   /**
@@ -437,9 +379,11 @@ class ReservationRepository extends EntityRepository
           WHERE r.series = :series AND r.start > :date')
         ->setParameters(array('series' => $entity->getSeries(), ':date' => $date));
     
-    $futureReservationsInSeries = $query->getResult();
- 
-    return $futureReservationsInSeries;
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
 	}
   
   /**
@@ -450,6 +394,8 @@ class ReservationRepository extends EntityRepository
    * select for a time period. 
    * 
    * @param Reservation $entity Description
+   * 
+   * @return array
    */
 	public function getChangedReservationsInSeries($entity) {
     $endRange = $entity->getEnd()->getTimestamp() + 1;
@@ -462,14 +408,19 @@ class ReservationRepository extends EntityRepository
           WHERE r.series = :series AND r.modified BETWEEN :date AND :endRange')
         ->setParameters(array('series' => $entity->getSeries(), ':date' => $entity->getModified(), ':endRange' => $endRange));
     
-    $futureReservationsInSeries = $query->getResult();
-    return $futureReservationsInSeries;
+    try {
+      return $query->getResult();
+    } catch (\Doctrine\ORM\NoResultException $ex) {
+      return null;
+    }
 	}
   
   /**
    * Returns an array of all past Reservations. 
    * 
    * @param datetime $now The time before which to find Reservations
+   * 
+   * @return array|null
    */
   public function findAllPastReservations($now) {
     $em = $this->getEntityManager();
